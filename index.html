@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="th" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPF NAV Chart Viewer</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+        * { font-family: 'Sarabun', sans-serif; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0d1b2a 50%, #1b263b 100%);
+        }
+        .card-glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-text {
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .loading-wave {
+            animation: wave 1.5s ease-in-out infinite;
+        }
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(2); }
+        }
+    </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full gradient-bg text-white overflow-auto">
+  <div class="min-h-full p-4 md:p-8">
+   <!-- Header -->
+   <header class="text-center mb-8">
+    <div class="inline-flex items-center gap-3 mb-2">
+     <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg">
+      <span class="text-2xl">📊</span>
+     </div>
+     <h1 id="main-title" class="text-3xl md:text-4xl font-bold glow-text">กราฟ NAV กองทุน กบข.</h1>
+    </div>
+    <p class="text-blue-300/80 text-sm">ข้อมูลมูลค่าหน่วยลงทุนจากกองทุนบำเหน็จบำนาญข้าราชการ</p>
+   </header><!-- Controls -->
+   <div class="max-w-4xl mx-auto mb-6">
+    <div class="card-glass rounded-2xl p-6"><!-- Fund Plan Selection -->
+     <div class="mb-6"><label class="block text-blue-300 text-sm mb-2 font-medium">เลือกแผนกองทุน</label>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2"><button class="plan-btn active px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="2">หลัก</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="3">หุ้น35</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="4">Bond</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="5">ฝากBond สั้น</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="6">หุ้น 20</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="7">หุ้น 65</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="8">หุ้นไทย</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="9">อสังหาไทย</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="10">หุ้นต่างประเทศ</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="11">คุ้มครองต้น1</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="12">BondF</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="13">ทอง</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="14">หุ้น 75</button> <button class="plan-btn px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-medium text-xs md:text-sm transition-all" data-plan="15">VAU</button>
+      </div>
+     </div>
+     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+      <!-- Start Month -->
+      <div>
+       <label class="block text-blue-300 text-sm mb-2 font-medium">เดือนเริ่มต้น</label> <select id="start-month" class="w-full bg-slate-800/80 border border-blue-500/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"> </select>
+      </div><!-- Start Year -->
+      <div>
+       <label class="block text-blue-300 text-sm mb-2 font-medium">ปีเริ่มต้น</label> <select id="start-year" class="w-full bg-slate-800/80 border border-blue-500/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"> </select>
+      </div><!-- End Month -->
+      <div>
+       <label class="block text-blue-300 text-sm mb-2 font-medium">เดือนสิ้นสุด</label> <select id="end-month" class="w-full bg-slate-800/80 border border-blue-500/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"> </select>
+      </div><!-- End Year -->
+      <div>
+       <label class="block text-blue-300 text-sm mb-2 font-medium">ปีสิ้นสุด</label> <select id="end-year" class="w-full bg-slate-800/80 border border-blue-500/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"> </select>
+      </div>
+     </div><!-- EMA Indicators Toggle -->
+     <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4"><label class="flex items-center gap-3 cursor-pointer bg-slate-800/50 rounded-lg p-3 hover:bg-slate-800 transition-all"> <input type="checkbox" id="ema50-toggle" class="w-4 h-4 rounded" checked> <span class="text-blue-300 text-sm font-medium">แสดง EMA 50</span> </label> <label class="flex items-center gap-3 cursor-pointer bg-slate-800/50 rounded-lg p-3 hover:bg-slate-800 transition-all"> <input type="checkbox" id="ema200-toggle" class="w-4 h-4 rounded" checked> <span class="text-blue-300 text-sm font-medium">แสดง EMA 200</span> </label> <label class="flex items-center gap-3 cursor-pointer bg-slate-800/50 rounded-lg p-3 hover:bg-slate-800 transition-all"> <input type="checkbox" id="nav-toggle" class="w-4 h-4 rounded" checked> <span class="text-blue-300 text-sm font-medium">แสดง NAV</span> </label>
+     </div><!-- Fetch Button -->
+     <div class="mt-6 flex justify-center">
+      <button id="fetch-btn" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 rounded-xl font-semibold text-lg shadow-lg shadow-blue-500/30 transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2"> <span>📈</span> <span id="fetch-btn-text">ดึงข้อมูลและแสดงกราฟ</span> </button>
+     </div>
+    </div>
+   </div><!-- Loading State -->
+   <div id="loading" class="hidden max-w-4xl mx-auto mb-6">
+    <div class="card-glass rounded-2xl p-8 text-center">
+     <div class="flex justify-center gap-1 mb-4">
+      <div class="w-2 h-8 bg-blue-500 rounded loading-wave" style="animation-delay: 0s"></div>
+      <div class="w-2 h-8 bg-cyan-500 rounded loading-wave" style="animation-delay: 0.1s"></div>
+      <div class="w-2 h-8 bg-blue-500 rounded loading-wave" style="animation-delay: 0.2s"></div>
+      <div class="w-2 h-8 bg-cyan-500 rounded loading-wave" style="animation-delay: 0.3s"></div>
+      <div class="w-2 h-8 bg-blue-500 rounded loading-wave" style="animation-delay: 0.4s"></div>
+     </div>
+     <p id="loading-text" class="text-blue-300">กำลังดึงข้อมูล...</p>
+    </div>
+   </div><!-- Error State -->
+   <div id="error" class="hidden max-w-4xl mx-auto mb-6">
+    <div class="bg-red-900/30 border border-red-500/50 rounded-2xl p-6 text-center">
+     <span class="text-4xl mb-3 block">⚠️</span>
+     <p id="error-text" class="text-red-300"></p>
+    </div>
+   </div><!-- Chart Container -->
+   <div id="chart-container" class="hidden max-w-6xl mx-auto">
+    <div class="card-glass rounded-2xl p-6">
+     <!-- Stats Cards -->
+     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-gradient-to-br from-green-600/20 to-green-800/20 rounded-xl p-4 border border-green-500/30">
+       <p class="text-green-400/80 text-xs mb-1">ค่าสูงสุด</p>
+       <p id="stat-max" class="text-2xl font-bold text-green-400">-</p>
+      </div>
+      <div class="bg-gradient-to-br from-red-600/20 to-red-800/20 rounded-xl p-4 border border-red-500/30">
+       <p class="text-red-400/80 text-xs mb-1">ค่าต่ำสุด</p>
+       <p id="stat-min" class="text-2xl font-bold text-red-400">-</p>
+      </div>
+      <div class="bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-xl p-4 border border-blue-500/30">
+       <p class="text-blue-400/80 text-xs mb-1">ค่าเฉลี่ย</p>
+       <p id="stat-avg" class="text-2xl font-bold text-blue-400">-</p>
+      </div>
+      <div class="bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-xl p-4 border border-purple-500/30">
+       <p class="text-purple-400/80 text-xs mb-1">จำนวนข้อมูล</p>
+       <p id="stat-count" class="text-2xl font-bold text-purple-400">-</p>
+      </div>
+     </div><!-- Chart -->
+     <div class="bg-slate-900/50 rounded-xl p-4" style="height: 400px;">
+      <canvas id="nav-chart"></canvas>
+     </div><!-- Data Note -->
+     <p class="text-center text-blue-300/60 text-xs mt-4">📊 ข้อมูล NAV จริงจากกองทุนบำเหน็จบำนาญข้าราชการ</p>
+    </div>
+   </div><!-- Footer -->
+   <footer class="text-center mt-8 text-blue-300/50 text-sm">
+    <p>ข้อมูลจาก กองทุนบำเหน็จบำนาญข้าราชการ (กบข.)</p>
+   </footer>
+  </div>
+  <script>
+        // Default configuration
+        const defaultConfig = {
+            chart_title: 'กราฟ NAV กองทุน กบข.',
+            background_color: '#0d1b2a',
+            card_color: '#1e3a5f',
+            text_color: '#ffffff',
+            accent_color: '#3b82f6',
+            secondary_color: '#06b6d4'
+        };
+
+        let config = { ...defaultConfig };
+        let navChart = null;
+        let selectedPlan = '2';
+        let currentData = [];
+
+        // Thai month names
+        const thaiMonths = [
+            'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 
+            'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม',
+            'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+        ];
+
+        // Plan data configuration with actual API values
+        const planNames = {
+            '2': 'หลัก',
+            '3': 'หุ้น35',
+            '4': 'Bond',
+            '5': 'ฝากBond สั้น',
+            '6': 'หุ้น 20',
+            '7': 'หุ้น 65',
+            '8': 'หุ้นไทย',
+            '9': 'อสังหาไทย',
+            '10': 'หุ้นต่างประเทศ',
+            '11': 'คุ้มครองต้น1',
+            '12': 'BondF',
+            '13': 'ทอง',
+            '14': 'หุ้น 75',
+            '15': 'VAU'
+        };
+
+        // Initialize dropdowns
+        function initDropdowns() {
+            const startMonth = document.getElementById('start-month');
+            const endMonth = document.getElementById('end-month');
+            const startYear = document.getElementById('start-year');
+            const endYear = document.getElementById('end-year');
+
+            // Populate months
+            for (let i = 1; i <= 12; i++) {
+                const optionStart = document.createElement('option');
+                optionStart.value = i;
+                optionStart.textContent = thaiMonths[i - 1];
+                startMonth.appendChild(optionStart);
+
+                const optionEnd = document.createElement('option');
+                optionEnd.value = i;
+                optionEnd.textContent = thaiMonths[i - 1];
+                endMonth.appendChild(optionEnd);
+            }
+
+            // Populate years (1998 to current year)
+            const currentYear = new Date().getFullYear();
+            for (let year = 1998; year <= currentYear; year++) {
+                const optionStart = document.createElement('option');
+                optionStart.value = year;
+                optionStart.textContent = year + 543; // Buddhist year
+                startYear.appendChild(optionStart);
+
+                const optionEnd = document.createElement('option');
+                optionEnd.value = year;
+                optionEnd.textContent = year + 543;
+                endYear.appendChild(optionEnd);
+            }
+
+            // Set defaults (last 2 years)
+            startMonth.value = 1;
+            startYear.value = currentYear - 2;
+            endMonth.value = new Date().getMonth() + 1;
+            endYear.value = currentYear;
+        }
+
+        // Calculate EMA (Exponential Moving Average)
+        function calculateEMA(data, period) {
+            const ema = [];
+            const k = 2 / (period + 1);
+
+            for (let i = 0; i < data.length; i++) {
+                if (i < period - 1) {
+                    ema.push(null);
+                } else if (i === period - 1) {
+                    // First EMA = Simple Moving Average
+                    let sum = 0;
+                    for (let j = 0; j < period; j++) {
+                        sum += data[j];
+                    }
+                    ema.push(sum / period);
+                } else {
+                    // Subsequent EMA = Previous EMA + k * (Current Price - Previous EMA)
+                    ema.push(data[i] * k + ema[i - 1] * (1 - k));
+                }
+            }
+
+            return ema;
+        }
+
+        // Cached API data
+        let cachedApiData = null;
+
+        // Fetch data from GPF API
+        async function fetchFromAPI(month, year) {
+            try {
+                // Format month as 00-12 and year as YYYY
+                const monthStr = String(month).padStart(2, '0');
+                const yearStr = String(year);
+                
+                const apiUrl = `https://www.gpf.or.th/thai2019/About/memberfund-api.php?pageName=NAVBottom_${monthStr}_${yearStr}`;
+                
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                
+                const text = await response.text();
+                
+                // Parse the HTML response to extract NAV data
+                const parseNavData = (html) => {
+                    const records = [];
+                    
+                    // Extract data using regex for each row
+                    const rows = html.match(/<tr[^>]*>.*?<\/tr>/gs) || [];
+                    
+                    rows.forEach(row => {
+                        // Extract date and NAV values
+                        const dateCells = row.match(/<td[^>]*>([\d\/]+)<\/td>/);
+                        if (dateCells && dateCells[1]) {
+                            const cells = row.match(/<td[^>]*>([^<]*)<\/td>/g) || [];
+                            
+                            if (cells.length >= 15) {
+                                const record = {
+                                    date: cells[0].replace(/<[^>]*>/g, '').trim(),
+                                    plan2: parseFloat(cells[1].replace(/<[^>]*>/g, '')) || 0,
+                                    plan3: parseFloat(cells[2].replace(/<[^>]*>/g, '')) || 0,
+                                    plan4: parseFloat(cells[3].replace(/<[^>]*>/g, '')) || 0,
+                                    plan5: parseFloat(cells[4].replace(/<[^>]*>/g, '')) || 0,
+                                    plan6: parseFloat(cells[5].replace(/<[^>]*>/g, '')) || 0,
+                                    plan7: parseFloat(cells[6].replace(/<[^>]*>/g, '')) || 0,
+                                    plan8: parseFloat(cells[7].replace(/<[^>]*>/g, '')) || 0,
+                                    plan9: parseFloat(cells[8].replace(/<[^>]*>/g, '')) || 0,
+                                    plan10: parseFloat(cells[9].replace(/<[^>]*>/g, '')) || 0,
+                                    plan11: parseFloat(cells[10].replace(/<[^>]*>/g, '')) || 0,
+                                    plan12: parseFloat(cells[11].replace(/<[^>]*>/g, '')) || 0,
+                                    plan13: parseFloat(cells[12].replace(/<[^>]*>/g, '')) || 0,
+                                    plan14: parseFloat(cells[13].replace(/<[^>]*>/g, '')) || 0,
+                                    plan15: parseFloat(cells[14].replace(/<[^>]*>/g, '')) || 0
+                                };
+                                
+                                if (record.date && !isNaN(record.plan2)) {
+                                    records.push(record);
+                                }
+                            }
+                        }
+                    });
+                    
+                    return records;
+                };
+                
+                const data = parseNavData(text);
+                if (data.length > 0) {
+                    cachedApiData = data;
+                    return data;
+                } else {
+                    throw new Error('ไม่พบข้อมูลในการตอบสนองจาก API');
+                }
+                
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // Get actual data from cache
+        const actualData = () => cachedApiData || [];
+
+        // Parse actual data and filter by date range
+        function getActualData(startMonth, startYear, endMonth, endYear, plan) {
+            const data = [];
+            const startDate = new Date(startYear, startMonth - 1, 1);
+            const endDate = new Date(endYear, endMonth - 1, 1);
+
+            const dataArray = actualData(); // Get from cache
+            dataArray.forEach(record => {
+                // Parse date format "DD/MM/YYYY"
+                const [day, month, year] = record.date.split('/').map(Number);
+                const recordDate = new Date(year, month - 1, day);
+
+                if (recordDate >= startDate && recordDate <= endDate) {
+                    const planKey = `plan${plan}`;
+                    const navValue = record[planKey];
+
+                    if (navValue !== undefined) {
+                        data.push({
+                            date: recordDate,
+                            label: `${day}/${month < 10 ? '0' + month : month}/${year}`,
+                            nav: navValue
+                        });
+                    }
+                }
+            });
+
+            // Sort by date
+            data.sort((a, b) => a.date - b.date);
+            return data;
+        }
+
+        // Calculate statistics
+        function calculateStats(data) {
+            const values = data.map(d => d.nav);
+            const max = Math.max(...values);
+            const min = Math.min(...values);
+            const avg = values.reduce((a, b) => a + b, 0) / values.length;
+
+            document.getElementById('stat-max').textContent = max.toFixed(4);
+            document.getElementById('stat-min').textContent = min.toFixed(4);
+            document.getElementById('stat-avg').textContent = avg.toFixed(4);
+            document.getElementById('stat-count').textContent = values.length + ' รายการ';
+        }
+
+        // Create/Update chart
+        function createChart(data) {
+            const ctx = document.getElementById('nav-chart').getContext('2d');
+            
+            if (navChart) {
+                navChart.destroy();
+            }
+
+            const showNAV = document.getElementById('nav-toggle').checked;
+            const showEMA50 = document.getElementById('ema50-toggle').checked;
+            const showEMA200 = document.getElementById('ema200-toggle').checked;
+
+            const navValues = data.map(d => d.nav);
+            const ema50Values = calculateEMA(navValues, 50);
+            const ema200Values = calculateEMA(navValues, 200);
+
+            const datasets = [];
+
+            if (showNAV) {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+                gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+
+                datasets.push({
+                    label: 'NAV (บาท/หน่วย)',
+                    data: navValues,
+                    borderColor: '#3b82f6',
+                    backgroundColor: gradient,
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: data.length > 36 ? 0 : 3,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    yAxisID: 'y'
+                });
+            }
+
+            if (showEMA50) {
+                datasets.push({
+                    label: 'EMA 50',
+                    data: ema50Values,
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    borderDash: [5, 5],
+                    yAxisID: 'y'
+                });
+            }
+
+            if (showEMA200) {
+                datasets.push({
+                    label: 'EMA 200',
+                    data: ema200Values,
+                    borderColor: '#ef4444',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    borderDash: [8, 4],
+                    yAxisID: 'y'
+                });
+            }
+
+            navChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.label),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#94a3b8',
+                                font: { family: 'Sarabun', size: 14 },
+                                padding: 15,
+                                boxWidth: 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#94a3b8',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    if (value === null) return context.dataset.label + ': -';
+                                    return `${context.dataset.label}: ${value.toFixed(4)} บาท/หน่วย`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                maxTicksLimit: 12,
+                                font: { family: 'Sarabun' }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                font: { family: 'Sarabun' },
+                                callback: function(value) {
+                                    return value.toFixed(2);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Fetch and display data
+        async function fetchData() {
+            const startMonth = parseInt(document.getElementById('start-month').value);
+            const startYear = parseInt(document.getElementById('start-year').value);
+            const endMonth = parseInt(document.getElementById('end-month').value);
+            const endYear = parseInt(document.getElementById('end-year').value);
+
+            // Validate date range
+            const startDate = new Date(startYear, startMonth - 1);
+            const endDate = new Date(endYear, endMonth - 1);
+
+            if (startDate > endDate) {
+                document.getElementById('error').classList.remove('hidden');
+                document.getElementById('error-text').textContent = 'วันที่เริ่มต้นต้องมาก่อนวันที่สิ้นสุด';
+                document.getElementById('chart-container').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('error').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('chart-container').classList.add('hidden');
+            document.getElementById('fetch-btn').disabled = true;
+            document.getElementById('fetch-btn-text').textContent = 'กำลังดึงข้อมูล...';
+
+            try {
+                // Fetch data from API for the date range
+                let allData = [];
+                let currentMonth = startMonth;
+                let currentYear = startYear;
+
+                // Fetch data month by month
+                while (currentYear < endYear || (currentYear === endYear && currentMonth <= endMonth)) {
+                    try {
+                        const monthData = await fetchFromAPI(currentMonth, currentYear);
+                        if (monthData && monthData.length > 0) {
+                            allData = allData.concat(monthData);
+                        }
+                    } catch (err) {
+                        console.warn(`ไม่พบข้อมูลสำหรับเดือน ${currentMonth}/${currentYear}`);
+                    }
+
+                    // Move to next month
+                    currentMonth++;
+                    if (currentMonth > 12) {
+                        currentMonth = 1;
+                        currentYear++;
+                    }
+                }
+
+                if (allData.length === 0) {
+                    throw new Error('ไม่พบข้อมูลสำหรับช่วงวันที่ที่เลือก');
+                }
+
+                // Cache the fetched data
+                cachedApiData = allData;
+
+                // Get actual data for selected plan
+                currentData = getActualData(startMonth, startYear, endMonth, endYear, selectedPlan);
+                
+                if (currentData.length === 0) {
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('error').classList.remove('hidden');
+                    document.getElementById('error-text').textContent = 'ไม่พบข้อมูลสำหรับช่วงวันที่ที่เลือก';
+                    document.getElementById('fetch-btn').disabled = false;
+                    document.getElementById('fetch-btn-text').textContent = '📈 ดึงข้อมูลและแสดงกราฟ';
+                    return;
+                }
+                
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('chart-container').classList.remove('hidden');
+                document.getElementById('fetch-btn').disabled = false;
+                document.getElementById('fetch-btn-text').textContent = '📈 ดึงข้อมูลและแสดงกราฟ';
+
+                calculateStats(currentData);
+                createChart(currentData);
+
+            } catch (error) {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error').classList.remove('hidden');
+                document.getElementById('error-text').textContent = 'เกิดข้อผิดพลาดในการดึงข้อมูล: ' + error.message;
+                document.getElementById('fetch-btn').disabled = false;
+                document.getElementById('fetch-btn-text').textContent = '📈 ดึงข้อมูลและแสดงกราฟ';
+            }
+        }
+
+        // Handle plan selection
+        document.querySelectorAll('.plan-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.plan-btn').forEach(b => {
+                    b.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+                    b.classList.add('bg-slate-700', 'hover:bg-slate-600');
+                });
+
+                e.target.classList.remove('bg-slate-700', 'hover:bg-slate-600');
+                e.target.classList.add('bg-blue-600', 'hover:bg-blue-500');
+
+                selectedPlan = e.target.dataset.plan;
+                document.getElementById('main-title').textContent = `${config.chart_title} - ${planNames[selectedPlan]}`;
+            });
+        });
+
+        // Handle EMA toggle
+        document.getElementById('ema50-toggle').addEventListener('change', () => {
+            if (currentData.length > 0) createChart(currentData);
+        });
+
+        document.getElementById('ema200-toggle').addEventListener('change', () => {
+            if (currentData.length > 0) createChart(currentData);
+        });
+
+        document.getElementById('nav-toggle').addEventListener('change', () => {
+            if (currentData.length > 0) createChart(currentData);
+        });
+
+        // Apply configuration
+        function onConfigChange(cfg) {
+            config = { ...defaultConfig, ...cfg };
+            document.getElementById('main-title').textContent = `${config.chart_title || defaultConfig.chart_title} - ${planNames[selectedPlan]}`;
+        }
+
+        // Initialize Element SDK
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig,
+                onConfigChange,
+                mapToCapabilities: (cfg) => ({
+                    recolorables: [
+                        {
+                            get: () => cfg.accent_color || defaultConfig.accent_color,
+                            set: (v) => { cfg.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); }
+                        }
+                    ],
+                    borderables: [],
+                    fontEditable: undefined,
+                    fontSizeable: undefined
+                }),
+                mapToEditPanelValues: (cfg) => new Map([
+                    ['chart_title', cfg.chart_title || defaultConfig.chart_title]
+                ])
+            });
+        }
+
+        // Event listeners
+        document.getElementById('fetch-btn').addEventListener('click', fetchData);
+
+        // Initialize
+        initDropdowns();
+        document.getElementById('main-title').textContent = `${config.chart_title} - ${planNames[selectedPlan]}`;
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d7eb1cfa5c17329',t:'MTc3Mjc3MjE1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
