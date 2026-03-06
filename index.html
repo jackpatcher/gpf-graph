@@ -66,35 +66,85 @@
                <div class="grid grid-cols-1 gap-2"><button id="tab-chart" class="tab-btn px-4 py-2.5 rounded-lg font-medium text-sm bg-blue-600 hover:bg-blue-500 text-white transition-all text-left" data-tab="chart">ดูกราฟ</button> <button id="tab-db" class="tab-btn px-4 py-2.5 rounded-lg font-medium text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all text-left" data-tab="db">จัดการ DB</button>
              </div>
             </div>
-
-                <div id="sidebar-plan-panel" class="mb-4">
-                    <p class="text-slate-600 text-sm font-medium mb-2">เลือกแผนการลงทุน</p>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-72 overflow-auto pr-1"><button class="plan-btn active px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium text-xs transition-all" data-plan="2">หลัก</button> <button class="plan-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="3">หุ้น35</button> <button class="plan-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="4">Bond</button> <button class="plan-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="5">ฝากBond สั้น</button> <button class="plan-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="6">หุ้น 20</button> <button class="plan-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="7">หุ้น 65</button> <button class="plan-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="8">หุ้นไทย</button> <button class="plan-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="9">อสังหาไทย</button> <button class="plan-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="10">หุ้นต่างประเทศ</button> <button class="plan-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="12">BondF</button> <button class="plan-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="13">ทอง</button> <button class="plan-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="14">หุ้น 75</button> <button class="plan-btn px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="15">VAU</button>
-                    </div>
-                </div>
-
            <p class="text-slate-500 text-xs">เลือกเมนูจากด้านบนเพื่อจัดการข้อมูล</p>
         </aside>
 
         <main class="xl:col-span-9 space-y-4">
-        <section id="chart-filter-panel" class="card-glass rounded-2xl p-4 space-y-4">
+                <section id="chart-filter-panel" class="card-glass rounded-2xl p-3 space-y-3">
 
-         <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                 <div id="content-plan-panel" class="space-y-2">
+                    <p class="text-slate-600 text-xs font-semibold">เลือกแผนการลงทุน</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-1.5"><button class="plan-btn active px-2 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium text-xs transition-all" data-plan="2">หลัก</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="3">หุ้น35</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="4">Bond</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="5">ฝากBond สั้น</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="6">หุ้น 20</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="7">หุ้น 65</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="8">หุ้นไทย</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="9">อสังหาไทย</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="10">หุ้นต่างประเทศ</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="12">BondF</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="13">ทอง</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="14">หุ้น 75</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="15">VAU</button>
+                    </div>
+                 </div>
+
+                 <div class="grid grid-cols-1 md:grid-cols-4 gap-2 items-end">
           <div>
-           <label class="block text-slate-600 text-xs mb-1.5 font-medium">เดือนเริ่มต้น</label> <select id="start-month" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"> </select>
+                     <label class="block text-slate-600 text-[11px] mb-1 font-medium">เดือนเริ่มต้น</label> <select id="start-month" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"> </select>
           </div>
           <div>
-           <label class="block text-slate-600 text-xs mb-1.5 font-medium">ปีเริ่มต้น</label> <select id="start-year" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"> </select>
+                     <label class="block text-slate-600 text-[11px] mb-1 font-medium">ปีเริ่มต้น</label> <select id="start-year" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"> </select>
           </div>
           <div>
-           <label class="block text-slate-600 text-xs mb-1.5 font-medium">เดือนสิ้นสุด</label> <select id="end-month" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"> </select>
+                     <label class="block text-slate-600 text-[11px] mb-1 font-medium">เดือนสิ้นสุด</label> <select id="end-month" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"> </select>
           </div>
           <div>
-           <label class="block text-slate-600 text-xs mb-1.5 font-medium">ปีสิ้นสุด</label> <select id="end-year" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"> </select>
+                     <label class="block text-slate-600 text-[11px] mb-1 font-medium">ปีสิ้นสุด</label> <select id="end-year" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"> </select>
           </div>
          </div>
 
-         <div class="grid grid-cols-1 md:grid-cols-3 gap-2"><label class="flex items-center gap-2 cursor-pointer bg-slate-50 rounded-lg px-3 py-2 hover:bg-slate-100 transition-all border border-slate-200"> <input type="checkbox" id="ema50-toggle" class="w-4 h-4 rounded" checked> <span class="text-slate-600 text-sm font-medium">แสดง EMA 50</span> </label> <label class="flex items-center gap-2 cursor-pointer bg-slate-50 rounded-lg px-3 py-2 hover:bg-slate-100 transition-all border border-slate-200"> <input type="checkbox" id="ema200-toggle" class="w-4 h-4 rounded" checked> <span class="text-slate-600 text-sm font-medium">แสดง EMA 200</span> </label> <label class="flex items-center gap-2 cursor-pointer bg-slate-50 rounded-lg px-3 py-2 hover:bg-slate-100 transition-all border border-slate-200"> <input type="checkbox" id="nav-toggle" class="w-4 h-4 rounded" checked> <span class="text-slate-600 text-sm font-medium">แสดง NAV</span> </label>
+                                 <div class="grid grid-cols-1 md:grid-cols-4 gap-1.5"><label class="flex items-center gap-2 cursor-pointer bg-slate-50 rounded-lg px-2.5 py-1.5 hover:bg-slate-100 transition-all border border-slate-200"> <input type="checkbox" id="ema50-toggle" class="w-3.5 h-3.5 rounded" checked> <span class="text-slate-600 text-xs font-medium">แสดง EMA 50</span> </label> <label class="flex items-center gap-2 cursor-pointer bg-slate-50 rounded-lg px-2.5 py-1.5 hover:bg-slate-100 transition-all border border-slate-200"> <input type="checkbox" id="ema200-toggle" class="w-3.5 h-3.5 rounded" checked> <span class="text-slate-600 text-xs font-medium">แสดง EMA 200</span> </label> <label class="flex items-center gap-2 cursor-pointer bg-slate-50 rounded-lg px-2.5 py-1.5 hover:bg-slate-100 transition-all border border-slate-200"> <input type="checkbox" id="nav-toggle" class="w-3.5 h-3.5 rounded" checked> <span class="text-slate-600 text-xs font-medium">แสดง NAV</span> </label> <button id="line-style-toggle" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium transition-all border border-slate-300" type="button">🎛️ ตั้งค่าเส้นกราฟ</button>
+                 </div>
+
+                 <div id="line-style-panel" class="hidden mt-2 bg-slate-50 rounded-lg border border-slate-200 p-2.5 space-y-2">
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+
+            <div class="bg-white rounded-lg border border-slate-200 p-2.5">
+             <p class="text-slate-700 text-xs font-semibold mb-2">EMA 50</p>
+             <div class="grid grid-cols-3 gap-2 items-end">
+              <div>
+               <label class="block text-[11px] text-slate-500 mb-1">สีเส้น</label>
+               <input id="ema50-color" type="color" value="#f59e0b" class="w-full h-8 rounded border border-slate-300 bg-white">
+              </div>
+              <div>
+               <label class="block text-[11px] text-slate-500 mb-1">ความหนา</label>
+               <input id="ema50-width" type="range" min="0.5" max="4" step="0.5" value="1" class="w-full">
+              </div>
+              <div>
+               <label class="block text-[11px] text-slate-500 mb-1">ประเภท</label>
+               <select id="ema50-style" class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-700">
+                <option value="dashed" selected>ประ</option>
+                <option value="solid">ทึบ</option>
+                <option value="dotted">จุด</option>
+                <option value="dashdot">ประ-จุด</option>
+               </select>
+              </div>
+             </div>
+            </div>
+
+            <div class="bg-white rounded-lg border border-slate-200 p-2.5">
+             <p class="text-slate-700 text-xs font-semibold mb-2">EMA 200</p>
+             <div class="grid grid-cols-3 gap-2 items-end">
+              <div>
+               <label class="block text-[11px] text-slate-500 mb-1">สีเส้น</label>
+               <input id="ema200-color" type="color" value="#ef4444" class="w-full h-8 rounded border border-slate-300 bg-white">
+              </div>
+              <div>
+               <label class="block text-[11px] text-slate-500 mb-1">ความหนา</label>
+               <input id="ema200-width" type="range" min="0.5" max="4" step="0.5" value="2" class="w-full">
+              </div>
+              <div>
+               <label class="block text-[11px] text-slate-500 mb-1">ประเภท</label>
+               <select id="ema200-style" class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-700">
+                <option value="dashdot" selected>ประ-จุด</option>
+                <option value="solid">ทึบ</option>
+                <option value="dashed">ประ</option>
+                <option value="dotted">จุด</option>
+               </select>
+              </div>
+             </div>
+            </div>
+           </div>
          </div>
 
         </section>
@@ -141,7 +191,12 @@
 
          <section id="chart-container" class="hidden">
             <div class="card-glass rounded-2xl p-5">
-                 <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-5">
+                 <div class="grid grid-cols-2 md:grid-cols-7 gap-3 mb-5">
+                     <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl p-3 border border-indigo-400 shadow-sm text-white md:col-span-2">
+                      <p class="text-indigo-100 text-xs font-medium mb-1">ข้อมูลล่าสุด ณ วันที่</p>
+                      <p id="stat-latest-date" class="text-2xl font-bold leading-tight">-</p>
+                      <p id="stat-latest-note" class="text-[11px] text-indigo-100 mt-1">อ้างอิงจากข้อมูลที่มีจริงในช่วงที่เลือก</p>
+                     </div>
                      <div class="bg-white rounded-xl p-3 border border-emerald-200 shadow-sm">
                       <p class="text-emerald-600 text-xs font-medium mb-1">ค่าสูงสุด</p>
                       <p id="stat-max" class="text-2xl font-bold text-emerald-600 leading-tight">-</p>
@@ -172,6 +227,18 @@
             </div>
          </section>
 
+            <section id="chart-fullscreen-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm p-3 md:p-6">
+             <div class="w-full h-full max-w-[1600px] mx-auto card-glass rounded-2xl p-3 md:p-4 flex flex-col">
+              <div class="flex items-center justify-between mb-3">
+                <p id="chart-fullscreen-title" class="text-slate-700 font-semibold text-sm md:text-base">กราฟขยาย</p>
+                <button id="chart-fullscreen-close" type="button" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium border border-slate-300">ปิด ✕</button>
+              </div>
+                            <div class="flex-1 min-h-0 bg-white rounded-xl border border-slate-200 p-2 relative">
+                                <canvas id="chart-fullscreen-canvas"></canvas>
+              </div>
+             </div>
+            </section>
+
         </main>
      </div>
 
@@ -200,6 +267,94 @@
         let autoFetchTimer = null;
         let isFetchingData = false;
         let pendingAutoFetch = false;
+        let fullscreenChart = null;
+
+        const cursorCrosshairPlugin = {
+            id: 'cursorCrosshairPlugin',
+            afterEvent(chart, args) {
+                const event = args?.event;
+                const chartArea = chart.chartArea;
+                if (!event || !chartArea) return;
+
+                const withinX = Number.isFinite(event.x) && event.x >= chartArea.left && event.x <= chartArea.right;
+                const withinY = Number.isFinite(event.y) && event.y >= chartArea.top && event.y <= chartArea.bottom;
+                const isInArea = withinX && withinY;
+
+                chart.$cursorCrosshair = isInArea
+                    ? { x: event.x, y: event.y, visible: true }
+                    : { visible: false };
+
+                args.changed = true;
+            },
+            afterDraw(chart) {
+                const { ctx, chartArea, scales } = chart;
+                const cursor = chart.$cursorCrosshair;
+                if (!chartArea || !cursor?.visible) return;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(100, 116, 139, 0.55)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([]);
+
+                ctx.moveTo(cursor.x, chartArea.top);
+                ctx.lineTo(cursor.x, chartArea.bottom);
+
+                ctx.moveTo(chartArea.left, cursor.y);
+                ctx.lineTo(chartArea.right, cursor.y);
+
+                ctx.stroke();
+
+                const xScale = scales?.x;
+                const yScale = scales?.y;
+                if (xScale && yScale) {
+                    const rawIndex = xScale.getValueForPixel(cursor.x);
+                    const labels = chart.data?.labels || [];
+                    const labelIndex = Number.isFinite(rawIndex)
+                        ? Math.max(0, Math.min(labels.length - 1, Math.round(rawIndex)))
+                        : -1;
+                    const xLabel = labelIndex >= 0 && labels[labelIndex] ? String(labels[labelIndex]) : '-';
+
+                    const yValue = yScale.getValueForPixel(cursor.y);
+                    const yLabel = Number.isFinite(yValue) ? Number(yValue).toFixed(4) : '-';
+
+                    ctx.font = '12px Sarabun';
+                    ctx.textBaseline = 'middle';
+                    const padX = 6;
+                    const boxHeight = 20;
+
+                    const xTextWidth = ctx.measureText(xLabel).width;
+                    const xBoxWidth = xTextWidth + padX * 2;
+                    let xBoxX = cursor.x - xBoxWidth / 2;
+                    xBoxX = Math.max(2, Math.min(xBoxX, chart.width - xBoxWidth - 2));
+                    let xBoxY = chartArea.bottom + 6;
+                    if (xBoxY + boxHeight > chart.height - 2) {
+                        xBoxY = chart.height - boxHeight - 2;
+                    }
+
+                    const yTextWidth = ctx.measureText(yLabel).width;
+                    const yBoxWidth = yTextWidth + padX * 2;
+                    let yBoxX = chartArea.right + 6;
+                    if (yBoxX + yBoxWidth > chart.width - 2) {
+                        yBoxX = chartArea.left - yBoxWidth - 6;
+                    }
+                    yBoxX = Math.max(2, Math.min(yBoxX, chart.width - yBoxWidth - 2));
+                    let yBoxY = cursor.y - boxHeight / 2;
+                    yBoxY = Math.max(2, Math.min(yBoxY, chart.height - boxHeight - 2));
+
+                    ctx.fillStyle = 'rgba(30, 41, 59, 0.9)';
+                    ctx.fillRect(xBoxX, xBoxY, xBoxWidth, boxHeight);
+                    ctx.fillRect(yBoxX, yBoxY, yBoxWidth, boxHeight);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(xLabel, xBoxX + xBoxWidth / 2, xBoxY + boxHeight / 2 + 0.5);
+                    ctx.fillText(yLabel, yBoxX + yBoxWidth / 2, yBoxY + boxHeight / 2 + 0.5);
+                }
+
+                ctx.restore();
+            }
+        };
 
         const NAV_DB_NAME = 'gpf_nav_cache_db';
         const NAV_DB_VERSION = 1;
@@ -308,7 +463,6 @@
 
             const tabChart = document.getElementById('tab-chart');
             const tabDb = document.getElementById('tab-db');
-            const sidebarPlanPanel = document.getElementById('sidebar-plan-panel');
 
             tabChart.classList.toggle('bg-blue-600', isChartTab);
             tabChart.classList.toggle('hover:bg-blue-500', isChartTab);
@@ -325,7 +479,6 @@
             tabDb.classList.toggle('text-slate-700', isChartTab);
 
             document.getElementById('db-management-panel').classList.toggle('hidden', isChartTab);
-            sidebarPlanPanel.classList.toggle('hidden', !isChartTab);
 
             const loading = document.getElementById('loading');
             const error = document.getElementById('error');
@@ -898,7 +1051,7 @@
         function getActualData(startMonth, startYear, endMonth, endYear, plan) {
             const data = [];
             const startDate = new Date(startYear, startMonth - 1, 1);
-            const endDate = new Date(endYear, endMonth - 1, 1);
+            const endDate = new Date(endYear, endMonth, 0, 23, 59, 59, 999);
 
             const dataArray = actualData(); // Get from cache
             dataArray.forEach(record => {
@@ -925,7 +1078,7 @@
 
         function getMultiPlanData(startMonth, startYear, endMonth, endYear, plans) {
             const startDate = new Date(startYear, startMonth - 1, 1);
-            const endDate = new Date(endYear, endMonth - 1, 1);
+            const endDate = new Date(endYear, endMonth, 0, 23, 59, 59, 999);
 
             const filteredRecords = actualData()
                 .filter(record => record.dateObj >= startDate && record.dateObj <= endDate)
@@ -988,14 +1141,38 @@
             };
         }
 
+        function getLatestDateFromPayload(chartPayload) {
+            if (!chartPayload) return null;
+
+            if (chartPayload.mode === 'single') {
+                for (let index = chartPayload.data.length - 1; index >= 0; index--) {
+                    const item = chartPayload.data[index];
+                    if (Number.isFinite(item?.nav)) {
+                        return item.label;
+                    }
+                }
+                return null;
+            }
+
+            for (let index = chartPayload.labels.length - 1; index >= 0; index--) {
+                const hasAnyPlanValue = chartPayload.plans.some(plan => Number.isFinite(chartPayload.series[plan]?.[index]));
+                if (hasAnyPlanValue) {
+                    return chartPayload.labels[index];
+                }
+            }
+
+            return null;
+        }
+
         // Calculate statistics
-        function calculateStats(data) {
+        function calculateStats(data, chartPayload) {
             const values = data.map(d => d.nav);
             const max = Math.max(...values);
             const min = Math.min(...values);
             const avg = values.reduce((a, b) => a + b, 0) / values.length;
             const firstNav = data[0]?.nav;
             const lastNav = data[data.length - 1]?.nav;
+            const latestDate = getLatestDateFromPayload(chartPayload);
 
             let pctChange = null;
             if (Number.isFinite(firstNav) && Number.isFinite(lastNav) && firstNav !== 0) {
@@ -1006,6 +1183,7 @@
             document.getElementById('stat-min').textContent = min.toFixed(4);
             document.getElementById('stat-avg').textContent = avg.toFixed(4);
             document.getElementById('stat-count').textContent = values.length + ' รายการ';
+            document.getElementById('stat-latest-date').textContent = latestDate || '-';
 
             const slopeEl = document.getElementById('stat-slope');
             if (pctChange === null || !Number.isFinite(pctChange)) {
@@ -1085,6 +1263,146 @@
             });
         }
 
+        function getDashPattern(style) {
+            switch (style) {
+                case 'solid':
+                    return [];
+                case 'dotted':
+                    return [2, 4];
+                case 'dashdot':
+                    return [8, 4, 2, 4];
+                case 'dashed':
+                default:
+                    return [6, 4];
+            }
+        }
+
+        function extendLabelsForProjection(labels, futureDays = 30) {
+            return [...labels, ...Array.from({ length: futureDays }, () => '')];
+        }
+
+        function extendSeriesForProjection(values, futureDays = 30) {
+            return [...values, ...Array.from({ length: futureDays }, () => null)];
+        }
+
+        function getProjectionSlots(totalPoints) {
+            if (!Number.isFinite(totalPoints) || totalPoints <= 0) return 0;
+            return Math.max(1, Math.round(totalPoints * 0.10));
+        }
+
+        function buildChartOptions(isFullscreen = false) {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#64748b',
+                            font: { family: 'Sarabun', size: isFullscreen ? 13 : 11 },
+                            padding: isFullscreen ? 14 : 10,
+                            boxWidth: isFullscreen ? 14 : 12
+                        }
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.12)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            maxTicksLimit: isFullscreen ? 12 : 8,
+                            font: { family: 'Sarabun', size: isFullscreen ? 11 : 10 }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.12)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: { family: 'Sarabun', size: isFullscreen ? 11 : 10 },
+                            callback: function(value) {
+                                return Number(value).toFixed(2);
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        function cloneDatasetsForFullscreen(datasets) {
+            return datasets.map(dataset => ({
+                ...dataset,
+                data: Array.isArray(dataset.data) ? [...dataset.data] : dataset.data,
+                borderDash: Array.isArray(dataset.borderDash) ? [...dataset.borderDash] : dataset.borderDash
+            }));
+        }
+
+        function getLatestLabelFromSeries(labels, values) {
+            if (!Array.isArray(labels) || !Array.isArray(values)) return null;
+
+            for (let index = Math.min(labels.length, values.length) - 1; index >= 0; index--) {
+                if (Number.isFinite(values[index]) && labels[index]) {
+                    return labels[index];
+                }
+            }
+
+            return null;
+        }
+
+
+        function closeFullscreenChart() {
+            const modal = document.getElementById('chart-fullscreen-modal');
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+
+            if (fullscreenChart) {
+                fullscreenChart.destroy();
+                fullscreenChart = null;
+            }
+        }
+
+        function openFullscreenChart(title, labels, datasets, latestDateLabel) {
+            const modal = document.getElementById('chart-fullscreen-modal');
+            const titleEl = document.getElementById('chart-fullscreen-title');
+            const canvas = document.getElementById('chart-fullscreen-canvas');
+            const ctx = canvas.getContext('2d');
+
+            if (fullscreenChart) {
+                fullscreenChart.destroy();
+                fullscreenChart = null;
+            }
+
+            titleEl.textContent = latestDateLabel
+                ? `กราฟขยาย - ${title} (อัปเดตล่าสุด: ${latestDateLabel})`
+                : `กราฟขยาย - ${title}`;
+
+            fullscreenChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [...labels],
+                    datasets: cloneDatasetsForFullscreen(datasets)
+                },
+                options: buildChartOptions(true),
+                plugins: [cursorCrosshairPlugin]
+            });
+
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
         // Create/Update chart
         function createChart(chartPayload) {
             navCharts.forEach(chart => chart.destroy());
@@ -1096,6 +1414,12 @@
             const showNAV = document.getElementById('nav-toggle').checked;
             const showEMA50 = document.getElementById('ema50-toggle').checked;
             const showEMA200 = document.getElementById('ema200-toggle').checked;
+            const ema50Color = document.getElementById('ema50-color').value || '#f59e0b';
+            const ema50Width = parseFloat(document.getElementById('ema50-width').value) || 1;
+            const ema200Width = parseFloat(document.getElementById('ema200-width').value) || 2;
+            const ema200Color = document.getElementById('ema200-color').value || '#ef4444';
+            const ema50Dash = getDashPattern(document.getElementById('ema50-style').value);
+            const ema200Dash = getDashPattern(document.getElementById('ema200-style').value);
 
             const planEntries = chartPayload.mode === 'single'
                 ? [{
@@ -1114,7 +1438,8 @@
                 if (!hasValue) return;
 
                 const chartCard = document.createElement('div');
-                chartCard.className = 'bg-white rounded-xl border border-slate-200 p-3 shadow-sm';
+                chartCard.className = 'bg-white rounded-xl border border-slate-200 p-3 shadow-sm cursor-zoom-in';
+                chartCard.title = 'คลิกเพื่อดูกราฟแบบเต็มจอ';
 
                 const slopePercent = calculateSeriesPriceChangePercent(entry.values);
                 const slopeSign = slopePercent && slopePercent > 0 ? '+' : '';
@@ -1132,7 +1457,9 @@
                         <p class="text-sm font-semibold text-slate-700">${planNames[entry.plan]}</p>
                         <span class="text-xs px-2 py-1 rounded-md border ${slopeClass}">Change: ${slopeText}</span>
                     </div>
-                    <div class="h-64"><canvas></canvas></div>
+                    <div class="h-64 relative">
+                        <canvas></canvas>
+                    </div>
                 `;
 
                 chartGrid.appendChild(chartCard);
@@ -1141,11 +1468,13 @@
 
                 const datasets = [];
                 const primaryColor = planLineColors[index % planLineColors.length];
+                const projectionSlots = getProjectionSlots(entry.labels.length);
+                const extendedLabels = extendLabelsForProjection(entry.labels, projectionSlots);
 
                 if (showNAV) {
                     datasets.push({
                         label: `NAV - ${planNames[entry.plan]}`,
-                        data: entry.values,
+                        data: extendSeriesForProjection(entry.values, projectionSlots),
                         borderColor: primaryColor,
                         backgroundColor: 'transparent',
                         borderWidth: 2,
@@ -1160,14 +1489,14 @@
                 if (showEMA50) {
                     datasets.push({
                         label: 'EMA 50',
-                        data: calculateEMA(normalizeValuesForEma(entry.values), 50),
-                        borderColor: '#f59e0b',
+                        data: extendSeriesForProjection(calculateEMA(normalizeValuesForEma(entry.values), 50), projectionSlots),
+                        borderColor: ema50Color,
                         backgroundColor: 'transparent',
-                        borderWidth: 1,
+                        borderWidth: ema50Width,
                         fill: false,
                         tension: 0.4,
                         pointRadius: 0,
-                        borderDash: [5, 5],
+                        borderDash: ema50Dash,
                         yAxisID: 'y'
                     });
                 }
@@ -1175,14 +1504,14 @@
                 if (showEMA200) {
                     datasets.push({
                         label: 'EMA 200',
-                        data: calculateEMA(normalizeValuesForEma(entry.values), 200),
-                        borderColor: '#ef4444',
+                        data: extendSeriesForProjection(calculateEMA(normalizeValuesForEma(entry.values), 200), projectionSlots),
+                        borderColor: ema200Color,
                         backgroundColor: 'transparent',
-                        borderWidth: 2,
+                        borderWidth: ema200Width,
                         fill: false,
                         tension: 0.4,
                         pointRadius: 0,
-                        borderDash: [8, 4],
+                        borderDash: ema200Dash,
                         yAxisID: 'y'
                     });
                 }
@@ -1190,70 +1519,16 @@
                 const chart = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: entry.labels,
+                        labels: extendedLabels,
                         datasets
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            intersect: false,
-                            mode: 'index'
-                        },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                labels: {
-                                    color: '#64748b',
-                                    font: { family: 'Sarabun', size: 11 },
-                                    padding: 10,
-                                    boxWidth: 12
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(30, 41, 59, 0.92)',
-                                titleColor: '#ffffff',
-                                bodyColor: '#e2e8f0',
-                                borderColor: '#94a3b8',
-                                borderWidth: 1,
-                                padding: 10,
-                                displayColors: true,
-                                callbacks: {
-                                    label: function(context) {
-                                        const value = context.parsed.y;
-                                        if (value === null) return context.dataset.label + ': -';
-                                        return `${context.dataset.label}: ${value.toFixed(4)} บาท/หน่วย`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: {
-                                    color: 'rgba(148, 163, 184, 0.12)',
-                                    drawBorder: false
-                                },
-                                ticks: {
-                                    color: '#64748b',
-                                    maxTicksLimit: 8,
-                                    font: { family: 'Sarabun', size: 10 }
-                                }
-                            },
-                            y: {
-                                grid: {
-                                    color: 'rgba(148, 163, 184, 0.12)',
-                                    drawBorder: false
-                                },
-                                ticks: {
-                                    color: '#64748b',
-                                    font: { family: 'Sarabun', size: 10 },
-                                    callback: function(value) {
-                                        return Number(value).toFixed(2);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    options: buildChartOptions(false),
+                    plugins: [cursorCrosshairPlugin]
+                });
+
+                chartCard.addEventListener('click', () => {
+                    const latestDateLabel = getLatestLabelFromSeries(entry.labels, entry.values);
+                    openFullscreenChart(planNames[entry.plan], extendedLabels, datasets, latestDateLabel);
                 });
 
                 navCharts.push(chart);
@@ -1347,7 +1622,7 @@
                 document.getElementById('chart-container').classList.remove('hidden');
                 setFetchUiState(false);
 
-                calculateStats(currentData);
+                calculateStats(currentData, currentChartPayload);
                 renderSelectedPlanChanges(currentChartPayload);
                 createChart(currentChartPayload);
 
@@ -1389,6 +1664,34 @@
 
         document.getElementById('nav-toggle').addEventListener('change', () => {
             if (currentChartPayload) createChart(currentChartPayload);
+        });
+
+        document.getElementById('line-style-toggle').addEventListener('click', () => {
+            const panel = document.getElementById('line-style-panel');
+            panel.classList.toggle('hidden');
+        });
+
+        document.getElementById('chart-fullscreen-close').addEventListener('click', closeFullscreenChart);
+
+        document.getElementById('chart-fullscreen-modal').addEventListener('click', (event) => {
+            if (event.target.id === 'chart-fullscreen-modal') {
+                closeFullscreenChart();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !document.getElementById('chart-fullscreen-modal').classList.contains('hidden')) {
+                closeFullscreenChart();
+            }
+        });
+
+        ['ema50-color', 'ema50-width', 'ema50-style', 'ema200-color', 'ema200-width', 'ema200-style'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                if (currentChartPayload) createChart(currentChartPayload);
+            });
+            document.getElementById(id).addEventListener('change', () => {
+                if (currentChartPayload) createChart(currentChartPayload);
+            });
         });
 
         // Apply configuration
@@ -1463,7 +1766,7 @@
                     return;
                 }
 
-                calculateStats(currentData);
+                calculateStats(currentData, currentChartPayload);
                 renderSelectedPlanChanges(currentChartPayload);
                 createChart(currentChartPayload);
                 document.getElementById('chart-container').classList.remove('hidden');

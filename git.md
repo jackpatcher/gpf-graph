@@ -1,3 +1,3 @@
 git add .
-git commit -m "ok normal"
+git commit -m "add crosshair"
 git push origin main
