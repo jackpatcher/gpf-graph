@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="th" class="h-full">
  <head>
   <meta charset="UTF-8">
@@ -60,23 +60,17 @@
      </header>
 
      <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
-        <aside class="xl:col-span-3 card-glass rounded-2xl p-4 h-fit">
+        <aside class="xl:col-span-2 card-glass rounded-2xl p-4 h-fit">
             <div class="mb-4">
                <p class="text-slate-600 text-sm font-medium mb-2">เมนู</p>
-               <div class="grid grid-cols-1 gap-2"><button id="tab-chart" class="tab-btn px-4 py-2.5 rounded-lg font-medium text-sm bg-blue-600 hover:bg-blue-500 text-white transition-all text-left" data-tab="chart">ดูกราฟ</button> <button id="tab-db" class="tab-btn px-4 py-2.5 rounded-lg font-medium text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all text-left" data-tab="db">จัดการ DB</button>
+                             <div class="grid grid-cols-1 gap-2"><button id="tab-chart" class="tab-btn px-4 py-2.5 rounded-lg font-medium text-sm bg-blue-600 hover:bg-blue-500 text-white transition-all text-left" data-tab="chart">ดูกราฟ</button> <button id="tab-db" class="tab-btn px-4 py-2.5 rounded-lg font-medium text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all text-left" data-tab="db">จัดการ DB</button> <button id="tab-portfolio" class="tab-btn px-4 py-2.5 rounded-lg font-medium text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all text-left" data-tab="portfolio">พอร์ต</button>
              </div>
             </div>
            <p class="text-slate-500 text-xs">เลือกเมนูจากด้านบนเพื่อจัดการข้อมูล</p>
         </aside>
 
-        <main class="xl:col-span-9 space-y-4">
+        <main class="xl:col-span-10 space-y-4">
                 <section id="chart-filter-panel" class="card-glass rounded-2xl p-3 space-y-3">
-
-                 <div id="content-plan-panel" class="space-y-2">
-                    <p class="text-slate-600 text-xs font-semibold">เลือกแผนการลงทุน</p>
-                    <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-1.5"><button class="plan-btn active px-2 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium text-xs transition-all" data-plan="2">หลัก</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="3">หุ้น35</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="4">Bond</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="5">ฝากBond สั้น</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="6">หุ้น 20</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="7">หุ้น 65</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="8">หุ้นไทย</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="9">อสังหาไทย</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="10">หุ้นต่างประเทศ</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="12">BondF</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="13">ทอง</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="14">หุ้น 75</button> <button class="plan-btn px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium text-xs transition-all" data-plan="15">VAU</button>
-                    </div>
-                 </div>
 
                  <div class="grid grid-cols-1 md:grid-cols-4 gap-2 items-end">
           <div>
@@ -165,10 +159,147 @@
                 <p id="db-last-update" class="text-sm font-semibold">-</p>
              </div>
             </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4"><button id="db-refresh-btn" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-all border border-slate-300">รีเฟรชสถานะ DB</button> <button id="db-load-range-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-all">โหลดข้อมูลจาก DB ตามช่วงวันที่</button> <button id="db-sync-all-btn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-all">ดาวน์โหลดทั้งหมดลง Cache (01/1998-ปัจจุบัน)</button> <button id="db-export-csv-btn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-all">ส่งออก DB เป็น CSV</button> <button id="db-import-csv-btn" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white rounded-lg text-sm font-medium transition-all">นำเข้า CSV ไปยัง DB</button> <button id="db-clear-btn" class="md:col-span-2 px-4 py-2 bg-rose-500 hover:bg-rose-400 text-white rounded-lg text-sm font-medium transition-all">ล้างข้อมูลแคชทั้งหมด</button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4"><button id="db-refresh-btn" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-all border border-slate-300">รีเฟรชสถานะ DB</button> <button id="db-load-range-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-all">โหลดข้อมูลจาก DB ตามช่วงวันที่</button> <button id="db-sync-all-btn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-all">ซิงก์ข้อมูลล่าสุดจาก GAS</button> <button id="db-export-csv-btn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-all">ส่งออก DB เป็น CSV</button> <button id="db-import-csv-btn" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-white rounded-lg text-sm font-medium transition-all">นำเข้า CSV ไปยัง DB</button> <button id="db-clear-btn" class="md:col-span-2 px-4 py-2 bg-rose-500 hover:bg-rose-400 text-white rounded-lg text-sm font-medium transition-all">ล้างข้อมูลแคชทั้งหมด</button>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-3 mb-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <p class="text-sm font-semibold text-slate-700">ข้อมูลรายเดือนใน GAS</p>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button id="gas-month-sync-mismatch-btn" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-white rounded-lg text-xs font-medium">ซิงก์เดือนที่ไม่ตรงกันทั้งหมด</button>
+                        <button id="gas-month-refresh-btn" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium border border-slate-300">รีเฟรชรายการเดือนจาก GAS</button>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-500 mb-2">คลิกปุ่ม "ซิงก์เดือนนี้" เพื่อเช็ก API เดือนนั้นอีกครั้งและอัปเดตเข้า IndexedDB ถ้ายังไม่มี/มีการเปลี่ยนแปลง</p>
+                <div id="gas-month-list" class="max-h-72 overflow-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 text-xs text-slate-600">
+                    <div class="text-slate-400">ยังไม่ได้โหลดรายการเดือนจาก GAS</div>
+                </div>
             </div>
             <input id="db-import-file" type="file" accept=".csv,text/csv" class="hidden">
                 <p id="db-status" class="text-sm text-slate-600">สถานะ: พร้อมใช้งาน</p>
+         </section>
+
+         <section id="portfolio-panel" class="hidden card-glass rounded-2xl p-5 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <h2 class="text-lg font-semibold text-slate-700">พอร์ตการลงทุนรายผู้ใช้</h2>
+                <p id="portfolio-auth-status" class="text-xs text-slate-500">ยังไม่เข้าสู่ระบบ</p>
+            </div>
+
+            <div id="portfolio-auth-box" class="rounded-xl border border-slate-200 bg-white p-3 space-y-3">
+                <p class="text-sm font-semibold text-slate-700">เข้าสู่ระบบ / สมัครผู้ใช้</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <input id="portfolio-username" type="text" placeholder="Username" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input id="portfolio-password" type="password" placeholder="Password" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <div class="flex gap-2">
+                        <button id="portfolio-login-btn" type="button" class="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium">Login</button>
+                        <button id="portfolio-register-btn" type="button" class="flex-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium border border-slate-300">Register</button>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-500">ข้อมูลผู้ใช้เก็บใน IndexedDB ของเบราว์เซอร์นี้เท่านั้น</p>
+            </div>
+
+            <div id="portfolio-main-box" class="hidden space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="rounded-xl p-4 border border-sky-200 bg-gradient-to-br from-sky-50 via-white to-slate-50 shadow-sm">
+                        <p class="text-sky-700 text-xs font-semibold tracking-wide">มูลค่าต้นทุนรวม</p>
+                        <p id="portfolio-total-cost" class="text-3xl font-bold text-slate-800 mt-1 leading-none">-</p>
+                    </div>
+                    <div class="rounded-xl p-4 border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-slate-50 shadow-sm">
+                        <p class="text-cyan-700 text-xs font-semibold tracking-wide">มูลค่าปัจจุบันรวม</p>
+                        <p id="portfolio-total-current" class="text-3xl font-bold text-slate-800 mt-1 leading-none">-</p>
+                    </div>
+                    <div class="rounded-xl p-4 border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-slate-50 shadow-sm">
+                        <p class="text-emerald-700 text-xs font-semibold tracking-wide">กำไร/ขาดทุนรวม</p>
+                        <p id="portfolio-total-pnl" class="text-3xl font-bold text-slate-800 mt-1 leading-none">-</p>
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-slate-200 bg-white p-3 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <p class="text-sm font-semibold text-slate-700">บันทึกการเปลี่ยนแผน</p>
+                        <button id="portfolio-logout-btn" type="button" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-400 text-white rounded-lg text-xs font-medium">Logout</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <input id="portfolio-change-date" type="date" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700" />
+                        <input id="portfolio-note" type="text" placeholder="หมายเหตุรวมรอบนี้ (ไม่บังคับ)" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700" />
+                        <div class="flex gap-2">
+                            <button id="portfolio-add-row-btn" type="button" class="flex-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium border border-slate-300">+ เพิ่มแผน</button>
+                            <button id="portfolio-save-btn" type="button" class="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium">บันทึกรอบนี้</button>
+                        </div>
+                    </div>
+                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-2">
+                        <div class="grid grid-cols-12 gap-2 text-[11px] text-slate-500 font-semibold px-1 mb-1">
+                            <div class="col-span-6">แผน (unitCost)</div>
+                            <div class="col-span-5 text-right">จำนวนหน่วย</div>
+                            <div class="col-span-1"></div>
+                        </div>
+                        <div id="portfolio-entries" class="space-y-2"></div>
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-slate-200 bg-white p-3">
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <p id="portfolio-selected-plan-chart-title" class="text-sm font-semibold text-slate-700">กราฟแผนปัจจุบันทั้งหมด</p>
+                        <p class="text-[11px] text-slate-500">ข้อมูลจาก IndexedDB</p>
+                    </div>
+                    <p id="portfolio-selected-plan-chart-empty" class="text-xs text-slate-400">ยังไม่มีแผนปัจจุบันสำหรับแสดงกราฟ</p>
+                    <div id="portfolio-selected-plan-chart-grid" class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3"></div>
+                    <div id="portfolio-selected-plan-chart-note" class="hidden text-[11px] text-slate-500 mt-2">แสดงเส้น NAV, EMA50, EMA200 ตามแผนปัจจุบัน</div>
+                    <div class="hidden h-56">
+                        <canvas id="portfolio-selected-plan-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-slate-200 bg-white p-3">
+                    <p class="text-sm font-semibold text-slate-700 mb-2">สถานะพอร์ตปัจจุบัน (ล่าสุดต่อแผน)</p>
+                    <div class="overflow-auto">
+                        <table class="min-w-full text-xs text-slate-700">
+                            <thead>
+                                <tr class="border-b border-slate-200">
+                                    <th class="text-left py-2 pr-2">แผน</th>
+                                    <th class="text-right py-2 px-2">หน่วย</th>
+                                    <th class="text-right py-2 px-2">NAV วันเปลี่ยน</th>
+                                    <th class="text-right py-2 px-2">NAV ล่าสุด</th>
+                                    <th class="text-right py-2 px-2">ต้นทุน</th>
+                                    <th class="text-right py-2 px-2">มูลค่าปัจจุบัน</th>
+                                    <th class="text-right py-2 pl-2">P/L</th>
+                                </tr>
+                            </thead>
+                            <tbody id="portfolio-current-table-body">
+                                <tr><td colspan="7" class="py-3 text-slate-400">ยังไม่มีข้อมูล</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-slate-200 bg-white p-3">
+                    <p class="text-sm font-semibold text-slate-700 mb-2">ประวัติการเปลี่ยนแผน</p>
+                    <div class="overflow-auto max-h-72">
+                        <table class="min-w-full text-xs text-slate-700">
+                            <thead>
+                                <tr class="border-b border-slate-200">
+                                    <th class="text-left py-2 pr-2">วันที่เปลี่ยน</th>
+                                    <th class="text-left py-2 px-2">รายละเอียดแผนในรอบ</th>
+                                    <th class="text-right py-2 px-2">ราคาแผน ณ วันที่เปลี่ยน</th>
+                                    <th class="text-right py-2 px-2">มูลค่าต้นทุนรวม</th>
+                                    <th class="text-right py-2 px-2">มูลค่าปัจจุบันรวม</th>
+                                    <th class="text-right py-2 px-2">P/L ถึงวันนี้</th>
+                                    <th class="text-left py-2 pl-2">หมายเหตุ</th>
+                                    <th class="text-right py-2 pl-2">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="portfolio-history-table-body">
+                                <tr><td colspan="8" class="py-3 text-slate-400">ยังไม่มีข้อมูล</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <p id="portfolio-status" class="text-sm text-slate-600">สถานะ: พร้อมใช้งาน</p>
+            <div id="portfolio-loading" class="hidden inline-flex items-center gap-2 text-xs text-blue-600 bg-blue-50 border border-blue-200 rounded-md px-2 py-1">
+                <span class="inline-block w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
+                <span id="portfolio-loading-text">กำลังโหลดข้อมูลพอร์ต...</span>
+            </div>
          </section>
 
          <section id="loading" class="hidden card-glass rounded-2xl p-8 text-center">
@@ -191,36 +322,25 @@
 
          <section id="chart-container" class="hidden">
             <div class="card-glass rounded-2xl p-5">
-                 <div class="grid grid-cols-2 md:grid-cols-7 gap-3 mb-5">
-                     <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl p-3 border border-indigo-400 shadow-sm text-white md:col-span-2">
+                      <div class="grid grid-cols-1 md:grid-cols-7 gap-3 mb-5">
+                            <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl p-3 border border-indigo-400 shadow-sm text-white md:col-span-2">
                       <p class="text-indigo-100 text-xs font-medium mb-1">ข้อมูลล่าสุด ณ วันที่</p>
                       <p id="stat-latest-date" class="text-2xl font-bold leading-tight">-</p>
                       <p id="stat-latest-note" class="text-[11px] text-indigo-100 mt-1">อ้างอิงจากข้อมูลที่มีจริงในช่วงที่เลือก</p>
                      </div>
-                     <div class="bg-white rounded-xl p-3 border border-emerald-200 shadow-sm">
-                      <p class="text-emerald-600 text-xs font-medium mb-1">ค่าสูงสุด</p>
-                      <p id="stat-max" class="text-2xl font-bold text-emerald-600 leading-tight">-</p>
-                </div>
-                     <div class="bg-white rounded-xl p-3 border border-rose-200 shadow-sm">
-                      <p class="text-rose-600 text-xs font-medium mb-1">ค่าต่ำสุด</p>
-                      <p id="stat-min" class="text-2xl font-bold text-rose-600 leading-tight">-</p>
-                </div>
-                     <div class="bg-white rounded-xl p-3 border border-blue-200 shadow-sm">
-                      <p class="text-blue-600 text-xs font-medium mb-1">ค่าเฉลี่ย</p>
-                      <p id="stat-avg" class="text-2xl font-bold text-blue-600 leading-tight">-</p>
-                </div>
-                     <div class="bg-white rounded-xl p-3 border border-violet-200 shadow-sm">
+                            <div class="bg-white rounded-xl p-3 border border-violet-200 shadow-sm md:col-span-1">
                       <p class="text-violet-600 text-xs font-medium mb-1">จำนวนข้อมูล</p>
                       <p id="stat-count" class="text-2xl font-bold text-violet-600 leading-tight">-</p>
                      </div>
-                     <div class="bg-white rounded-xl p-3 border border-cyan-200 shadow-sm">
+                            <div class="bg-white rounded-xl p-3 border border-cyan-200 shadow-sm md:col-span-1">
                       <p class="text-cyan-700 text-xs font-medium mb-1">% ราคาเปลี่ยนไป</p>
                       <p id="stat-slope" class="text-2xl font-bold text-cyan-700 leading-tight">-</p>
                      </div>
-                     <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
-                        <p class="text-slate-600 text-xs font-medium mb-2">% ทุกแผนที่เลือก</p>
-                        <div id="stat-plan-changes" class="space-y-1 text-xs text-slate-600">-</div>
-                </div>
+                            <div id="content-plan-panel" class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm md:col-span-3 space-y-2">
+                                <p class="text-slate-600 text-xs font-semibold">เลือกแผนการลงทุน</p>
+                                <div class="flex flex-wrap gap-1.5"><button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-blue-100 border-blue-300 text-blue-700" data-plan="1" type="button">หลัก</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="2" type="button">หุ้น35</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="3" type="button">bond</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="4" type="button">ฝากBond สั้น</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="5" type="button">หุ้น 20</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="6" type="button">หุ้น 65</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="7" type="button">หุ้นไทย</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="8" type="button">อสังหาไทย</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="9" type="button">หุ้นต่างประเทศ</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="10" type="button">คุ้มครองต้น1</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="11" type="button">bondF</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="12" type="button">ทอง</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="13" type="button">หุ้น 75</button> <button class="plan-btn px-2.5 py-1 border rounded-full font-medium text-xs transition-all bg-white border-slate-300 hover:bg-slate-100 text-slate-700" data-plan="14" type="button">vau</button>
+                                </div>
+                            </div>
              </div>
                  <div id="multi-chart-grid" class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3"></div>
                  <p class="text-center text-slate-500 text-xs mt-4">📊 ข้อมูล NAV จริงจากกองทุนบำเหน็จบำนาญข้าราชการ</p>
@@ -259,7 +379,7 @@
 
         let config = { ...defaultConfig };
         let navCharts = [];
-        let selectedPlans = ['2'];
+        let selectedPlans = ['1'];
         let currentData = [];
         let currentChartPayload = null;
         let activeTab = 'chart';
@@ -268,6 +388,8 @@
         let isFetchingData = false;
         let pendingAutoFetch = false;
         let fullscreenChart = null;
+        let gasMonthListLoaded = false;
+        let startupAutoSyncDone = false;
 
         const cursorCrosshairPlugin = {
             id: 'cursorCrosshairPlugin',
@@ -357,9 +479,20 @@
         };
 
         const NAV_DB_NAME = 'gpf_nav_cache_db';
-        const NAV_DB_VERSION = 1;
+        const NAV_DB_VERSION = 3;
         const NAV_DB_STORE = 'monthly_nav_cache';
+        const USERS_DB_STORE = 'users';
+        const PORT_DB_STORE = 'portfolio_changes';
         let navDbPromise = null;
+        let activeUser = null;
+        let portfolioEditingChangeId = '';
+        let portfolioNavRecordsCache = [];
+        let portfolioCurrentRowsCache = [];
+        let portfolioChangesCache = [];
+        let portfolioSelectedPlanCharts = [];
+        let portfolioLoadingCounter = 0;
+        const portfolioHistoryByChangeId = new Map();
+        const ACTIVE_USER_STORAGE_KEY = 'gpf_active_user_v1';
 
         // Thai month names
         const thaiMonths = [
@@ -370,25 +503,54 @@
 
         // Plan data configuration with actual API values
         const planNames = {
-            '2': 'หลัก',
-            '3': 'หุ้น35',
-            '4': 'Bond',
-            '5': 'ฝากBond สั้น',
-            '6': 'หุ้น 20',
-            '7': 'หุ้น 65',
-            '8': 'หุ้นไทย',
-            '9': 'อสังหาไทย',
-            '10': 'หุ้นต่างประเทศ',
-            '12': 'BondF',
-            '13': 'ทอง',
-            '14': 'หุ้น 75',
-            '15': 'VAU'
+            '1': 'หลัก',
+            '2': 'หุ้น35',
+            '3': 'bond',
+            '4': 'ฝากBond สั้น',
+            '5': 'หุ้น 20',
+            '6': 'หุ้น 65',
+            '7': 'หุ้นไทย',
+            '8': 'อสังหาไทย',
+            '9': 'หุ้นต่างประเทศ',
+            '10': 'คุ้มครองต้น1',
+            '11': 'bondF',
+            '12': 'ทอง',
+            '13': 'หุ้น 75',
+            '14': 'vau'
         };
 
-        const planLineColors = [
-            '#2563eb', '#16a34a', '#ea580c', '#7c3aed', '#0891b2', '#dc2626', '#ca8a04',
-            '#4f46e5', '#0f766e', '#be185d', '#4338ca', '#15803d', '#b45309', '#7e22ce'
-        ];
+        const planColors = {
+            '1': '#2563eb',
+            '2': '#16a34a',
+            '3': '#f97316',
+            '4': '#9333ea',
+            '5': '#06b6d4',
+            '6': '#ef4444',
+            '7': '#a16207',
+            '8': '#ec4899',
+            '9': '#0f766e',
+            '10': '#7c3aed',
+            '11': '#4f46e5',
+            '12': '#d4af37',
+            '13': '#65a30d',
+            '14': '#334155'
+        };
+
+        function hexToRgba(hex, alpha) {
+            const cleanedHex = String(hex || '').replace('#', '').trim();
+            if (!/^[0-9a-fA-F]{6}$/.test(cleanedHex)) {
+                return `rgba(37, 99, 235, ${alpha})`;
+            }
+
+            const r = parseInt(cleanedHex.slice(0, 2), 16);
+            const g = parseInt(cleanedHex.slice(2, 4), 16);
+            const b = parseInt(cleanedHex.slice(4, 6), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        function getPlanColor(plan) {
+            return planColors[plan] || '#334155';
+        }
 
         function updateMainTitle() {
             const selectedNames = selectedPlans.map(plan => planNames[plan]).filter(Boolean);
@@ -398,12 +560,19 @@
         function refreshPlanButtonStyles() {
             document.querySelectorAll('.plan-btn').forEach(button => {
                 const isSelected = selectedPlans.includes(button.dataset.plan);
-                button.classList.toggle('bg-blue-600', isSelected);
-                button.classList.toggle('hover:bg-blue-500', isSelected);
-                button.classList.toggle('text-white', isSelected);
-                button.classList.toggle('bg-slate-100', !isSelected);
-                button.classList.toggle('hover:bg-slate-200', !isSelected);
-                button.classList.toggle('text-slate-700', !isSelected);
+                const planColor = getPlanColor(button.dataset.plan);
+
+                button.style.color = isSelected ? planColor : hexToRgba(planColor, 0.8);
+                button.style.borderColor = isSelected ? planColor : hexToRgba(planColor, 0.4);
+                button.style.backgroundColor = isSelected ? hexToRgba(planColor, 0.2) : hexToRgba(planColor, 0.06);
+                button.style.boxShadow = isSelected
+                    ? `0 6px 14px ${hexToRgba(planColor, 0.25)}, inset 0 0 0 1px ${hexToRgba(planColor, 0.35)}`
+                    : `inset 0 0 0 1px ${hexToRgba(planColor, 0.12)}`;
+                button.style.opacity = isSelected ? '1' : '0.72';
+                button.style.filter = isSelected ? 'none' : 'saturate(0.7)';
+                button.style.transform = isSelected ? 'translateY(-1px)' : 'translateY(0)';
+                button.style.fontWeight = isSelected ? '700' : '600';
+                button.setAttribute('aria-pressed', String(isSelected));
             });
         }
 
@@ -458,11 +627,15 @@
         }
 
         function setActiveTab(tabName) {
+            const previousTab = activeTab;
             activeTab = tabName;
             const isChartTab = tabName === 'chart';
+            const isDbTab = tabName === 'db';
+            const isPortfolioTab = tabName === 'portfolio';
 
             const tabChart = document.getElementById('tab-chart');
             const tabDb = document.getElementById('tab-db');
+            const tabPortfolio = document.getElementById('tab-portfolio');
 
             tabChart.classList.toggle('bg-blue-600', isChartTab);
             tabChart.classList.toggle('hover:bg-blue-500', isChartTab);
@@ -471,14 +644,22 @@
             tabChart.classList.toggle('hover:bg-slate-200', !isChartTab);
             tabChart.classList.toggle('text-slate-700', !isChartTab);
 
-            tabDb.classList.toggle('bg-blue-600', !isChartTab);
-            tabDb.classList.toggle('hover:bg-blue-500', !isChartTab);
-            tabDb.classList.toggle('text-white', !isChartTab);
-            tabDb.classList.toggle('bg-slate-100', isChartTab);
-            tabDb.classList.toggle('hover:bg-slate-200', isChartTab);
-            tabDb.classList.toggle('text-slate-700', isChartTab);
+            tabDb.classList.toggle('bg-blue-600', isDbTab);
+            tabDb.classList.toggle('hover:bg-blue-500', isDbTab);
+            tabDb.classList.toggle('text-white', isDbTab);
+            tabDb.classList.toggle('bg-slate-100', !isDbTab);
+            tabDb.classList.toggle('hover:bg-slate-200', !isDbTab);
+            tabDb.classList.toggle('text-slate-700', !isDbTab);
 
-            document.getElementById('db-management-panel').classList.toggle('hidden', isChartTab);
+            tabPortfolio.classList.toggle('bg-blue-600', isPortfolioTab);
+            tabPortfolio.classList.toggle('hover:bg-blue-500', isPortfolioTab);
+            tabPortfolio.classList.toggle('text-white', isPortfolioTab);
+            tabPortfolio.classList.toggle('bg-slate-100', !isPortfolioTab);
+            tabPortfolio.classList.toggle('hover:bg-slate-200', !isPortfolioTab);
+            tabPortfolio.classList.toggle('text-slate-700', !isPortfolioTab);
+
+            document.getElementById('db-management-panel').classList.toggle('hidden', !isDbTab);
+            document.getElementById('portfolio-panel').classList.toggle('hidden', !isPortfolioTab);
 
             const loading = document.getElementById('loading');
             const error = document.getElementById('error');
@@ -487,21 +668,57 @@
 
             if (isChartTab) {
                 const state = chartPanelVisibility || { loading: false, error: false, chart: false, chartFilter: true };
-                loading.classList.toggle('hidden', !state.loading);
-                error.classList.toggle('hidden', !state.error);
-                chart.classList.toggle('hidden', !state.chart);
-                chartFilter.classList.toggle('hidden', !state.chartFilter);
+
+                const hasAnyVisiblePanel = !!(state.loading || state.error || state.chart || state.chartFilter);
+                const fallbackState = hasAnyVisiblePanel
+                    ? state
+                    : {
+                        loading: false,
+                        error: false,
+                        chart: Array.isArray(currentData) && currentData.length > 0,
+                        chartFilter: true
+                    };
+
+                loading.classList.toggle('hidden', !fallbackState.loading);
+                error.classList.toggle('hidden', !fallbackState.error);
+                chart.classList.toggle('hidden', !fallbackState.chart);
+                chartFilter.classList.toggle('hidden', !fallbackState.chartFilter);
             } else {
-                chartPanelVisibility = {
-                    loading: !loading.classList.contains('hidden'),
-                    error: !error.classList.contains('hidden'),
-                    chart: !chart.classList.contains('hidden'),
-                    chartFilter: !chartFilter.classList.contains('hidden')
-                };
+                // Save chart panel state only when leaving chart tab.
+                if (previousTab === 'chart') {
+                    chartPanelVisibility = {
+                        loading: !loading.classList.contains('hidden'),
+                        error: !error.classList.contains('hidden'),
+                        chart: !chart.classList.contains('hidden'),
+                        chartFilter: !chartFilter.classList.contains('hidden')
+                    };
+                }
                 loading.classList.add('hidden');
                 error.classList.add('hidden');
                 chart.classList.add('hidden');
                 chartFilter.classList.add('hidden');
+
+                if (isDbTab && !gasMonthListLoaded) {
+                    refreshGasMonthList()
+                        .then(() => {
+                            gasMonthListLoaded = true;
+                        })
+                        .catch((errorObj) => {
+                            const statusEl = document.getElementById('db-status');
+                            if (statusEl) {
+                                statusEl.textContent = `สถานะ: โหลดรายการเดือนจาก GAS ไม่สำเร็จ (${errorObj.message})`;
+                            }
+                        });
+                }
+
+                if (isPortfolioTab) {
+                    refreshPortfolioUi().catch((errorObj) => {
+                        const statusEl = document.getElementById('portfolio-status');
+                        if (statusEl) {
+                            statusEl.textContent = `สถานะ: โหลดพอร์ตไม่สำเร็จ (${errorObj.message})`;
+                        }
+                    });
+                }
             }
         }
 
@@ -554,8 +771,13 @@
             return ema;
         }
 
-        // Cached API data
+        // Cached data source
         let cachedApiData = null;
+
+        // Replace this with your GAS Web App deployment URL.
+        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxn9OA4-5Bg0d5nrDVxiPyY8M_JnXBuNM-MYWaxRqqvFQ8DysYgrYq01xh58m91Oqhn/exec';
+        const GAS_SYNC_TOKEN = 'Amp';
+        const GAS_PAGE_LIMIT = 5000;
 
         function parseApiDate(dateText) {
             if (!dateText || typeof dateText !== 'string') return null;
@@ -597,20 +819,20 @@
             return {
                 date: parsedDate.label,
                 dateObj: parsedDate.dateObj,
-                plan2: normalizedUnitCosts[0],
-                plan3: normalizedUnitCosts[1],
-                plan4: normalizedUnitCosts[2],
-                plan5: normalizedUnitCosts[3],
-                plan6: normalizedUnitCosts[4],
-                plan7: normalizedUnitCosts[5],
-                plan8: normalizedUnitCosts[6],
-                plan9: normalizedUnitCosts[7],
-                plan10: normalizedUnitCosts[8],
-                plan11: normalizedUnitCosts[9],
-                plan12: normalizedUnitCosts[10],
-                plan13: normalizedUnitCosts[11],
-                plan14: normalizedUnitCosts[12],
-                plan15: normalizedUnitCosts[13],
+                plan1: normalizedUnitCosts[0],
+                plan2: normalizedUnitCosts[1],
+                plan3: normalizedUnitCosts[2],
+                plan4: normalizedUnitCosts[3],
+                plan5: normalizedUnitCosts[4],
+                plan6: normalizedUnitCosts[5],
+                plan7: normalizedUnitCosts[6],
+                plan8: normalizedUnitCosts[7],
+                plan9: normalizedUnitCosts[8],
+                plan10: normalizedUnitCosts[9],
+                plan11: normalizedUnitCosts[10],
+                plan12: normalizedUnitCosts[11],
+                plan13: normalizedUnitCosts[12],
+                plan14: normalizedUnitCosts[13],
                 unitCosts: normalizedUnitCosts
             };
         }
@@ -657,6 +879,23 @@
                     if (!db.objectStoreNames.contains(NAV_DB_STORE)) {
                         const store = db.createObjectStore(NAV_DB_STORE, { keyPath: 'monthKey' });
                         store.createIndex('updatedAt', 'updatedAt', { unique: false });
+                    }
+
+                    if (!db.objectStoreNames.contains(USERS_DB_STORE)) {
+                        const usersStore = db.createObjectStore(USERS_DB_STORE, {
+                            keyPath: 'id',
+                            autoIncrement: true
+                        });
+                        usersStore.createIndex('username', 'username', { unique: true });
+                    }
+
+                    if (!db.objectStoreNames.contains(PORT_DB_STORE)) {
+                        const portStore = db.createObjectStore(PORT_DB_STORE, {
+                            keyPath: 'id',
+                            autoIncrement: true
+                        });
+                        portStore.createIndex('userId', 'userId', { unique: false });
+                        portStore.createIndex('userDate', ['userId', 'effectiveDate'], { unique: false });
                     }
                 };
 
@@ -723,6 +962,1154 @@
             });
         }
 
+        function parseIsoDateToDateObj(isoDate) {
+            const text = String(isoDate || '').trim();
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return null;
+            const [y, m, d] = text.split('-').map(Number);
+            if (!y || !m || !d) return null;
+            return new Date(y, m - 1, d);
+        }
+
+        function parseFlexibleDateToDateObj(value) {
+            const text = String(value || '').trim();
+            if (!text) return null;
+
+            const isoDate = parseIsoDateToDateObj(text);
+            if (isoDate) return isoDate;
+
+            // Support ISO datetime such as 2026-02-24T00:00:00.000Z
+            const isoDateTimeMatch = text.match(/^(\d{4}-\d{2}-\d{2})[T\s]/);
+            if (isoDateTimeMatch) {
+                const parsedIsoPart = parseIsoDateToDateObj(isoDateTimeMatch[1]);
+                if (parsedIsoPart) return parsedIsoPart;
+            }
+
+            // Support values like MM/DD/YYYY or DD/MM/YYYY coming from legacy/localized records.
+            const slashMatch = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+            if (slashMatch) {
+                const first = Number(slashMatch[1]);
+                const second = Number(slashMatch[2]);
+                const year = Number(slashMatch[3]);
+                if (!Number.isFinite(first) || !Number.isFinite(second) || !Number.isFinite(year)) return null;
+
+                // Prefer MM/DD/YYYY for browser date-input displays, then fallback to DD/MM/YYYY.
+                if (first >= 1 && first <= 12 && second >= 1 && second <= 31) {
+                    return new Date(year, first - 1, second);
+                }
+                if (first >= 1 && first <= 31 && second >= 1 && second <= 12) {
+                    return new Date(year, second - 1, first);
+                }
+            }
+
+            // Last resort for other browser-parsable date strings.
+            const parsed = new Date(text);
+            if (!isNaN(parsed.getTime())) {
+                return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+            }
+
+            return null;
+        }
+
+        function formatCurrency(value) {
+            const num = Number(value || 0);
+            return num.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatShortDateDisplay(value) {
+            if (!value) return '-';
+
+            if (value instanceof Date && !isNaN(value.getTime())) {
+                return `${String(value.getDate()).padStart(2, '0')}/${String(value.getMonth() + 1).padStart(2, '0')}/${value.getFullYear()}`;
+            }
+
+            const text = String(value).trim();
+            const isoMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (isoMatch) {
+                return `${isoMatch[3]}/${isoMatch[2]}/${isoMatch[1]}`;
+            }
+
+            const parsed = new Date(text);
+            if (!isNaN(parsed.getTime())) {
+                return `${String(parsed.getDate()).padStart(2, '0')}/${String(parsed.getMonth() + 1).padStart(2, '0')}/${parsed.getFullYear()}`;
+            }
+
+            return text;
+        }
+
+        function setPortfolioStatus(message, tone = 'normal') {
+            const el = document.getElementById('portfolio-status');
+            if (!el) return;
+            el.textContent = `สถานะ: ${message}`;
+            el.classList.remove('text-slate-600', 'text-rose-600', 'text-emerald-600', 'text-amber-600');
+            if (tone === 'error') {
+                el.classList.add('text-rose-600');
+            } else if (tone === 'success') {
+                el.classList.add('text-emerald-600');
+            } else if (tone === 'warn') {
+                el.classList.add('text-amber-600');
+            } else {
+                el.classList.add('text-slate-600');
+            }
+        }
+
+        function setPortfolioLoading(isLoading, message = 'กำลังโหลดข้อมูลพอร์ต...') {
+            const box = document.getElementById('portfolio-loading');
+            const textEl = document.getElementById('portfolio-loading-text');
+            if (!box || !textEl) return;
+
+            if (isLoading) {
+                portfolioLoadingCounter += 1;
+                textEl.textContent = String(message || 'กำลังโหลดข้อมูลพอร์ต...');
+                box.classList.remove('hidden');
+            } else {
+                portfolioLoadingCounter = Math.max(0, portfolioLoadingCounter - 1);
+                if (portfolioLoadingCounter === 0) {
+                    box.classList.add('hidden');
+                }
+            }
+        }
+
+        function getPlanIndexById(planId) {
+            const id = Number(planId);
+            if (!Number.isInteger(id) || id < 1 || id > 14) return -1;
+            return id - 1;
+        }
+
+        async function hashPassword(password) {
+            const text = String(password || '');
+            if (!text) return '';
+
+            if (window.crypto && window.crypto.subtle && window.TextEncoder) {
+                const data = new TextEncoder().encode(text);
+                const digest = await window.crypto.subtle.digest('SHA-256', data);
+                return Array.from(new Uint8Array(digest))
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('');
+            }
+
+            return `plain:${text}`;
+        }
+
+        async function idbFindUserByUsername(username) {
+            const db = await openNavDb();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(USERS_DB_STORE, 'readonly');
+                const store = tx.objectStore(USERS_DB_STORE);
+                const index = store.index('username');
+                const request = index.get(String(username || '').trim());
+                request.onsuccess = () => resolve(request.result || null);
+                request.onerror = () => reject(request.error || new Error('ค้นหาผู้ใช้ไม่สำเร็จ'));
+            });
+        }
+
+        async function idbCreateUser(username, passwordHash) {
+            const db = await openNavDb();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(USERS_DB_STORE, 'readwrite');
+                const store = tx.objectStore(USERS_DB_STORE);
+                const payload = {
+                    username: String(username || '').trim(),
+                    passwordHash: String(passwordHash || ''),
+                    createdAt: new Date().toISOString()
+                };
+                const request = store.add(payload);
+                request.onsuccess = () => resolve({ ...payload, id: request.result });
+                request.onerror = () => reject(request.error || new Error('สร้างผู้ใช้ไม่สำเร็จ'));
+            });
+        }
+
+        async function idbGetUserById(userId) {
+            const id = String(userId || '').trim();
+            if (!id) return null;
+            const db = await openNavDb();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(USERS_DB_STORE, 'readonly');
+                const store = tx.objectStore(USERS_DB_STORE);
+                const request = store.get(id);
+                request.onsuccess = () => resolve(request.result || null);
+                request.onerror = () => reject(request.error || new Error('อ่านข้อมูลผู้ใช้ไม่สำเร็จ'));
+            });
+        }
+
+        async function idbAddPortfolioChange(change) {
+            const db = await openNavDb();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(PORT_DB_STORE, 'readwrite');
+                const store = tx.objectStore(PORT_DB_STORE);
+                const payload = {
+                    userId: String(change.userId || '').trim(),
+                    batchId: String(change.batchId || ''),
+                    effectiveDate: String(change.effectiveDate || ''),
+                    entriesJson: String(change.entriesJson || '[]'),
+                    note: String(change.note || ''),
+                    createdAt: new Date().toISOString()
+                };
+                const request = store.add(payload);
+                request.onsuccess = () => resolve({ ...payload, id: request.result });
+                request.onerror = () => reject(request.error || new Error('บันทึกรายการพอร์ตไม่สำเร็จ'));
+            });
+        }
+
+        async function idbGetPortfolioChangesByUser(userId) {
+            const id = String(userId || '').trim();
+            if (!id) return [];
+
+            const db = await openNavDb();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(PORT_DB_STORE, 'readonly');
+                const store = tx.objectStore(PORT_DB_STORE);
+                const index = store.index('userId');
+                const request = index.getAll(id);
+                request.onsuccess = () => {
+                    const rows = (request.result || []).slice().sort((a, b) => {
+                        if (a.effectiveDate !== b.effectiveDate) {
+                            return String(a.effectiveDate).localeCompare(String(b.effectiveDate));
+                        }
+                        return String(a.createdAt || '').localeCompare(String(b.createdAt || ''));
+                    });
+                    resolve(rows);
+                };
+                request.onerror = () => reject(request.error || new Error('อ่านประวัติพอร์ตไม่สำเร็จ'));
+            });
+        }
+
+        async function idbDeletePortfolioChangeById(localId) {
+            const id = Number(localId);
+            if (!Number.isFinite(id)) return;
+
+            const db = await openNavDb();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(PORT_DB_STORE, 'readwrite');
+                const store = tx.objectStore(PORT_DB_STORE);
+                const request = store.delete(id);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error || new Error('ลบรายการพอร์ตในเครื่องไม่สำเร็จ'));
+            });
+        }
+
+        async function idbReplacePortfolioHistoryByUser(userId, batches) {
+            const id = String(userId || '').trim();
+            const input = Array.isArray(batches) ? batches : [];
+            if (!id) return;
+
+            const db = await openNavDb();
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(PORT_DB_STORE, 'readwrite');
+                const store = tx.objectStore(PORT_DB_STORE);
+                const index = store.index('userId');
+                const request = index.getAll(id);
+                request.onsuccess = () => {
+                    const existing = request.result || [];
+                    for (let i = 0; i < existing.length; i++) {
+                        if (existing[i] && existing[i].id != null) {
+                            store.delete(existing[i].id);
+                        }
+                    }
+
+                    for (let i = 0; i < input.length; i++) {
+                        const item = input[i] || {};
+                        store.add({
+                            userId: id,
+                            batchId: String(item.batchId || ''),
+                            effectiveDate: String(item.effectiveDate || ''),
+                            entriesJson: String(item.entriesJson || JSON.stringify(item.entries || [])),
+                            note: String(item.note || ''),
+                            createdAt: String(item.createdAt || new Date().toISOString())
+                        });
+                    }
+                };
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error || new Error('อัปเดต cache พอร์ตไม่สำเร็จ'));
+                request.onerror = () => reject(request.error || new Error('อ่าน cache พอร์ตไม่สำเร็จ'));
+            });
+        }
+
+        async function registerUserViaGas(username, passwordHash, displayName) {
+            const payload = await fetchGasJson({
+                action: 'register_user',
+                username,
+                passwordHash,
+                displayName: displayName || username
+            });
+            return payload?.result || null;
+        }
+
+        async function loginUserViaGas(username, passwordHash) {
+            const payload = await fetchGasJson({
+                action: 'login_user',
+                username,
+                passwordHash
+            });
+            return payload?.result || null;
+        }
+
+        async function savePortfolioBatchViaGas(userId, effectiveDate, entriesJson, note, batchId) {
+            const payload = await fetchGasJson({
+                action: 'save_portfolio_batch',
+                userId,
+                effectiveDate,
+                entriesJson,
+                note,
+                batchId
+            });
+            return payload?.result || null;
+        }
+
+        async function updatePortfolioBatchViaGas(changeId, userId, effectiveDate, entriesJson, note, batchId) {
+            const payload = await fetchGasJson({
+                action: 'update_portfolio_batch',
+                changeId,
+                userId,
+                effectiveDate,
+                entriesJson,
+                note,
+                batchId
+            });
+            return payload?.result || null;
+        }
+
+        async function deletePortfolioBatchViaGas(changeId, userId) {
+            const payload = await fetchGasJson({
+                action: 'delete_portfolio_batch',
+                changeId,
+                userId
+            });
+            return payload?.result || null;
+        }
+
+        async function getPortfolioHistoryViaGas(userId) {
+            const payload = await fetchGasJson({
+                action: 'get_portfolio_history',
+                userId,
+                limit: 1000
+            });
+            return payload?.result?.batches || [];
+        }
+
+        async function syncPortfolioHistoryFromGasToCache(userId) {
+            const id = String(userId || '').trim();
+            if (!id) return [];
+            const batches = await getPortfolioHistoryViaGas(id);
+            await idbReplacePortfolioHistoryByUser(id, batches);
+            return batches;
+        }
+
+        function parsePortfolioEntriesJson(entriesJsonText) {
+            const text = String(entriesJsonText || '').trim();
+            if (!text) return [];
+
+            try {
+                const parsed = JSON.parse(text);
+                if (!Array.isArray(parsed)) return [];
+
+                const normalizePlanName = (name) => String(name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+                const resolvePlanIdByName = (name) => {
+                    const target = normalizePlanName(name);
+                    if (!target) return '';
+                    const found = Object.keys(planNames).find((planId) => normalizePlanName(planNames[planId]) === target);
+                    return String(found || '').trim();
+                };
+
+                return parsed
+                    .map((item) => {
+                        const rawUnitCostKey = String(item?.unitCostKey || '').trim();
+                        const rawPlanName = String(item?.planName || '').trim();
+                        const units = Number(item?.units || 0);
+
+                        // Backward compatibility: prefer planName to resolve canonical unitCost key.
+                        const resolvedPlanId = resolvePlanIdByName(rawPlanName);
+                        const unitCostKey = resolvedPlanId ? `unitCost${resolvedPlanId}` : rawUnitCostKey;
+
+                        return {
+                            unitCostKey,
+                            planName: rawPlanName,
+                            units
+                        };
+                    })
+                    .filter((item) => /^unitCost\d+$/.test(item.unitCostKey) && Number.isFinite(item.units) && item.units >= 0);
+            } catch (_error) {
+                return [];
+            }
+        }
+
+        function parsePlanIdFromUnitCostKey(unitCostKey) {
+            const match = String(unitCostKey || '').match(/^unitCost(\d+)$/i);
+            if (!match) return '';
+            return String(parseInt(match[1], 10));
+        }
+
+        function createPortfolioBatchId(effectiveDate) {
+            const dateText = String(effectiveDate || '').replace(/-/g, '');
+            const stamp = String(Date.now()).slice(-5);
+            return `B${dateText}-${stamp}`;
+        }
+
+        function setPortfolioEditMode(changeId) {
+            portfolioEditingChangeId = String(changeId || '').trim();
+            const saveBtn = document.getElementById('portfolio-save-btn');
+            if (!saveBtn) return;
+            if (portfolioEditingChangeId) {
+                saveBtn.textContent = 'อัปเดตรอบนี้';
+                saveBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-500');
+                saveBtn.classList.add('bg-amber-600', 'hover:bg-amber-500');
+            } else {
+                saveBtn.textContent = 'บันทึกรอบนี้';
+                saveBtn.classList.remove('bg-amber-600', 'hover:bg-amber-500');
+                saveBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500');
+            }
+        }
+
+        function getPortfolioRowKey(row) {
+            const changeId = String(row?.changeId || '').trim();
+            if (changeId) return `change:${changeId}`;
+
+            const batchId = String(row?.batchId || '').trim();
+            if (batchId) return `batch:${batchId}`;
+
+            const localId = Number(row?.id);
+            if (Number.isFinite(localId)) return `local:${localId}`;
+
+            return '';
+        }
+
+        function loadPortfolioBatchIntoForm(batch) {
+            const item = batch || {};
+            document.getElementById('portfolio-change-date').value = String(item.effectiveDate || '').trim();
+            document.getElementById('portfolio-note').value = String(item.note || '').trim();
+
+            const entries = parsePortfolioEntriesJson(item.entriesJson);
+            const container = document.getElementById('portfolio-entries');
+            if (!container) return;
+            container.innerHTML = '';
+            if (!entries.length) {
+                addPortfolioEntryRow('1', '');
+            } else {
+                entries.forEach((entry) => {
+                    const plan = parsePlanIdFromUnitCostKey(entry.unitCostKey) || '1';
+                    addPortfolioEntryRow(plan, String(entry.units));
+                });
+            }
+        }
+
+        function setActiveUser(user) {
+            activeUser = user || null;
+            if (activeUser && String(activeUser.userId || '').trim()) {
+                localStorage.setItem(ACTIVE_USER_STORAGE_KEY, JSON.stringify({
+                    userId: String(activeUser.userId || '').trim(),
+                    username: String(activeUser.username || '').trim(),
+                    displayName: String(activeUser.displayName || '').trim()
+                }));
+            } else {
+                localStorage.removeItem(ACTIVE_USER_STORAGE_KEY);
+                renderPortfolioSummary({ totalCost: 0, totalCurrent: 0, totalPnl: 0 });
+                renderPortfolioCurrentTable([]);
+                renderPortfolioHistoryTable([]);
+            }
+            updatePortfolioAuthUi();
+        }
+
+        function updatePortfolioAuthUi() {
+            const authStatus = document.getElementById('portfolio-auth-status');
+            const authBox = document.getElementById('portfolio-auth-box');
+            const mainBox = document.getElementById('portfolio-main-box');
+            if (!authStatus || !authBox || !mainBox) return;
+
+            if (activeUser) {
+                authStatus.textContent = `เข้าสู่ระบบ: ${activeUser.username}`;
+                authBox.classList.add('hidden');
+                mainBox.classList.remove('hidden');
+            } else {
+                authStatus.textContent = 'ยังไม่เข้าสู่ระบบ';
+                authBox.classList.remove('hidden');
+                mainBox.classList.add('hidden');
+            }
+        }
+
+        async function restoreActiveUserSession() {
+            const saved = localStorage.getItem(ACTIVE_USER_STORAGE_KEY);
+            if (!saved) {
+                setActiveUser(null);
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(saved);
+                const userId = String(parsed?.userId || '').trim();
+                if (!userId) {
+                    setActiveUser(null);
+                    return;
+                }
+                setActiveUser({
+                    userId,
+                    username: String(parsed?.username || '').trim(),
+                    displayName: String(parsed?.displayName || '').trim()
+                });
+            } catch (_error) {
+                setActiveUser(null);
+            }
+        }
+
+        async function getAllCachedNavRecords() {
+            const entries = await idbGetAllMonths();
+            if (!entries.length) return [];
+
+            const all = [];
+            entries.forEach((entry) => {
+                all.push(...hydrateRecords(entry.records || []));
+            });
+            return dedupeRecordsByDate(all);
+        }
+
+        function getLatestNavPriceForPlan(navRecords, plan) {
+            const idx = getPlanIndexById(plan);
+            if (idx < 0) return null;
+
+            for (let i = navRecords.length - 1; i >= 0; i--) {
+                const value = toUnitCostValue(navRecords[i]?.unitCosts?.[idx]);
+                if (Number.isFinite(value)) {
+                    return value;
+                }
+            }
+
+            return null;
+        }
+
+        function getNavPriceAtOrBefore(navRecords, plan, effectiveDateText) {
+            const idx = getPlanIndexById(plan);
+            const effectiveDate = parseFlexibleDateToDateObj(effectiveDateText);
+            if (idx < 0 || !effectiveDate) return null;
+
+            let price = null;
+            let nearestAfter = null;
+            for (let i = 0; i < navRecords.length; i++) {
+                const row = navRecords[i];
+                if (!(row.dateObj instanceof Date)) continue;
+                const value = toUnitCostValue(row.unitCosts?.[idx]);
+                if (!Number.isFinite(value)) continue;
+
+                if (row.dateObj.getTime() <= effectiveDate.getTime()) {
+                    price = value;
+                } else {
+                    // Fallback when no price exists on/before the selected date in IndexedDB.
+                    nearestAfter = value;
+                    break;
+                }
+            }
+
+            return Number.isFinite(price) ? price : nearestAfter;
+        }
+
+        function buildPortfolioSnapshot(changes, navRecords) {
+            const rows = Array.isArray(changes) ? changes : [];
+            const latestByPlan = new Map();
+            const historyRows = [];
+
+            rows.forEach((item) => {
+                const entries = parsePortfolioEntriesJson(item.entriesJson);
+                let batchCost = 0;
+                let batchCurrent = 0;
+                const entrySummaries = [];
+
+                entries.forEach((entry) => {
+                    const plan = parsePlanIdFromUnitCostKey(entry.unitCostKey);
+                    if (!plan) return;
+
+                    const units = Number(entry.units || 0);
+                    const entryPrice = getNavPriceAtOrBefore(navRecords, plan, item.effectiveDate);
+                    const latestPrice = getLatestNavPriceForPlan(navRecords, plan);
+                    const entryValue = Number.isFinite(entryPrice) ? units * entryPrice : 0;
+                    const latestValue = Number.isFinite(latestPrice) ? units * latestPrice : 0;
+                    const pnl = latestValue - entryValue;
+
+                    batchCost += entryValue;
+                    batchCurrent += latestValue;
+                    entrySummaries.push({
+                        unitCostKey: entry.unitCostKey,
+                        plan,
+                        planName: entry.planName || planNames[plan] || `แผน ${plan}`,
+                        units,
+                        entryPrice,
+                        latestPrice,
+                        pnl
+                    });
+
+                    const prev = latestByPlan.get(plan);
+                    const nextModel = {
+                        source: item,
+                        plan,
+                        units,
+                        planName: entry.planName || planNames[plan] || `แผน ${plan}`
+                    };
+                    if (!prev) {
+                        latestByPlan.set(plan, nextModel);
+                    } else {
+                        const prevDate = String(prev.source?.effectiveDate || '');
+                        const nextDate = String(item.effectiveDate || '');
+                        if (nextDate > prevDate || (nextDate === prevDate && String(item.createdAt || '') >= String(prev.source?.createdAt || ''))) {
+                            latestByPlan.set(plan, nextModel);
+                        }
+                    }
+                });
+
+                historyRows.push({
+                    ...item,
+                    entrySummaries,
+                    planName: entrySummaries.map((it) => it.planName).join(', '),
+                    units: entrySummaries.reduce((sum, it) => sum + Number(it.units || 0), 0),
+                    entryPrice: null,
+                    latestPrice: null,
+                    pnl: batchCurrent - batchCost,
+                    entryValue: batchCost,
+                    latestValue: batchCurrent
+                });
+            });
+
+            const currentRows = Array.from(latestByPlan.values()).map((item) => {
+                const plan = String(item.plan || '');
+                const units = Number(item.units || 0);
+                const entryPrice = getNavPriceAtOrBefore(navRecords, plan, item.source?.effectiveDate);
+                const latestPrice = getLatestNavPriceForPlan(navRecords, plan);
+                const cost = Number.isFinite(entryPrice) ? units * entryPrice : 0;
+                const current = Number.isFinite(latestPrice) ? units * latestPrice : 0;
+
+                return {
+                    ...item.source,
+                    plan,
+                    units,
+                    planName: item.planName,
+                    entryPrice,
+                    latestPrice,
+                    cost,
+                    current,
+                    pnl: current - cost
+                };
+            }).sort((a, b) => String(a.plan).localeCompare(String(b.plan), 'en'));
+
+            const totalCost = currentRows.reduce((sum, row) => sum + Number(row.cost || 0), 0);
+            const totalCurrent = currentRows.reduce((sum, row) => sum + Number(row.current || 0), 0);
+
+            return {
+                totalCost,
+                totalCurrent,
+                totalPnl: totalCurrent - totalCost,
+                currentRows,
+                historyRows: historyRows.slice().sort((a, b) => {
+                    if (a.effectiveDate !== b.effectiveDate) {
+                        return String(b.effectiveDate).localeCompare(String(a.effectiveDate));
+                    }
+                    return Number(b.id || 0) - Number(a.id || 0);
+                })
+            };
+        }
+
+        function renderPortfolioSummary(snapshot) {
+            document.getElementById('portfolio-total-cost').textContent = formatCurrency(snapshot.totalCost);
+            document.getElementById('portfolio-total-current').textContent = formatCurrency(snapshot.totalCurrent);
+
+            const pnlEl = document.getElementById('portfolio-total-pnl');
+            pnlEl.textContent = formatCurrency(snapshot.totalPnl);
+            pnlEl.classList.remove('text-emerald-600', 'text-rose-600', 'text-slate-800');
+            if (snapshot.totalPnl > 0) {
+                pnlEl.classList.add('text-emerald-600');
+            } else if (snapshot.totalPnl < 0) {
+                pnlEl.classList.add('text-rose-600');
+            } else {
+                pnlEl.classList.add('text-slate-800');
+            }
+        }
+
+        function renderPortfolioCurrentTable(rows) {
+            const body = document.getElementById('portfolio-current-table-body');
+            if (!rows.length) {
+                body.innerHTML = '<tr><td colspan="7" class="py-3 text-slate-400">ยังไม่มีข้อมูล</td></tr>';
+                return;
+            }
+
+            body.innerHTML = rows.map((row) => {
+                const pnlClass = row.pnl >= 0 ? 'text-emerald-600' : 'text-rose-600';
+                return `
+                    <tr class="border-b border-slate-100">
+                        <td class="py-2 pr-2">${row.planName}</td>
+                        <td class="py-2 px-2 text-right">${formatCurrency(row.units)}</td>
+                        <td class="py-2 px-2 text-right">${Number.isFinite(row.entryPrice) ? formatCurrency(row.entryPrice) : '-'}</td>
+                        <td class="py-2 px-2 text-right">${Number.isFinite(row.latestPrice) ? formatCurrency(row.latestPrice) : '-'}</td>
+                        <td class="py-2 px-2 text-right">${formatCurrency(row.cost)}</td>
+                        <td class="py-2 px-2 text-right">${formatCurrency(row.current)}</td>
+                        <td class="py-2 pl-2 text-right ${pnlClass}">${formatCurrency(row.pnl)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderPortfolioHistoryTable(rows) {
+            const body = document.getElementById('portfolio-history-table-body');
+            portfolioHistoryByChangeId.clear();
+            if (!rows.length) {
+                body.innerHTML = '<tr><td colspan="8" class="py-3 text-slate-400">ยังไม่มีข้อมูล</td></tr>';
+                return;
+            }
+
+            rows.forEach((row) => {
+                const key = getPortfolioRowKey(row);
+                if (key) {
+                    portfolioHistoryByChangeId.set(key, row);
+                }
+            });
+
+            body.innerHTML = rows.map((row) => {
+                const pnlClass = row.pnl >= 0 ? 'text-emerald-600' : 'text-rose-600';
+                const entriesLabel = Array.isArray(row.entrySummaries) && row.entrySummaries.length
+                    ? row.entrySummaries.map((it) => `${it.planName}: ${formatCurrency(it.units)} หน่วย`).join(' | ')
+                    : (row.planName || '-');
+                const entryPriceLabel = Array.isArray(row.entrySummaries) && row.entrySummaries.length
+                    ? row.entrySummaries
+                        .map((it) => Number.isFinite(it.entryPrice) ? `${it.planName}: ${formatCurrency(it.entryPrice)}` : `${it.planName}: -`)
+                        .join(' | ')
+                    : '-';
+                const rowKey = getPortfolioRowKey(row);
+                const changeId = String(row.changeId || '').trim();
+                const shortDate = formatShortDateDisplay(row.effectiveDate);
+                return `
+                    <tr class="border-b border-slate-100">
+                        <td class="py-2 pr-2 whitespace-nowrap" title="${String(row.effectiveDate || '-')}">${shortDate}</td>
+                        <td class="py-2 px-2">${entriesLabel}</td>
+                        <td class="py-2 px-2 text-right">${entryPriceLabel}</td>
+                        <td class="py-2 px-2 text-right">${formatCurrency(row.entryValue || 0)}</td>
+                        <td class="py-2 px-2 text-right">${formatCurrency(row.latestValue || 0)}</td>
+                        <td class="py-2 px-2 text-right ${pnlClass}">${formatCurrency(row.pnl)}</td>
+                        <td class="py-2 pl-2">${row.note ? row.note.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '-'}</td>
+                        <td class="py-2 pl-2 text-right">
+                            <div class="inline-flex gap-1">
+                                <button type="button" class="portfolio-edit-btn px-2 py-1 text-[11px] rounded bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-300" data-row-key="${rowKey}" data-change-id="${changeId}">แก้ไข</button>
+                                <button type="button" class="portfolio-delete-btn px-2 py-1 text-[11px] rounded bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-300" data-row-key="${rowKey}" data-change-id="${changeId}">ลบ</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function refreshPortfolioUi() {
+            setPortfolioLoading(true, 'กำลังโหลดข้อมูลพอร์ต...');
+            try {
+                updatePortfolioAuthUi();
+                if (!activeUser) {
+                    document.getElementById('portfolio-status').textContent = 'สถานะ: กรุณา login เพื่อใช้งานพอร์ต';
+                    portfolioCurrentRowsCache = [];
+                    portfolioChangesCache = [];
+                    destroyPortfolioSelectedPlanChart();
+                    return;
+                }
+
+                try {
+                    await syncPortfolioHistoryFromGasToCache(activeUser.userId);
+                } catch (_error) {
+                    // Keep working from local cache when GAS is temporarily unreachable.
+                }
+
+                const navRecords = await getAllCachedNavRecords();
+                portfolioNavRecordsCache = navRecords;
+                if (!navRecords.length) {
+                    document.getElementById('portfolio-status').textContent = 'สถานะ: ยังไม่มีข้อมูล NAV ในแคช (ไปแท็บจัดการ DB เพื่อซิงก์ก่อน)';
+                    renderPortfolioSummary({ totalCost: 0, totalCurrent: 0, totalPnl: 0 });
+                    renderPortfolioCurrentTable([]);
+                    renderPortfolioHistoryTable([]);
+                    portfolioCurrentRowsCache = [];
+                    portfolioChangesCache = [];
+                    await refreshPortfolioEntryPriceHints();
+                    await refreshPortfolioSelectedPlanChart();
+                    return;
+                }
+
+                const changes = await idbGetPortfolioChangesByUser(activeUser.userId);
+                portfolioChangesCache = Array.isArray(changes) ? changes : [];
+                const snapshot = buildPortfolioSnapshot(changes, navRecords);
+                renderPortfolioSummary(snapshot);
+                renderPortfolioCurrentTable(snapshot.currentRows);
+                renderPortfolioHistoryTable(snapshot.historyRows);
+                portfolioCurrentRowsCache = Array.isArray(snapshot.currentRows) ? snapshot.currentRows : [];
+                await refreshPortfolioEntryPriceHints();
+                await refreshPortfolioSelectedPlanChart();
+                document.getElementById('portfolio-status').textContent = `สถานะ: โหลดพอร์ตของ ${activeUser.username} แล้ว (${changes.length} รายการ)`;
+            } finally {
+                setPortfolioLoading(false);
+            }
+        }
+
+        function getPortfolioPlanOptionsHtml(selectedPlan = '') {
+            const selected = String(selectedPlan || '').trim();
+            const planIds = Object.keys(planNames).sort((a, b) => Number(a) - Number(b));
+            return planIds
+                .map((planId) => {
+                    const selectedAttr = selected === String(planId) ? ' selected' : '';
+                    return `<option value="${planId}"${selectedAttr}>${planNames[planId]} (unitCost${planId})</option>`;
+                })
+                .join('');
+        }
+
+        function createPortfolioEntryRowHtml(plan = '1', units = '') {
+            return `
+                <div class="grid grid-cols-12 gap-2 portfolio-entry-row">
+                    <div class="col-span-6">
+                        <select class="portfolio-entry-plan w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700">
+                            ${getPortfolioPlanOptionsHtml(plan)}
+                        </select>
+                        <p class="portfolio-entry-price mt-1 text-[11px] text-slate-500">ราคา ณ วันที่เปลี่ยน: -</p>
+                    </div>
+                    <div class="col-span-5">
+                        <input type="number" step="0.0001" min="0" value="${units}" placeholder="จำนวนหน่วย" class="portfolio-entry-units w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 text-right" />
+                    </div>
+                    <div class="col-span-1">
+                        <button type="button" class="portfolio-entry-remove w-full h-full px-2 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-lg text-xs font-semibold border border-rose-200">ลบ</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addPortfolioEntryRow(plan = '1', units = '') {
+            const container = document.getElementById('portfolio-entries');
+            if (!container) return;
+            container.insertAdjacentHTML('beforeend', createPortfolioEntryRowHtml(plan, units));
+            refreshPortfolioEntryPriceHints().catch(() => {});
+            refreshPortfolioSelectedPlanChart().catch(() => {});
+        }
+
+        function resetPortfolioEntryRows() {
+            const container = document.getElementById('portfolio-entries');
+            if (!container) return;
+            container.innerHTML = '';
+            addPortfolioEntryRow('1', '');
+        }
+
+        function collectPortfolioEntries() {
+            const container = document.getElementById('portfolio-entries');
+            if (!container) return [];
+
+            const rows = Array.from(container.querySelectorAll('.portfolio-entry-row'));
+            const entries = [];
+            rows.forEach((row) => {
+                const plan = String(row.querySelector('.portfolio-entry-plan')?.value || '').trim();
+                const units = Number(row.querySelector('.portfolio-entry-units')?.value || '');
+                entries.push({ plan, units });
+            });
+
+            return entries;
+        }
+
+        async function getPortfolioNavRecordsForPricing() {
+            if (Array.isArray(portfolioNavRecordsCache) && portfolioNavRecordsCache.length) {
+                return portfolioNavRecordsCache;
+            }
+
+            const records = await getAllCachedNavRecords();
+            portfolioNavRecordsCache = Array.isArray(records) ? records : [];
+            return portfolioNavRecordsCache;
+        }
+
+        async function refreshPortfolioEntryPriceHints() {
+            const container = document.getElementById('portfolio-entries');
+            if (!container) return;
+
+            const effectiveDate = String(document.getElementById('portfolio-change-date')?.value || '').trim();
+            const rows = Array.from(container.querySelectorAll('.portfolio-entry-row'));
+            if (!rows.length) return;
+
+            const navRecords = await getPortfolioNavRecordsForPricing();
+            rows.forEach((row) => {
+                const plan = String(row.querySelector('.portfolio-entry-plan')?.value || '').trim();
+                const label = row.querySelector('.portfolio-entry-price');
+                if (!label) return;
+
+                if (!effectiveDate || !navRecords.length || getPlanIndexById(plan) < 0) {
+                    label.textContent = 'ราคา ณ วันที่เปลี่ยน: -';
+                    return;
+                }
+
+                const price = getNavPriceAtOrBefore(navRecords, plan, effectiveDate);
+                label.textContent = Number.isFinite(price)
+                    ? `ราคา ณ วันที่เปลี่ยน: ${formatCurrency(price)}`
+                    : 'ราคา ณ วันที่เปลี่ยน: -';
+            });
+        }
+
+        function destroyPortfolioSelectedPlanChart() {
+            portfolioSelectedPlanCharts.forEach((chart) => chart.destroy());
+            portfolioSelectedPlanCharts = [];
+        }
+
+        function buildPortfolioPlanChangeMarkers(planId, labels, navRecords) {
+            const selectedPlan = String(planId || '').trim();
+            const labelList = Array.isArray(labels) ? labels : [];
+            const markerByLabel = new Map();
+            if (!selectedPlan || getPlanIndexById(selectedPlan) < 0 || !labelList.length) {
+                return labelList.map(() => null);
+            }
+
+            const navRows = Array.isArray(navRecords) ? navRecords : [];
+            const labelDateMap = new Map();
+            navRows.forEach((row) => {
+                if (!row || !(row.dateObj instanceof Date)) return;
+                const label = String(row.date || '').trim();
+                if (!label) return;
+                labelDateMap.set(label, row.dateObj);
+            });
+
+            const findNearestLabelForChangeDate = (effectiveDateText) => {
+                const effectiveDate = parseFlexibleDateToDateObj(effectiveDateText);
+                if (!(effectiveDate instanceof Date) || isNaN(effectiveDate.getTime())) {
+                    return '';
+                }
+
+                let lastOnOrBefore = '';
+                for (let i = 0; i < labelList.length; i++) {
+                    const label = labelList[i];
+                    const labelDateObj = labelDateMap.get(label);
+                    if (!(labelDateObj instanceof Date)) continue;
+                    if (labelDateObj.getTime() <= effectiveDate.getTime()) {
+                        lastOnOrBefore = label;
+                    }
+                }
+
+                if (lastOnOrBefore) return lastOnOrBefore;
+
+                // If the change date is earlier than visible range, pin to first visible point.
+                for (let i = 0; i < labelList.length; i++) {
+                    const label = labelList[i];
+                    if (labelDateMap.has(label)) return label;
+                }
+                return '';
+            };
+
+            const sourceRows = Array.isArray(portfolioChangesCache) ? portfolioChangesCache : [];
+            sourceRows.forEach((changeRow) => {
+                const entries = parsePortfolioEntriesJson(changeRow.entriesJson);
+                const hasPlan = entries.some((entry) => parsePlanIdFromUnitCostKey(entry.unitCostKey) === selectedPlan);
+                if (!hasPlan) return;
+
+                const displayDate = formatShortDateDisplay(changeRow.effectiveDate);
+                const markerLabel = findNearestLabelForChangeDate(changeRow.effectiveDate);
+                if (!markerLabel) return;
+
+                const price = getNavPriceAtOrBefore(navRows, selectedPlan, markerLabel);
+                if (!Number.isFinite(price)) return;
+
+                markerByLabel.set(markerLabel, {
+                    y: Number(price),
+                    changedAt: String(changeRow.effectiveDate || ''),
+                    displayDate
+                });
+            });
+
+            return labelList.map((label) => markerByLabel.get(label) || null);
+        }
+
+        async function refreshPortfolioSelectedPlanChart() {
+            const grid = document.getElementById('portfolio-selected-plan-chart-grid');
+            const emptyEl = document.getElementById('portfolio-selected-plan-chart-empty');
+            const titleEl = document.getElementById('portfolio-selected-plan-chart-title');
+            const noteEl = document.getElementById('portfolio-selected-plan-chart-note');
+            if (!grid || !emptyEl || !titleEl || !noteEl) return;
+
+            const rows = Array.isArray(portfolioCurrentRowsCache) ? portfolioCurrentRowsCache : [];
+            if (!rows.length) {
+                titleEl.textContent = 'กราฟแผนปัจจุบันทั้งหมด';
+                emptyEl.textContent = 'ยังไม่มีแผนปัจจุบันสำหรับแสดงกราฟ';
+                emptyEl.classList.remove('hidden');
+                noteEl.classList.add('hidden');
+                grid.innerHTML = '';
+                destroyPortfolioSelectedPlanChart();
+                return;
+            }
+
+            titleEl.textContent = 'กราฟแผนปัจจุบันทั้งหมด';
+
+            const navRecords = await getPortfolioNavRecordsForPricing();
+            if (!Array.isArray(navRecords) || !navRecords.length) {
+                emptyEl.textContent = 'ไม่พบข้อมูล NAV ใน IndexedDB';
+                emptyEl.classList.remove('hidden');
+                noteEl.classList.add('hidden');
+                grid.innerHTML = '';
+                destroyPortfolioSelectedPlanChart();
+                return;
+            }
+
+            emptyEl.classList.add('hidden');
+            noteEl.classList.remove('hidden');
+            destroyPortfolioSelectedPlanChart();
+            grid.innerHTML = '';
+
+            const showEMA50 = document.getElementById('ema50-toggle')?.checked ?? true;
+            const showEMA200 = document.getElementById('ema200-toggle')?.checked ?? true;
+            const ema50Color = document.getElementById('ema50-color')?.value || '#f59e0b';
+            const ema50Width = parseFloat(document.getElementById('ema50-width')?.value) || 1;
+            const ema200Color = document.getElementById('ema200-color')?.value || '#ef4444';
+            const ema200Width = parseFloat(document.getElementById('ema200-width')?.value) || 2;
+            const ema50Dash = getDashPattern(document.getElementById('ema50-style')?.value || 'dashed');
+            const ema200Dash = getDashPattern(document.getElementById('ema200-style')?.value || 'dashdot');
+
+            rows.forEach((row) => {
+                const selectedPlan = String(row.plan || '').trim();
+                const planName = planNames[selectedPlan] || row.planName || `แผน ${selectedPlan}`;
+                const idx = getPlanIndexById(selectedPlan);
+                if (idx < 0) return;
+
+                const points = navRecords
+                    .map((record) => ({
+                        label: String(record.date || ''),
+                        value: toUnitCostValue(record.unitCosts?.[idx])
+                    }))
+                    .filter((item) => item.label && Number.isFinite(item.value));
+                if (!points.length) return;
+
+                const maxPoints = 180;
+                const sliced = points.slice(Math.max(0, points.length - maxPoints));
+                const labels = sliced.map((it) => it.label);
+                const values = sliced.map((it) => Number(it.value));
+                const planColor = getPlanColor(selectedPlan);
+
+                const slopePercent = calculateSeriesPriceChangePercent(values);
+                const slopeSign = slopePercent && slopePercent > 0 ? '+' : '';
+                const slopeText = Number.isFinite(slopePercent) ? `${slopeSign}${slopePercent.toFixed(2)}%` : '-';
+                const slopeClass = !Number.isFinite(slopePercent)
+                    ? 'text-slate-600 bg-slate-100 border-slate-200'
+                    : slopePercent > 0
+                        ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                        : slopePercent < 0
+                            ? 'text-rose-700 bg-rose-50 border-rose-200'
+                            : 'text-slate-600 bg-slate-100 border-slate-200';
+
+                const chartCard = document.createElement('div');
+                chartCard.className = 'bg-white rounded-xl border border-slate-200 p-3 shadow-sm cursor-zoom-in';
+                chartCard.title = 'คลิกเพื่อดูกราฟแบบเต็มจอ';
+                chartCard.innerHTML = `
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <p class="text-sm font-semibold text-slate-700">${planName}</p>
+                        <span class="text-xs px-2 py-1 rounded-md border ${slopeClass}">Change: ${slopeText}</span>
+                    </div>
+                    <div class="h-56 relative">
+                        <canvas></canvas>
+                    </div>
+                `;
+                grid.appendChild(chartCard);
+
+                const canvas = chartCard.querySelector('canvas');
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return;
+
+                const datasets = [
+                    {
+                        label: `NAV - ${planName}`,
+                        data: values,
+                        borderColor: planColor,
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.35,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        yAxisID: 'y'
+                    }
+                ];
+
+                if (showEMA50) {
+                    datasets.push({
+                        label: 'EMA 50',
+                        data: calculateEMA(normalizeValuesForEma(values), 50),
+                        borderColor: ema50Color,
+                        backgroundColor: 'transparent',
+                        borderWidth: ema50Width,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        borderDash: ema50Dash,
+                        yAxisID: 'y'
+                    });
+                }
+
+                if (showEMA200) {
+                    datasets.push({
+                        label: 'EMA 200',
+                        data: calculateEMA(normalizeValuesForEma(values), 200),
+                        borderColor: ema200Color,
+                        backgroundColor: 'transparent',
+                        borderWidth: ema200Width,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        borderDash: ema200Dash,
+                        yAxisID: 'y'
+                    });
+                }
+
+                const markerData = buildPortfolioPlanChangeMarkers(selectedPlan, labels, navRecords);
+                const hasMarker = markerData.some((point) => point && Number.isFinite(point.y));
+                if (hasMarker) {
+                    datasets.push({
+                        label: 'จุดเปลี่ยนแผน',
+                        data: markerData,
+                        type: 'line',
+                        showLine: false,
+                        borderColor: '#dc2626',
+                        backgroundColor: '#dc2626',
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 1.5,
+                        pointStyle: 'rectRot',
+                        yAxisID: 'y',
+                        order: 0
+                    });
+                }
+
+                const portfolioChartOptions = buildChartOptions(false);
+                portfolioChartOptions.plugins.tooltip = {
+                    enabled: true,
+                    callbacks: {
+                        title: function (items) {
+                            const raw = items?.[0]?.raw;
+                            if (raw && typeof raw === 'object' && raw.displayDate) {
+                                return `วันที่เปลี่ยน: ${raw.displayDate}`;
+                            }
+                            return items?.[0]?.label || '';
+                        },
+                        label: function (context) {
+                            const raw = context.raw;
+                            if (context.dataset?.label === 'จุดเปลี่ยนแผน' && raw && typeof raw === 'object') {
+                                const value = Number(raw.y);
+                                return `ราคาเปลี่ยนแผน: ${Number.isFinite(value) ? formatCurrency(value) : '-'}`;
+                            }
+
+                            const value = context.parsed?.y;
+                            return `${context.dataset?.label || 'ค่า'}: ${Number.isFinite(value) ? formatCurrency(value) : '-'}`;
+                        }
+                    }
+                };
+
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets
+                    },
+                    options: portfolioChartOptions,
+                    plugins: [cursorCrosshairPlugin]
+                });
+
+                chartCard.addEventListener('click', () => {
+                    const latestDateLabel = getLatestLabelFromSeries(labels, values);
+                    openFullscreenChart(planName, labels, datasets, latestDateLabel);
+                });
+
+                portfolioSelectedPlanCharts.push(chart);
+            });
+
+            if (portfolioSelectedPlanCharts.length === 0) {
+                emptyEl.textContent = 'ไม่พบข้อมูล NAV ของแผนปัจจุบันใน IndexedDB';
+                emptyEl.classList.remove('hidden');
+                noteEl.classList.add('hidden');
+            }
+        }
+
         async function refreshDbStats() {
             try {
                 const allMonths = await idbGetAllMonths();
@@ -742,119 +2129,354 @@
             }
         }
 
-        function mapApiRowsToRecords(apiRows) {
-            if (!Array.isArray(apiRows)) return [];
+        function assertGasConfigured() {
+            if (!GAS_WEB_APP_URL) {
+                throw new Error('ยังไม่ได้ตั้งค่า GAS_WEB_APP_URL ใน index.html');
+            }
+        }
 
-            const records = [];
+        async function fetchGasJson(params = {}, method = 'GET') {
+            assertGasConfigured();
 
-            apiRows.forEach(row => {
-                const parsedDate = parseApiDate(row.LAUNCH_DATE);
-                if (!parsedDate) return;
-
-                const unitCosts = [];
-                for (let i = 1; i <= 14; i++) {
-                    unitCosts.push(toUnitCostValue(row[`UNIT_COST${i}`]));
+            const searchParams = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && String(value) !== '') {
+                    searchParams.set(key, String(value));
                 }
-                const record = createRecordFromParsedDate(parsedDate, unitCosts);
-                if (record) records.push(record);
             });
 
-            return records;
-        }
-
-        // Fetch data from GPF API
-        async function fetchFromAPI(month, year) {
-            try {
-                // Format month as 00-12 and year as YYYY
-                const monthStr = String(month).padStart(2, '0');
-                const yearStr = String(year);
-                
-                const apiUrl = `https://www.gpf.or.th/thai2019/About/memberfund-api.php?pageName=NAVBottom_${monthStr}_${yearStr}`;
-                const localProxyUrl = `http://127.0.0.1:8787/api/nav?month=${monthStr}&year=${yearStr}`;
-                const proxyUrls = [
-                    localProxyUrl,
-                    `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`,
-                    `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`
-                ];
-                const isLocalDev = ['127.0.0.1', 'localhost'].includes(window.location.hostname);
-                const candidateUrls = isLocalDev ? [...proxyUrls, apiUrl] : [apiUrl, ...proxyUrls];
-
-                let text = '';
-                let lastError = null;
-
-                for (const candidateUrl of candidateUrls) {
-                    try {
-                        const response = await fetch(candidateUrl);
-                        if (!response.ok) {
-                            lastError = new Error(`API Error: ${response.status}`);
-                            continue;
-                        }
-
-                        const responseText = await response.text();
-                        if (!responseText || !responseText.trim()) {
-                            lastError = new Error('API ตอบกลับว่างเปล่า');
-                            continue;
-                        }
-
-                        text = responseText;
-                        break;
-                    } catch (err) {
-                        lastError = err;
-                    }
-                }
-
-                if (!text) {
-                    throw lastError || new Error('ไม่สามารถเชื่อมต่อ API ได้');
-                }
-
-                let jsonData;
-
-                try {
-                    jsonData = JSON.parse(text);
-                } catch (parseError) {
-                    const jsonMatch = text.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                    if (!jsonMatch) {
-                        throw new Error('รูปแบบข้อมูล API ไม่ถูกต้อง');
-                    }
-                    jsonData = JSON.parse(jsonMatch[0]);
-                }
-
-                const data = mapApiRowsToRecords(jsonData);
-                if (data.length > 0) {
-                    cachedApiData = data;
-                    return data;
-                } else {
-                    throw new Error('ไม่พบข้อมูลในการตอบสนองจาก API');
-                }
-                
-            } catch (error) {
-                console.error('API Error:', error);
-                if (error instanceof TypeError && /fetch/i.test(error.message)) {
-                    throw new Error('ติดข้อจำกัด CORS จากต้นทาง และ proxy สำรองไม่สามารถใช้งานได้ในขณะนี้');
-                }
-                throw error;
+            let response;
+            if (method === 'POST') {
+                response = await fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(params)
+                });
+            } else {
+                const url = `${GAS_WEB_APP_URL}?${searchParams.toString()}`;
+                response = await fetch(url, { method: 'GET' });
             }
+
+            if (!response.ok) {
+                throw new Error(`GAS ตอบกลับไม่สำเร็จ (${response.status})`);
+            }
+
+            const payload = await response.json();
+            if (payload?.ok === false) {
+                throw new Error(payload.error || 'GAS ตอบกลับผิดพลาด');
+            }
+            return payload;
         }
 
-        async function fetchMonthDataWithCache(month, year) {
-            try {
+        function formatAsIsoDate(dateObj) {
+            if (!(dateObj instanceof Date)) return '';
+            return `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+        }
+
+        async function getLatestCachedDateIso() {
+            const allMonths = await idbGetAllMonths();
+            let latest = null;
+
+            allMonths.forEach(entry => {
+                const records = hydrateRecords(entry.records || []);
+                records.forEach(record => {
+                    if (!latest || record.dateObj > latest) {
+                        latest = record.dateObj;
+                    }
+                });
+            });
+
+            return latest ? formatAsIsoDate(latest) : '';
+        }
+
+        async function upsertRecordsToIndexedDb(records) {
+            const groupedByMonth = new Map();
+
+            records.forEach(record => {
+                const parsed = parseApiDate(record.date);
+                if (!parsed) return;
+                const monthKey = getMonthKey(parsed.month, parsed.year);
+                if (!groupedByMonth.has(monthKey)) groupedByMonth.set(monthKey, []);
+                groupedByMonth.get(monthKey).push(createRecordFromDateText(record.date, record.unitCosts || []));
+            });
+
+            let upsertedMonths = 0;
+            for (const [monthKey, monthRecords] of groupedByMonth.entries()) {
+                const [yearText, monthText] = monthKey.split('-');
+                const year = parseInt(yearText, 10);
+                const month = parseInt(monthText, 10);
+                if (!Number.isInteger(year) || !Number.isInteger(month)) continue;
+
+                const validRecords = monthRecords.filter(Boolean);
+                if (!validRecords.length) continue;
+
                 const cachedMonth = await idbGetMonth(month, year);
-                if (cachedMonth?.records?.length) {
-                    return hydrateRecords(cachedMonth.records);
-                }
-            } catch (cacheError) {
-                console.warn('อ่านแคชไม่สำเร็จ จะดึงจาก API แทน', cacheError);
+                const merged = dedupeRecordsByDate([
+                    ...hydrateRecords(cachedMonth?.records || []),
+                    ...validRecords
+                ]);
+                await idbPutMonth(month, year, merged);
+                upsertedMonths += 1;
             }
 
-            const apiData = await fetchFromAPI(month, year);
+            return upsertedMonths;
+        }
+
+        async function pullDataFromGasToIndexedDb({ forceSync = false } = {}) {
+            const since = forceSync ? '' : await getLatestCachedDateIso();
+            const collected = [];
+            let cursorSince = since;
+
+            for (let page = 0; page < 100; page++) {
+                const gasPayload = await fetchGasJson({
+                    action: 'data',
+                    since: cursorSince,
+                    limit: GAS_PAGE_LIMIT
+                });
+
+                const records = gasPayload?.result?.records || [];
+                if (!Array.isArray(records) || records.length === 0) break;
+
+                collected.push(...records);
+
+                if (records.length < GAS_PAGE_LIMIT) break;
+                cursorSince = formatAsIsoDate(parseApiDate(records[records.length - 1].date)?.dateObj || null);
+                if (!cursorSince) break;
+            }
+
+            if (!collected.length) return { pulledRows: 0, upsertedMonths: 0 };
+
+            const upsertedMonths = await upsertRecordsToIndexedDb(collected);
+            return { pulledRows: collected.length, upsertedMonths };
+        }
+
+        async function syncGasSourceThenPullToDb() {
+            // GAS Web App does not reliably support browser CORS preflight for JSON POST.
+            // Use simple GET query call to avoid OPTIONS preflight.
+            await fetchGasJson({ action: 'sync', token: GAS_SYNC_TOKEN });
+            // Pull only incremental records after sync to avoid reloading entire history every time.
+            return pullDataFromGasToIndexedDb({ forceSync: false });
+        }
+
+        function formatMonthLabel(year, month) {
+            const d = new Date(year, month - 1, 1);
+            return d.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
+        }
+
+        async function fetchGasMonthSummary() {
+            const payload = await fetchGasJson({ action: 'monthSummary' });
+            return payload?.result?.months || [];
+        }
+
+        async function buildIndexedDbMonthCountMap() {
+            const map = {};
+            const entries = await idbGetAllMonths();
+            entries.forEach(entry => {
+                const monthKey = String(entry.monthKey || '').trim();
+                if (!monthKey) return;
+                const count = dedupeRecordsByDate(hydrateRecords(entry.records || [])).length;
+                map[monthKey] = count;
+            });
+            return map;
+        }
+
+        function buildCombinedMonthRows(gasMonths, idbCountMap) {
+            const combinedMap = new Map();
+
+            (gasMonths || []).forEach(item => {
+                const year = Number(item.year);
+                const month = Number(item.month);
+                const monthKey = item.monthKey || getMonthKey(month, year);
+                combinedMap.set(monthKey, {
+                    year,
+                    month,
+                    monthKey,
+                    gasRecordCount: Number(item.recordCount || 0),
+                    idbRecordCount: Number(idbCountMap[monthKey] || 0),
+                    lastDate: item.lastDate || '-',
+                    lastUpdatedAt: item.lastUpdatedAt || ''
+                });
+            });
+
+            Object.keys(idbCountMap || {}).forEach(monthKey => {
+                if (combinedMap.has(monthKey)) return;
+                const [yearText, monthText] = monthKey.split('-');
+                const year = parseInt(yearText, 10);
+                const month = parseInt(monthText, 10);
+                if (!Number.isInteger(year) || !Number.isInteger(month)) return;
+
+                combinedMap.set(monthKey, {
+                    year,
+                    month,
+                    monthKey,
+                    gasRecordCount: 0,
+                    idbRecordCount: Number(idbCountMap[monthKey] || 0),
+                    lastDate: '-',
+                    lastUpdatedAt: ''
+                });
+            });
+
+            return Array.from(combinedMap.values()).sort((a, b) => {
+                if (a.year !== b.year) return b.year - a.year;
+                return b.month - a.month;
+            });
+        }
+
+        function renderGasMonthList(months = []) {
+            const container = document.getElementById('gas-month-list');
+            if (!container) return;
+
+            if (!Array.isArray(months) || months.length === 0) {
+                container.innerHTML = '<div class="text-slate-400">ยังไม่พบข้อมูลรายเดือนใน GAS</div>';
+                return;
+            }
+
+            container.innerHTML = months.map(item => {
+                const year = Number(item.year);
+                const month = Number(item.month);
+                const monthLabel = formatMonthLabel(year, month);
+                const gasRecordCount = Number(item.gasRecordCount || 0);
+                const idbRecordCount = Number(item.idbRecordCount || 0);
+                const isRecordOutlier = gasRecordCount < 15 || gasRecordCount > 28;
+                const isMismatch = gasRecordCount !== idbRecordCount;
+                const lastDate = item.lastDate || '-';
+                const updatedAtText = item.lastUpdatedAt
+                    ? new Date(item.lastUpdatedAt).toLocaleString('th-TH')
+                    : '-';
+                const cardClass = isRecordOutlier
+                    ? 'border-rose-300 bg-rose-50'
+                    : isMismatch
+                        ? 'border-amber-300 bg-amber-50'
+                        : 'border-slate-200 bg-white';
+                const badgeClass = isRecordOutlier
+                    ? 'bg-rose-100 text-rose-700 border border-rose-300'
+                    : isMismatch
+                        ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                        : 'bg-slate-100 text-slate-700 border border-slate-200';
+                const diffText = isMismatch
+                    ? `<p class="text-[11px] text-amber-700 font-medium">Mismatch: GAS ${gasRecordCount} | IndexedDB ${idbRecordCount}</p>`
+                    : `<p class="text-[11px] text-emerald-700">ตรงกัน: GAS ${gasRecordCount} | IndexedDB ${idbRecordCount}</p>`;
+
+                return `
+                    <div class="rounded-lg border ${cardClass} p-2">
+                        <div class="flex items-start justify-between gap-2 mb-1">
+                            <p class="text-slate-700 font-semibold leading-tight">${monthLabel}</p>
+                            <span class="shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium ${badgeClass}">GAS: ${gasRecordCount}</span>
+                        </div>
+                        <div class="space-y-0.5 mb-2">
+                            ${diffText}
+                            <p class="text-[11px] text-slate-500">last date: ${lastDate}</p>
+                            <p class="text-[11px] text-slate-500">updated: ${updatedAtText}</p>
+                        </div>
+                        <button
+                            type="button"
+                            class="gas-sync-month-btn w-full px-2 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-medium"
+                            data-year="${year}"
+                            data-month="${month}"
+                        >ซิงก์เดือนนี้</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function refreshGasMonthList() {
+            const container = document.getElementById('gas-month-list');
+            if (container) {
+                container.innerHTML = '<div class="text-slate-400">กำลังโหลดรายการเดือนจาก GAS...</div>';
+            }
+
+            const gasMonths = await fetchGasMonthSummary();
+            const idbCountMap = await buildIndexedDbMonthCountMap();
+            const combined = buildCombinedMonthRows(gasMonths, idbCountMap);
+            renderGasMonthList(combined);
+            return combined;
+        }
+
+        async function syncSingleGasMonthToDb(year, month, options = {}) {
+            if (!Number.isInteger(year) || !Number.isInteger(month)) {
+                throw new Error('เดือน/ปีไม่ถูกต้อง');
+            }
+
+            const opts = options || {};
+            const skipRefresh = !!opts.skipRefresh;
+
+            document.getElementById('db-status').textContent = `สถานะ: กำลังซิงก์ ${String(month).padStart(2, '0')}/${year} จาก API -> GAS...`;
+            const syncPayload = await fetchGasJson({
+                action: 'sync',
+                token: GAS_SYNC_TOKEN,
+                startYear: year,
+                startMonth: month,
+                endYear: year,
+                endMonth: month,
+                reconcile: true
+            });
+            const syncResult = syncPayload?.result || {};
+
+            document.getElementById('db-status').textContent = `สถานะ: กำลังดึงข้อมูล ${String(month).padStart(2, '0')}/${year} จาก GAS -> IndexedDB...`;
+            const payload = await fetchGasJson({ action: 'dataMonth', year, month });
+            const records = payload?.result?.records || [];
+            const upsertedMonths = await upsertRecordsToIndexedDb(records);
+
+            if (!skipRefresh) {
+                await refreshDbStats();
+                await refreshGasMonthList();
+                if (activeUser) {
+                    await refreshPortfolioUi();
+                }
+            }
+
+            const deletedRows = Number(syncResult.deletedRows || 0);
+            document.getElementById('db-status').textContent = `สถานะ: ซิงก์เดือน ${String(month).padStart(2, '0')}/${year} สำเร็จแบบ reconcile (rows: ${records.length}, deleted: ${deletedRows}, upsertedMonths: ${upsertedMonths})`;
+            return { rows: records.length, deletedRows, upsertedMonths };
+        }
+
+        async function autoSyncMismatchedMonthsOnStartup() {
+            if (startupAutoSyncDone) return;
+            startupAutoSyncDone = true;
+
+            const markerKey = 'gpf-startup-auto-sync-v1';
+            if (sessionStorage.getItem(markerKey) === 'done') return;
+
+            await syncMismatchedMonths({
+                statusPrefix: 'สถานะ: ตรวจสอบความต่าง GAS กับ IndexedDB อัตโนมัติ...',
+                successPrefix: 'สถานะ: ซิงก์อัตโนมัติสำเร็จ',
+                markSessionDone: true
+            });
+        }
+
+        async function syncMismatchedMonths({ statusPrefix, successPrefix, markSessionDone = false } = {}) {
+            const markerKey = 'gpf-startup-auto-sync-v1';
 
             try {
-                await idbPutMonth(month, year, apiData);
-            } catch (cacheError) {
-                console.warn('บันทึกแคชไม่สำเร็จ', cacheError);
-            }
+                document.getElementById('db-status').textContent = statusPrefix || 'สถานะ: กำลังตรวจสอบเดือนที่ไม่ตรงกัน...';
+                const months = await refreshGasMonthList();
+                const mismatched = months.filter(item => Number(item.gasRecordCount || 0) !== Number(item.idbRecordCount || 0));
 
-            return apiData;
+                if (!mismatched.length) {
+                    if (markSessionDone) {
+                        sessionStorage.setItem(markerKey, 'done');
+                    }
+                    document.getElementById('db-status').textContent = 'สถานะ: ข้อมูล GAS และ IndexedDB ตรงกันแล้ว';
+                    return;
+                }
+
+                for (let i = 0; i < mismatched.length; i++) {
+                    const item = mismatched[i];
+                    await syncSingleGasMonthToDb(Number(item.year), Number(item.month), { skipRefresh: true });
+                }
+
+                await refreshDbStats();
+                await refreshGasMonthList();
+                if (activeUser) {
+                    await refreshPortfolioUi();
+                }
+                if (markSessionDone) {
+                    sessionStorage.setItem(markerKey, 'done');
+                }
+                document.getElementById('db-status').textContent = `${successPrefix || 'สถานะ: ซิงก์เดือนที่ไม่ตรงกันสำเร็จ'} (${mismatched.length} เดือน)`;
+            } catch (error) {
+                document.getElementById('db-status').textContent = `สถานะ: ซิงก์เดือนที่ไม่ตรงกันไม่สำเร็จ (${error.message})`;
+            }
         }
 
         async function loadDataFromDbRange(startMonth, startYear, endMonth, endYear) {
@@ -958,23 +2580,60 @@
                 throw new Error('ไฟล์ CSV ไม่มีข้อมูล');
             }
 
+            const normalizeHeaderName = (name) => String(name || '')
+                .replace(/^\uFEFF/, '')
+                .trim()
+                .toUpperCase()
+                .replace(/\s+/g, '_');
+
+            const headerColumns = parseCsvLine(lines[0]).map(normalizeHeaderName);
+            const headerMap = new Map();
+            headerColumns.forEach((name, index) => {
+                if (!name || headerMap.has(name)) return;
+                headerMap.set(name, index);
+            });
+
+            const dateColumnIndex = headerMap.has('LAUNCH_DATE')
+                ? headerMap.get('LAUNCH_DATE')
+                : (headerMap.has('DATE') ? headerMap.get('DATE') : -1);
+
+            const monthKeyColumnIndex = headerMap.has('MONTH_KEY')
+                ? headerMap.get('MONTH_KEY')
+                : (headerMap.has('MONTH') ? headerMap.get('MONTH') : -1);
+
+            const unitCostColumnIndexes = Array.from({ length: 14 }, (_, i) => {
+                const n = i + 1;
+                const candidates = [`UNIT_COST${n}`, `UNITCOST${n}`];
+                for (let c = 0; c < candidates.length; c++) {
+                    if (headerMap.has(candidates[c])) return headerMap.get(candidates[c]);
+                }
+                return -1;
+            });
+
+            const hasHeaderMapping = dateColumnIndex >= 0 && unitCostColumnIndexes.some(idx => idx >= 0);
+
             const groupedByMonth = new Map();
 
             for (let lineIndex = 1; lineIndex < lines.length; lineIndex++) {
                 const columns = parseCsvLine(lines[lineIndex]);
-                if (columns.length < 16) continue;
 
-                const dateText = (columns[1] || '').trim();
+                // Header-based parsing for current file format; fallback to legacy fixed-index parsing.
+                const dateText = hasHeaderMapping
+                    ? String(columns[dateColumnIndex] || '').trim()
+                    : String(columns[1] || '').trim();
                 const parsedDate = parseApiDate(dateText);
                 if (!parsedDate) continue;
 
-                const inputMonthKey = (columns[0] || '').trim();
+                const inputMonthKey = hasHeaderMapping && monthKeyColumnIndex >= 0
+                    ? String(columns[monthKeyColumnIndex] || '').trim()
+                    : String(columns[0] || '').trim();
                 const monthKey = inputMonthKey || getMonthKey(parsedDate.month, parsedDate.year);
 
-                const unitCosts = [];
-                for (let i = 2; i <= 15; i++) {
-                    unitCosts.push(toUnitCostValue((columns[i] || '').trim()));
-                }
+                const unitCosts = Array.from({ length: 14 }, (_, i) => {
+                    const columnIndex = hasHeaderMapping ? unitCostColumnIndexes[i] : (i + 2);
+                    const rawValue = columnIndex >= 0 ? columns[columnIndex] : '';
+                    return toUnitCostValue(String(rawValue || '').trim());
+                });
 
                 const record = createRecordFromParsedDate(parsedDate, unitCosts);
                 if (!record) continue;
@@ -1003,45 +2662,10 @@
         }
 
         async function syncAllHistoricalDataToCache() {
-            const startMonth = 1;
-            const startYear = 1998;
-            const now = new Date();
-            const endMonth = now.getMonth() + 1;
-            const endYear = now.getFullYear();
-
-            let currentMonth = startMonth;
-            let currentYear = startYear;
-            let successCount = 0;
-            let failCount = 0;
-
-            const totalMonths = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
-            let processed = 0;
-
-            while (currentYear < endYear || (currentYear === endYear && currentMonth <= endMonth)) {
-                processed += 1;
-                document.getElementById('db-status').textContent = `สถานะ: กำลังดาวน์โหลด ${processed}/${totalMonths} เดือน (${String(currentMonth).padStart(2, '0')}/${currentYear})`;
-
-                try {
-                    const monthData = await fetchFromAPI(currentMonth, currentYear);
-                    if (monthData.length > 0) {
-                        await idbPutMonth(currentMonth, currentYear, dedupeRecordsByDate(monthData));
-                        successCount += 1;
-                    } else {
-                        failCount += 1;
-                    }
-                } catch (error) {
-                    failCount += 1;
-                }
-
-                currentMonth += 1;
-                if (currentMonth > 12) {
-                    currentMonth = 1;
-                    currentYear += 1;
-                }
-            }
-
+            document.getElementById('db-status').textContent = 'สถานะ: กำลังสั่ง GAS sync และอัปเดตข้อมูลลง IndexedDB...';
+            const syncResult = await syncGasSourceThenPullToDb();
             await refreshDbStats();
-            document.getElementById('db-status').textContent = `สถานะ: ดาวน์โหลดครบแล้ว สำเร็จ ${successCount} เดือน, ไม่สำเร็จ ${failCount} เดือน`;
+            document.getElementById('db-status').textContent = `สถานะ: ซิงก์จาก GAS สำเร็จ (โหลด ${syncResult.pulledRows} แถว, อัปเดต ${syncResult.upsertedMonths} เดือน)`;
         }
 
         // Get actual data from cache
@@ -1167,9 +2791,6 @@
         // Calculate statistics
         function calculateStats(data, chartPayload) {
             const values = data.map(d => d.nav);
-            const max = Math.max(...values);
-            const min = Math.min(...values);
-            const avg = values.reduce((a, b) => a + b, 0) / values.length;
             const firstNav = data[0]?.nav;
             const lastNav = data[data.length - 1]?.nav;
             const latestDate = getLatestDateFromPayload(chartPayload);
@@ -1179,9 +2800,6 @@
                 pctChange = ((lastNav - firstNav) / firstNav) * 100;
             }
 
-            document.getElementById('stat-max').textContent = max.toFixed(4);
-            document.getElementById('stat-min').textContent = min.toFixed(4);
-            document.getElementById('stat-avg').textContent = avg.toFixed(4);
             document.getElementById('stat-count').textContent = values.length + ' รายการ';
             document.getElementById('stat-latest-date').textContent = latestDate || '-';
 
@@ -1206,6 +2824,7 @@
 
         function renderSelectedPlanChanges(chartPayload) {
             const container = document.getElementById('stat-plan-changes');
+            if (!container) return;
             if (!chartPayload) {
                 container.innerHTML = '-';
                 return;
@@ -1362,6 +2981,57 @@
             return null;
         }
 
+        function buildAlignedComparisonPayload(chartPayload) {
+            if (!chartPayload || chartPayload.mode !== 'multi' || chartPayload.plans.length <= 1) {
+                return null;
+            }
+
+            const labels = Array.isArray(chartPayload.labels) ? chartPayload.labels : [];
+            const plans = chartPayload.plans.filter(plan => Array.isArray(chartPayload.series?.[plan]));
+            if (labels.length < 2 || plans.length <= 1) return null;
+
+            let commonStartIndex = -1;
+            for (let index = 0; index < labels.length; index++) {
+                const hasAllPlansValue = plans.every(plan => Number.isFinite(chartPayload.series[plan][index]));
+                if (hasAllPlansValue) {
+                    commonStartIndex = index;
+                    break;
+                }
+            }
+
+            if (commonStartIndex < 0) return null;
+
+            const alignedLabels = labels.slice(commonStartIndex);
+            if (alignedLabels.length < 2) return null;
+
+            const normalizedSeries = {};
+
+            plans.forEach(plan => {
+                const sourceValues = chartPayload.series[plan].slice(commonStartIndex);
+                const baseValue = sourceValues[0];
+
+                if (!Number.isFinite(baseValue) || baseValue === 0) {
+                    normalizedSeries[plan] = sourceValues.map(() => null);
+                    return;
+                }
+
+                normalizedSeries[plan] = sourceValues.map(value => {
+                    if (!Number.isFinite(value)) return null;
+                    return (value / baseValue) * 100;
+                });
+            });
+
+            const hasData = plans.some(plan => normalizedSeries[plan].some(value => Number.isFinite(value)));
+            if (!hasData) return null;
+
+            return {
+                plans,
+                labels: alignedLabels,
+                series: normalizedSeries,
+                commonStartLabel: alignedLabels[0] || null
+            };
+        }
+
 
         function closeFullscreenChart() {
             const modal = document.getElementById('chart-fullscreen-modal');
@@ -1433,7 +3103,73 @@
                     values: chartPayload.series[plan]
                 }));
 
-            planEntries.forEach((entry, index) => {
+            if (showNAV) {
+                const comparisonPayload = buildAlignedComparisonPayload(chartPayload);
+
+                if (comparisonPayload) {
+                    const compareCard = document.createElement('div');
+                    compareCard.className = 'bg-white rounded-xl border border-slate-200 p-3 shadow-sm cursor-zoom-in md:col-span-2 2xl:col-span-3';
+                    compareCard.title = 'คลิกเพื่อดูกราฟแบบเต็มจอ';
+
+                    compareCard.innerHTML = `
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <div>
+                                <p class="text-sm font-semibold text-slate-700">เปรียบเทียบทุกแผน (ฐาน 100)</p>
+                                <p class="text-[11px] text-slate-500">เริ่มเทียบจากวันที่เดียวกัน: ${comparisonPayload.commonStartLabel || '-'}</p>
+                            </div>
+                        </div>
+                        <div class="h-72 relative">
+                            <canvas></canvas>
+                        </div>
+                    `;
+
+                    chartGrid.appendChild(compareCard);
+
+                    const compareCanvas = compareCard.querySelector('canvas');
+                    const compareCtx = compareCanvas.getContext('2d');
+                    const comparisonDatasets = comparisonPayload.plans.map(plan => {
+                        const change = calculateSeriesPriceChangePercent(comparisonPayload.series[plan] || []);
+                        const sign = Number.isFinite(change) && change > 0 ? '+' : '';
+                        const percentText = Number.isFinite(change) ? ` ${sign}${change.toFixed(2)}%` : '';
+
+                        return {
+                            label: `${planNames[plan]}${percentText}`,
+                            data: comparisonPayload.series[plan],
+                            borderColor: getPlanColor(plan),
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.35,
+                            pointRadius: 0,
+                            pointHoverRadius: 4,
+                            yAxisID: 'y'
+                        };
+                    });
+
+                    const comparisonChart = new Chart(compareCtx, {
+                        type: 'line',
+                        data: {
+                            labels: [...comparisonPayload.labels],
+                            datasets: comparisonDatasets
+                        },
+                        options: buildChartOptions(false),
+                        plugins: [cursorCrosshairPlugin]
+                    });
+
+                    compareCard.addEventListener('click', () => {
+                        const firstPlan = comparisonPayload.plans[0];
+                        const latestDateLabel = getLatestLabelFromSeries(
+                            comparisonPayload.labels,
+                            comparisonPayload.series[firstPlan] || []
+                        );
+                        openFullscreenChart('เปรียบเทียบทุกแผน (ฐาน 100)', comparisonPayload.labels, comparisonDatasets, latestDateLabel);
+                    });
+
+                    navCharts.push(comparisonChart);
+                }
+            }
+
+            planEntries.forEach((entry) => {
                 const hasValue = entry.values.some(value => Number.isFinite(value));
                 if (!hasValue) return;
 
@@ -1467,7 +3203,7 @@
                 const ctx = canvas.getContext('2d');
 
                 const datasets = [];
-                const primaryColor = planLineColors[index % planLineColors.length];
+                const primaryColor = getPlanColor(entry.plan);
                 const projectionSlots = getProjectionSlots(entry.labels.length);
                 const extendedLabels = extendLabelsForProjection(entry.labels, projectionSlots);
 
@@ -1571,32 +3307,10 @@
             setFetchUiState(true);
 
             try {
-                // Fetch data from API for the date range
-                let allData = [];
-                let currentMonth = startMonth;
-                let currentYear = startYear;
-
-                // Fetch data month by month
-                while (currentYear < endYear || (currentYear === endYear && currentMonth <= endMonth)) {
-                    try {
-                        const monthData = await fetchMonthDataWithCache(currentMonth, currentYear);
-                        if (monthData && monthData.length > 0) {
-                            allData = allData.concat(monthData);
-                        }
-                    } catch (err) {
-                        console.warn(`ไม่พบข้อมูลสำหรับเดือน ${currentMonth}/${currentYear}`);
-                    }
-
-                    // Move to next month
-                    currentMonth++;
-                    if (currentMonth > 12) {
-                        currentMonth = 1;
-                        currentYear++;
-                    }
-                }
+                let allData = await loadDataFromDbRange(startMonth, startYear, endMonth, endYear);
 
                 if (allData.length === 0) {
-                    throw new Error('ไม่พบข้อมูลสำหรับช่วงวันที่ที่เลือก');
+                    throw new Error('ไม่พบข้อมูลใน IndexedDB สำหรับช่วงวันที่ที่เลือก (ไปที่แท็บจัดการ DB เพื่อซิงก์จาก GAS)');
                 }
 
                 allData = dedupeRecordsByDate(allData);
@@ -1656,14 +3370,17 @@
         // Handle EMA toggle
         document.getElementById('ema50-toggle').addEventListener('change', () => {
             if (currentChartPayload) createChart(currentChartPayload);
+            refreshPortfolioSelectedPlanChart().catch(() => {});
         });
 
         document.getElementById('ema200-toggle').addEventListener('change', () => {
             if (currentChartPayload) createChart(currentChartPayload);
+            refreshPortfolioSelectedPlanChart().catch(() => {});
         });
 
         document.getElementById('nav-toggle').addEventListener('change', () => {
             if (currentChartPayload) createChart(currentChartPayload);
+            refreshPortfolioSelectedPlanChart().catch(() => {});
         });
 
         document.getElementById('line-style-toggle').addEventListener('click', () => {
@@ -1688,9 +3405,11 @@
         ['ema50-color', 'ema50-width', 'ema50-style', 'ema200-color', 'ema200-width', 'ema200-style'].forEach(id => {
             document.getElementById(id).addEventListener('input', () => {
                 if (currentChartPayload) createChart(currentChartPayload);
+                refreshPortfolioSelectedPlanChart().catch(() => {});
             });
             document.getElementById(id).addEventListener('change', () => {
                 if (currentChartPayload) createChart(currentChartPayload);
+                refreshPortfolioSelectedPlanChart().catch(() => {});
             });
         });
 
@@ -1778,7 +3497,7 @@
         });
 
         document.getElementById('db-sync-all-btn').addEventListener('click', async () => {
-            const confirmed = window.confirm('ดาวน์โหลดข้อมูลทั้งหมดตั้งแต่ 01/1998 ถึงปัจจุบันลง Cache? อาจใช้เวลาหลายนาที');
+            const confirmed = window.confirm('ซิงก์ข้อมูลล่าสุดจาก GAS แล้วอัปเดตลง IndexedDB ตอนนี้?');
             if (!confirmed) return;
 
             const button = document.getElementById('db-sync-all-btn');
@@ -1787,8 +3506,61 @@
 
             try {
                 await syncAllHistoricalDataToCache();
+                if (activeUser) {
+                    await refreshPortfolioUi();
+                }
             } catch (error) {
-                document.getElementById('db-status').textContent = `สถานะ: ดาวน์โหลดทั้งหมดไม่สำเร็จ (${error.message})`;
+                document.getElementById('db-status').textContent = `สถานะ: ซิงก์จาก GAS ไม่สำเร็จ (${error.message})`;
+            } finally {
+                button.disabled = false;
+                button.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
+        });
+
+        document.getElementById('gas-month-refresh-btn').addEventListener('click', async () => {
+            try {
+                document.getElementById('db-status').textContent = 'สถานะ: กำลังโหลดรายการเดือนจาก GAS...';
+                const months = await refreshGasMonthList();
+                gasMonthListLoaded = true;
+                document.getElementById('db-status').textContent = `สถานะ: โหลดรายการเดือนจาก GAS แล้ว (${months.length} เดือน)`;
+            } catch (error) {
+                document.getElementById('db-status').textContent = `สถานะ: โหลดรายการเดือนจาก GAS ไม่สำเร็จ (${error.message})`;
+            }
+        });
+
+        document.getElementById('gas-month-sync-mismatch-btn').addEventListener('click', async () => {
+            const button = document.getElementById('gas-month-sync-mismatch-btn');
+            button.disabled = true;
+            button.classList.add('opacity-60', 'cursor-not-allowed');
+
+            try {
+                await syncMismatchedMonths({
+                    statusPrefix: 'สถานะ: กำลังซิงก์เฉพาะเดือนที่ไม่ตรงกันทั้งหมด...'
+                });
+            } finally {
+                button.disabled = false;
+                button.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
+        });
+
+        document.getElementById('gas-month-list').addEventListener('click', async (event) => {
+            const button = event.target.closest('.gas-sync-month-btn');
+            if (!button) return;
+
+            const year = parseInt(button.dataset.year, 10);
+            const month = parseInt(button.dataset.month, 10);
+            if (!Number.isInteger(year) || !Number.isInteger(month)) return;
+
+            const confirmed = window.confirm(`ซิงก์เดือน ${String(month).padStart(2, '0')}/${year} จาก GAS และอัปเดตลง IndexedDB ตอนนี้?`);
+            if (!confirmed) return;
+
+            button.disabled = true;
+            button.classList.add('opacity-60', 'cursor-not-allowed');
+
+            try {
+                await syncSingleGasMonthToDb(year, month);
+            } catch (error) {
+                document.getElementById('db-status').textContent = `สถานะ: ซิงก์เดือน ${String(month).padStart(2, '0')}/${year} ไม่สำเร็จ (${error.message})`;
             } finally {
                 button.disabled = false;
                 button.classList.remove('opacity-60', 'cursor-not-allowed');
@@ -1802,6 +3574,9 @@
             try {
                 await idbClearAll();
                 await refreshDbStats();
+                if (activeUser) {
+                    await refreshPortfolioUi();
+                }
                 document.getElementById('db-status').textContent = 'สถานะ: ล้างข้อมูล DB แล้ว';
             } catch (error) {
                 document.getElementById('db-status').textContent = `สถานะ: ล้าง DB ไม่สำเร็จ (${error.message})`;
@@ -1829,6 +3604,9 @@
                 const text = await file.text();
                 const monthCount = await importDbFromCsvText(text);
                 await refreshDbStats();
+                if (activeUser) {
+                    await refreshPortfolioUi();
+                }
                 document.getElementById('db-status').textContent = `สถานะ: นำเข้า CSV สำเร็จ (${monthCount} เดือน)`;
             } catch (error) {
                 document.getElementById('db-status').textContent = `สถานะ: นำเข้า CSV ไม่สำเร็จ (${error.message})`;
@@ -1837,13 +3615,310 @@
             }
         });
 
+        document.getElementById('portfolio-register-btn').addEventListener('click', async () => {
+            setPortfolioLoading(true, 'กำลังสมัครผู้ใช้...');
+            try {
+                setPortfolioStatus('กำลังสมัครผู้ใช้...', 'warn');
+                const username = String(document.getElementById('portfolio-username').value || '').trim();
+                const password = String(document.getElementById('portfolio-password').value || '').trim();
+
+                if (username.length < 3) {
+                    throw new Error('Username ต้องยาวอย่างน้อย 3 ตัวอักษร');
+                }
+                if (password.length < 4) {
+                    throw new Error('Password ต้องยาวอย่างน้อย 4 ตัวอักษร');
+                }
+
+                const passwordHash = await hashPassword(password);
+                const user = await registerUserViaGas(username, passwordHash, username);
+                setActiveUser({
+                    userId: String(user?.userId || '').trim(),
+                    username: String(user?.username || username).trim(),
+                    displayName: String(user?.displayName || username).trim()
+                });
+                document.getElementById('portfolio-password').value = '';
+                setPortfolioStatus(`สมัครและเข้าสู่ระบบแล้ว (${username})`, 'success');
+                await refreshPortfolioUi();
+            } catch (error) {
+                setPortfolioStatus(`สมัครผู้ใช้ไม่สำเร็จ (${error.message})`, 'error');
+            } finally {
+                setPortfolioLoading(false);
+            }
+        });
+
+        document.getElementById('portfolio-login-btn').addEventListener('click', async () => {
+            setPortfolioLoading(true, 'กำลังเข้าสู่ระบบ...');
+            try {
+                setPortfolioStatus('กำลังเข้าสู่ระบบ...', 'warn');
+                const username = String(document.getElementById('portfolio-username').value || '').trim();
+                const password = String(document.getElementById('portfolio-password').value || '').trim();
+                if (!username || !password) {
+                    throw new Error('กรอก username และ password ให้ครบ');
+                }
+
+                const passwordHash = await hashPassword(password);
+                const user = await loginUserViaGas(username, passwordHash);
+                setActiveUser({
+                    userId: String(user?.userId || '').trim(),
+                    username: String(user?.username || username).trim(),
+                    displayName: String(user?.displayName || username).trim()
+                });
+                document.getElementById('portfolio-password').value = '';
+                setPortfolioStatus(`เข้าสู่ระบบแล้ว (${username})`, 'success');
+                await refreshPortfolioUi();
+            } catch (error) {
+                setPortfolioStatus(`login ไม่สำเร็จ (${error.message})`, 'error');
+            } finally {
+                setPortfolioLoading(false);
+            }
+        });
+
+        document.getElementById('portfolio-logout-btn').addEventListener('click', () => {
+            setActiveUser(null);
+            document.getElementById('portfolio-status').textContent = 'สถานะ: ออกจากระบบแล้ว';
+        });
+
+        document.getElementById('portfolio-add-row-btn').addEventListener('click', () => {
+            addPortfolioEntryRow('1', '');
+        });
+
+        document.getElementById('portfolio-change-date').addEventListener('change', () => {
+            refreshPortfolioEntryPriceHints().catch(() => {});
+            refreshPortfolioSelectedPlanChart().catch(() => {});
+        });
+
+        document.getElementById('portfolio-entries').addEventListener('click', (event) => {
+            const button = event.target.closest('.portfolio-entry-remove');
+            if (!button) return;
+
+            const container = document.getElementById('portfolio-entries');
+            const rows = container.querySelectorAll('.portfolio-entry-row');
+            if (rows.length <= 1) {
+                const unitInput = rows[0]?.querySelector('.portfolio-entry-units');
+                if (unitInput) unitInput.value = '';
+                return;
+            }
+
+            const row = button.closest('.portfolio-entry-row');
+            if (row) row.remove();
+            refreshPortfolioSelectedPlanChart().catch(() => {});
+        });
+
+        document.getElementById('portfolio-entries').addEventListener('change', (event) => {
+            if (!event.target.closest('.portfolio-entry-plan')) return;
+            refreshPortfolioEntryPriceHints().catch(() => {});
+            refreshPortfolioSelectedPlanChart().catch(() => {});
+        });
+
+        document.getElementById('portfolio-history-table-body').addEventListener('click', async (event) => {
+            const editButton = event.target.closest('.portfolio-edit-btn');
+            if (editButton) {
+                const rowKey = String(editButton.dataset.rowKey || '').trim();
+                const batch = portfolioHistoryByChangeId.get(rowKey);
+                if (!batch) return;
+                loadPortfolioBatchIntoForm(batch);
+                setPortfolioEditMode(rowKey);
+                document.getElementById('portfolio-status').textContent = `สถานะ: โหมดแก้ไข batch ${batch.batchId || batch.changeId || rowKey}`;
+                return;
+            }
+
+            const deleteButton = event.target.closest('.portfolio-delete-btn');
+            if (!deleteButton) return;
+
+            if (!activeUser) {
+                document.getElementById('portfolio-status').textContent = 'สถานะ: กรุณา login ก่อนลบข้อมูล';
+                return;
+            }
+
+            const rowKey = String(deleteButton.dataset.rowKey || '').trim();
+            const batch = portfolioHistoryByChangeId.get(rowKey);
+            if (!batch) return;
+            const confirmed = window.confirm(`ยืนยันลบ batch ${batch.batchId || batch.changeId || rowKey} ?`);
+            if (!confirmed) return;
+
+            setPortfolioLoading(true, 'กำลังลบรายการพอร์ต...');
+            deleteButton.disabled = true;
+            try {
+                if (String(batch.changeId || '').trim()) {
+                    await deletePortfolioBatchViaGas(String(batch.changeId || '').trim(), activeUser.userId);
+                    await syncPortfolioHistoryFromGasToCache(activeUser.userId);
+                } else if (Number.isFinite(Number(batch.id))) {
+                    await idbDeletePortfolioChangeById(Number(batch.id));
+                } else {
+                    throw new Error('ไม่พบรหัสรายการที่ใช้ลบ');
+                }
+
+                await refreshPortfolioUi();
+                if (portfolioEditingChangeId === rowKey) {
+                    setPortfolioEditMode('');
+                    resetPortfolioEntryRows();
+                    document.getElementById('portfolio-change-date').value = formatAsIsoDate(new Date());
+                    document.getElementById('portfolio-note').value = '';
+                }
+                document.getElementById('portfolio-status').textContent = `สถานะ: ลบ batch ${batch.batchId || batch.changeId || rowKey} สำเร็จ`;
+            } catch (error) {
+                document.getElementById('portfolio-status').textContent = `สถานะ: ลบ batch ไม่สำเร็จ (${error.message})`;
+            } finally {
+                setPortfolioLoading(false);
+                deleteButton.disabled = false;
+            }
+        });
+
+        document.getElementById('portfolio-save-btn').addEventListener('click', async () => {
+            setPortfolioLoading(true, 'กำลังบันทึกรายการพอร์ต...');
+            try {
+                setPortfolioStatus('กำลังบันทึกรายการพอร์ต...', 'warn');
+                if (!activeUser) {
+                    throw new Error('กรุณา login ก่อนบันทึก');
+                }
+
+                const effectiveDate = String(document.getElementById('portfolio-change-date').value || '').trim();
+                const note = String(document.getElementById('portfolio-note').value || '').trim();
+                const entries = collectPortfolioEntries();
+
+                if (!parseIsoDateToDateObj(effectiveDate)) {
+                    throw new Error('วันที่เปลี่ยนแผนไม่ถูกต้อง');
+                }
+
+                const validEntries = entries.filter((entry) => Number.isFinite(entry.units) && entry.units >= 0);
+                if (!validEntries.length) {
+                    throw new Error('กรอกจำนวนหน่วยอย่างน้อย 1 แผน');
+                }
+
+                const normalizedEntries = [];
+                for (let i = 0; i < validEntries.length; i++) {
+                    const entry = validEntries[i];
+                    if (getPlanIndexById(entry.plan) < 0) {
+                        throw new Error(`แผนไม่ถูกต้องที่รายการ ${i + 1}`);
+                    }
+                    normalizedEntries.push({
+                        unitCostKey: `unitCost${entry.plan}`,
+                        planName: planNames[entry.plan] || `แผน ${entry.plan}`,
+                        units: Number(entry.units)
+                    });
+                }
+
+                const batchId = createPortfolioBatchId(effectiveDate);
+                let saved;
+                if (portfolioEditingChangeId) {
+                    const editingRow = portfolioHistoryByChangeId.get(portfolioEditingChangeId);
+                    const editingBatchId = String(editingRow?.batchId || batchId);
+                    const editingChangeId = String(editingRow?.changeId || '').trim();
+                    if (String(editingRow?.changeId || '').trim()) {
+                        saved = await updatePortfolioBatchViaGas(
+                            editingChangeId,
+                            activeUser.userId,
+                            effectiveDate,
+                            JSON.stringify(normalizedEntries),
+                            note,
+                            editingBatchId
+                        );
+                        await syncPortfolioHistoryFromGasToCache(activeUser.userId);
+                    } else {
+                        try {
+                            // Backend now supports update by batchId when changeId is missing.
+                            saved = await updatePortfolioBatchViaGas(
+                                '',
+                                activeUser.userId,
+                                effectiveDate,
+                                JSON.stringify(normalizedEntries),
+                                note,
+                                editingBatchId
+                            );
+                            await syncPortfolioHistoryFromGasToCache(activeUser.userId);
+                        } catch (_gasUpdateError) {
+                            if (Number.isFinite(Number(editingRow?.id))) {
+                                await idbDeletePortfolioChangeById(Number(editingRow.id));
+                                const localSaved = await idbAddPortfolioChange({
+                                    userId: activeUser.userId,
+                                    batchId: editingBatchId,
+                                    effectiveDate,
+                                    entriesJson: JSON.stringify(normalizedEntries),
+                                    note
+                                });
+                                saved = {
+                                    batchId: editingBatchId,
+                                    localOnly: true,
+                                    createdAt: localSaved?.createdAt || new Date().toISOString()
+                                };
+                            } else {
+                                throw new Error('ไม่พบรหัสรายการที่ใช้แก้ไข');
+                            }
+                        }
+                    }
+                } else {
+                    const entriesJsonText = JSON.stringify(normalizedEntries);
+                    const localSaved = await idbAddPortfolioChange({
+                        userId: activeUser.userId,
+                        batchId,
+                        effectiveDate,
+                        entriesJson: entriesJsonText,
+                        note
+                    });
+
+                    try {
+                        saved = await savePortfolioBatchViaGas(
+                            activeUser.userId,
+                            effectiveDate,
+                            entriesJsonText,
+                            note,
+                            batchId
+                        );
+                        await syncPortfolioHistoryFromGasToCache(activeUser.userId);
+                    } catch (gasError) {
+                        saved = {
+                            batchId: batchId,
+                            entriesCount: normalizedEntries.length,
+                            localOnly: true,
+                            createdAt: localSaved?.createdAt || new Date().toISOString(),
+                            error: gasError && gasError.message ? gasError.message : String(gasError)
+                        };
+                        await refreshPortfolioUi();
+                        setPortfolioEditMode('');
+                        document.getElementById('portfolio-note').value = '';
+                        resetPortfolioEntryRows();
+                        setPortfolioStatus(
+                            `บันทึกในเครื่องสำเร็จ (${normalizedEntries.length} แผน) แต่ส่งขึ้น GAS ไม่สำเร็จ (${saved.error})`,
+                            'warn'
+                        );
+                        return;
+                    }
+                }
+
+                document.getElementById('portfolio-note').value = '';
+                setPortfolioEditMode('');
+                resetPortfolioEntryRows();
+                await refreshPortfolioUi();
+                setPortfolioStatus(`บันทึกรายการพอร์ตสำเร็จ (${validEntries.length} แผน, batch: ${saved?.batchId || '-'})`, 'success');
+            } catch (error) {
+                setPortfolioStatus(`บันทึกรายการไม่สำเร็จ (${error.message})`, 'error');
+            } finally {
+                setPortfolioLoading(false);
+            }
+        });
+
         // Initialize
         initDropdowns();
+        resetPortfolioEntryRows();
+        setPortfolioEditMode('');
+        document.getElementById('portfolio-change-date').value = formatAsIsoDate(new Date());
+        refreshPortfolioEntryPriceHints().catch(() => {});
         refreshDbStats();
-        setActiveTab('chart');
-        refreshPlanButtonStyles();
-        updateMainTitle();
-        scheduleAutoFetch(0);
+        restoreActiveUserSession()
+            .catch(() => {
+                setActiveUser(null);
+            })
+            .finally(() => {
+                setActiveTab('chart');
+                refreshPlanButtonStyles();
+                updateMainTitle();
+                scheduleAutoFetch(0);
+                setTimeout(() => {
+                    autoSyncMismatchedMonthsOnStartup();
+                }, 250);
+            });
     </script>
  </body>
 </html>
+
+
