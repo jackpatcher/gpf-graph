@@ -6,6 +6,7 @@
   <title>GPF NAV Chart Viewer</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
   <style>
         * { font-family: 'Sarabun', sans-serif; }
@@ -35,6 +36,36 @@
             0%, 100% { transform: scaleY(1); }
             50% { transform: scaleY(2); }
         }
+        #toast-container {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 90;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: min(92vw, 380px);
+            pointer-events: none;
+        }
+        .app-toast {
+            pointer-events: auto;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.15);
+            padding: 10px 12px;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .app-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .app-toast.info { border-left: 4px solid #3b82f6; }
+        .app-toast.success { border-left: 4px solid #10b981; }
+        .app-toast.warn { border-left: 4px solid #f59e0b; }
+        .app-toast.error { border-left: 4px solid #ef4444; }
     </style>
   <style>body { box-sizing: border-box; }</style>
  </head>
@@ -52,7 +83,7 @@
             </div>
          </div>
          <div class="hidden md:flex items-center gap-2 text-xs text-slate-500">
-            <span>จิรัฎฐ์ สุดใจ  iam.geradt@gmail.com</span>
+            <span>พัฒนาโดย จิรัฎฐ์ สุดใจ  iam.geradt@gmail.com</span>
             <span class="pulse-dot w-2 h-2 bg-emerald-400 rounded-full"></span>
             <span>LIVE DATA</span>
          </div>
@@ -181,11 +212,33 @@
          <section id="portfolio-panel" class="hidden card-glass rounded-2xl p-5 space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-2">
                 <h2 class="text-lg font-semibold text-slate-700">พอร์ตการลงทุนรายผู้ใช้</h2>
-                <p id="portfolio-auth-status" class="text-xs text-slate-500">ยังไม่เข้าสู่ระบบ</p>
+                <div class="relative flex items-center gap-2">
+                    <p id="portfolio-auth-status" class="text-xs text-slate-500">ยังไม่เข้าสู่ระบบ</p>
+                    <button id="portfolio-open-plan-modal-btn" type="button" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-medium">เปลี่ยนแผน</button>
+                    <button id="portfolio-profile-menu-btn" type="button" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-medium">บัญชี</button>
+                    <div id="portfolio-profile-menu" class="hidden absolute right-0 top-9 w-64 rounded-xl border border-slate-200 bg-white shadow-lg p-2 z-20 space-y-1">
+                        <button id="portfolio-menu-login-toggle-btn" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm bg-slate-100 hover:bg-slate-200 text-slate-700">Login / Register</button>
+                        <button id="portfolio-menu-logout-btn" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm bg-rose-50 hover:bg-rose-100 text-rose-700">Logout</button>
+                        <div class="border-t border-slate-200 my-1"></div>
+                        <button id="portfolio-menu-open-email-change-btn" type="button" class="w-full text-left px-3 py-2 rounded-lg text-sm bg-amber-50 hover:bg-amber-100 text-amber-700">เปลี่ยนอีเมล</button>
+                    </div>
+                </div>
             </div>
 
-            <div id="portfolio-auth-box" class="rounded-xl border border-slate-200 bg-white p-3 space-y-3">
+            <div id="portfolio-auth-box" class="hidden rounded-xl border border-slate-200 bg-white p-3 space-y-3">
                 <p class="text-sm font-semibold text-slate-700">เข้าสู่ระบบ / สมัครผู้ใช้</p>
+
+                <!-- Google Sign-In (แสดงเฉพาะเมื่อตั้งค่า GOOGLE_CLIENT_ID) -->
+                <div id="google-signin-section" class="hidden">
+                    <div id="google-signin-btn"></div>
+                    <p id="google-signin-help" class="mt-2 text-[11px] text-slate-500 break-all"></p>
+                    <div class="flex items-center gap-2 my-2">
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                        <span class="text-xs text-slate-400">หรือ</span>
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                     <input id="portfolio-username" type="text" placeholder="Username" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     <input id="portfolio-password" type="password" placeholder="Password" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500" />
@@ -206,36 +259,53 @@
                     <div class="rounded-xl p-4 border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-slate-50 shadow-sm">
                         <p class="text-cyan-700 text-xs font-semibold tracking-wide">มูลค่าปัจจุบันรวม</p>
                         <p id="portfolio-total-current" class="text-3xl font-bold text-slate-800 mt-1 leading-none">-</p>
+                        <p id="portfolio-total-current-updated-at" class="text-[11px] text-slate-500 mt-2">อัปเดตล่าสุด: -</p>
                     </div>
                     <div class="rounded-xl p-4 border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-slate-50 shadow-sm">
                         <p class="text-emerald-700 text-xs font-semibold tracking-wide">กำไร/ขาดทุนรวม</p>
                         <p id="portfolio-total-pnl" class="text-3xl font-bold text-slate-800 mt-1 leading-none">-</p>
+                        <p class="text-[11px] text-slate-500 mt-2">เปอร์เซ็นต์: <span id="portfolio-total-pnl-percent" class="text-base font-bold text-slate-700">-</span></p>
                     </div>
                 </div>
 
-                <div class="rounded-xl border border-slate-200 bg-white p-3 space-y-3">
+                <div id="admin-approval-dashboard" class="hidden rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-slate-50 p-4 space-y-3">
                     <div class="flex flex-wrap items-center justify-between gap-2">
-                        <p class="text-sm font-semibold text-slate-700">บันทึกการเปลี่ยนแผน</p>
-                        <button id="portfolio-logout-btn" type="button" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-400 text-white rounded-lg text-xs font-medium">Logout</button>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <input id="portfolio-change-date" type="date" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700" />
-                        <input id="portfolio-note" type="text" placeholder="หมายเหตุรวมรอบนี้ (ไม่บังคับ)" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700" />
-                        <div class="flex gap-2">
-                            <button id="portfolio-add-row-btn" type="button" class="flex-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium border border-slate-300">+ เพิ่มแผน</button>
-                            <button id="portfolio-save-btn" type="button" class="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium">บันทึกรอบนี้</button>
+                        <div>
+                            <p class="text-sm font-semibold text-emerald-800">Admin Dashboard: อนุมัติผู้สมัครใหม่</p>
+                            <p class="text-xs text-emerald-700">ดูจำนวนคำขอค้าง และกดอนุมัติได้ทันทีจากการ์ดด้านล่าง</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="admin-approve-all-btn" type="button" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-medium">อนุมัติทั้งหมด</button>
+                            <button id="admin-approval-refresh-btn" type="button" class="px-3 py-1.5 bg-white hover:bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium border border-emerald-300">รีเฟรชรายการรออนุมัติ</button>
                         </div>
                     </div>
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-2">
-                        <div class="grid grid-cols-12 gap-2 text-[11px] text-slate-500 font-semibold px-1 mb-1">
-                            <div class="col-span-6">แผน (unitCost)</div>
-                            <div class="col-span-5 text-right">จำนวนหน่วย</div>
-                            <div class="col-span-1"></div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+                        <div class="rounded-lg border border-emerald-200 bg-white p-3">
+                            <p class="text-[11px] text-emerald-700">รออนุมัติทั้งหมด</p>
+                            <p id="admin-approval-total-pending" class="text-2xl font-bold text-emerald-800 leading-none mt-1">0</p>
                         </div>
-                        <div id="portfolio-entries" class="space-y-2"></div>
+                        <div class="rounded-lg border border-sky-200 bg-white p-3">
+                            <p class="text-[11px] text-sky-700">ผู้ใช้ทั้งหมด</p>
+                            <p id="admin-approval-total-users" class="text-2xl font-bold text-sky-800 leading-none mt-1">0</p>
+                        </div>
+                        <div class="rounded-lg border border-amber-200 bg-white p-3">
+                            <p class="text-[11px] text-amber-700">อนุมัติแล้ว</p>
+                            <p id="admin-approval-total-approved" class="text-2xl font-bold text-amber-800 leading-none mt-1">0</p>
+                        </div>
+                        <div class="rounded-lg border border-violet-200 bg-white p-3">
+                            <p class="text-[11px] text-violet-700">แอดมิน</p>
+                            <p id="admin-approval-total-admin" class="text-2xl font-bold text-violet-800 leading-none mt-1">0</p>
+                        </div>
+                    </div>
+
+                    <p id="admin-approval-status" class="text-xs text-emerald-700">สถานะ: พร้อมใช้งาน</p>
+                    <div id="admin-approval-list" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div class="text-xs text-slate-400">ยังไม่มีผู้ใช้ที่รออนุมัติ</div>
                     </div>
                 </div>
 
+ 
                 <div class="rounded-xl border border-slate-200 bg-white p-3">
                     <div class="flex items-center justify-between gap-2 mb-2">
                         <p id="portfolio-selected-plan-chart-title" class="text-sm font-semibold text-slate-700">กราฟแผนปัจจุบันทั้งหมด</p>
@@ -293,12 +363,165 @@
                         </table>
                     </div>
                 </div>
+
+                <div class="rounded-xl border border-slate-200 bg-white p-3 space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-sm font-semibold text-slate-700">ผลการเปลี่ยนแผน (Take Profit)</p>
+                        <p class="text-[11px] text-slate-500">คำนวณจากการปิดรอบก่อนหน้า ณ วันเปลี่ยนรอบใหม่</p>
+                    </div>
+                    <p id="portfolio-switch-result-empty" class="text-xs text-slate-400">ยังไม่มีรายการเปลี่ยนแผนเพียงพอสำหรับคำนวณผล</p>
+                    <div id="portfolio-switch-result-chart-wrap" class="hidden h-64">
+                        <canvas id="portfolio-switch-result-chart"></canvas>
+                    </div>
+                    <div class="overflow-auto max-h-72">
+                        <table class="min-w-full text-xs text-slate-700">
+                            <thead>
+                                <tr class="border-b border-slate-200">
+                                    <th class="text-left py-2 pr-2">ครั้งที่</th>
+                                    <th class="text-left py-2 px-2">วันที่เปลี่ยน</th>
+                                    <th class="text-left py-2 px-2">จากรอบ</th>
+                                    <th class="text-left py-2 px-2">ไปรอบ</th>
+                                    <th class="text-right py-2 px-2">ต้นทุนรอบก่อน</th>
+                                    <th class="text-right py-2 px-2">มูลค่าขาย (Take Profit)</th>
+                                    <th class="text-right py-2 px-2">ผลต่าง</th>
+                                    <th class="text-right py-2 pl-2">ผลตอบแทน</th>
+                                </tr>
+                            </thead>
+                            <tbody id="portfolio-switch-result-table-body">
+                                <tr><td colspan="8" class="py-3 text-slate-400">ยังไม่มีข้อมูล</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="portfolio-current-status" class="hidden rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
+                        <p class="text-xs font-semibold text-amber-900">สถานะปัจจุบัน (กำลังดำเนินการ)</p>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <p class="text-amber-700">แผนปัจจุบัน</p>
+                                <p id="portfolio-current-plans" class="font-semibold text-amber-900">-</p>
+                            </div>
+                            <div>
+                                <p class="text-amber-700">วันที่เปลี่ยน</p>
+                                <p id="portfolio-current-date" class="font-semibold text-amber-900">-</p>
+                            </div>
+                            <div>
+                                <p class="text-amber-700">มูลค่าปัจจุบัน (NET)</p>
+                                <p id="portfolio-current-net" class="font-semibold text-emerald-600">-</p>
+                            </div>
+                            <div>
+                                <p class="text-amber-700">กำไร/ขาดทุน</p>
+                                <p id="portfolio-current-pnl" class="font-semibold text-emerald-600">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <p id="portfolio-status" class="text-sm text-slate-600">สถานะ: พร้อมใช้งาน</p>
             <div id="portfolio-loading" class="hidden inline-flex items-center gap-2 text-xs text-blue-600 bg-blue-50 border border-blue-200 rounded-md px-2 py-1">
                 <span class="inline-block w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
                 <span id="portfolio-loading-text">กำลังโหลดข้อมูลพอร์ต...</span>
+            </div>
+
+            <div id="portfolio-email-change-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm p-4">
+                <div class="max-w-2xl mx-auto mt-8 md:mt-16 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+                    <div class="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-200 bg-slate-50">
+                        <div>
+                            <p class="text-sm font-semibold text-slate-800">เปลี่ยน Email บัญชี</p>
+                            <p id="portfolio-email-change-current-email" class="text-xs text-slate-500">กำลังเตรียมข้อมูล...</p>
+                        </div>
+                        <button id="portfolio-email-change-close-btn" type="button" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-medium border border-slate-300">ปิด</button>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                            <div id="email-change-step-1" class="rounded-lg border border-blue-200 bg-blue-50 p-2">
+                                <p class="text-[11px] font-semibold text-blue-700">STEP 1</p>
+                                <p class="text-[11px] text-blue-700">ส่ง OTP</p>
+                            </div>
+                            <div id="email-change-step-2" class="rounded-lg border border-slate-200 bg-slate-50 p-2">
+                                <p class="text-[11px] font-semibold text-slate-600">STEP 2</p>
+                                <p class="text-[11px] text-slate-600">ยืนยัน OTP</p>
+                            </div>
+                            <div id="email-change-step-3" class="rounded-lg border border-slate-200 bg-slate-50 p-2">
+                                <p class="text-[11px] font-semibold text-slate-600">STEP 3</p>
+                                <p class="text-[11px] text-slate-600">Login ด้วย Google ใหม่</p>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 leading-relaxed">
+                            เพื่อไม่ให้หลงขั้นตอน: ทำตาม Step 1 -> Step 2 -> Step 3 ตามลำดับ
+                        </div>
+                        <div class="grid grid-cols-1 gap-3">
+                            <div>
+                                <label class="block text-xs text-slate-500 mb-1">OTP จากอีเมลเดิม</label>
+                                <input id="portfolio-email-change-otp" type="text" inputmode="numeric" maxlength="6" placeholder="OTP 6 หลัก" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700" />
+                            </div>
+                        </div>
+                        <p id="portfolio-email-change-modal-status" class="text-xs text-slate-500">กดปุ่มส่ง OTP เพื่อเริ่มขั้นตอน</p>
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="space-y-1">
+                                <button id="portfolio-resend-email-change-otp-btn" type="button" class="px-3 py-2 bg-amber-500 hover:bg-amber-400 text-white rounded-lg text-sm font-medium">ส่ง OTP</button>
+                                <p id="portfolio-email-otp-resend-hint" class="text-[11px] text-slate-500">ไม่ได้รับอีเมล? กดปุ่มนี้เพื่อส่ง OTP อีกครั้ง</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                            <button id="portfolio-email-change-cancel-btn" type="button" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium border border-slate-300">ยกเลิก</button>
+                            <button id="portfolio-verify-email-change-btn" type="button" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium">ยืนยัน OTP และเตรียม Login ด้วย Google</button>
+                            <button id="portfolio-email-change-finish-btn" type="button" class="hidden px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium">Finish: Logout แล้ว Login ด้วย Google ใหม่</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="portfolio-plan-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm p-4">
+                <div class="max-w-3xl mx-auto mt-8 md:mt-16 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+                    <div class="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-200 bg-slate-50">
+                        <div>
+                            <p class="text-sm font-semibold text-slate-800">เปลี่ยนแผนการลงทุน</p>
+                            <p class="text-xs text-slate-500">ใช้ popup นี้ทั้งเพิ่มรายการใหม่และแก้ไขรายการเดิม</p>
+                        </div>
+                        <button id="portfolio-plan-modal-close-btn" type="button" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-medium border border-slate-300">ปิด</button>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                            <input id="portfolio-change-date" type="date" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700" />
+                            <input id="portfolio-note" type="text" placeholder="หมายเหตุรวมรอบนี้ (ไม่บังคับ)" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700" />
+                            <div class="flex gap-2">
+                                <button id="portfolio-add-row-btn" type="button" class="flex-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium border border-slate-300">+ เพิ่มแผน</button>
+                                <button id="portfolio-save-btn" type="button" class="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium">บันทึกรอบนี้</button>
+                            </div>
+                        </div>
+                        <div class="rounded-lg border border-slate-200 bg-slate-50 p-2">
+                            <div class="grid grid-cols-12 gap-2 text-[11px] text-slate-500 font-semibold px-1 mb-1">
+                                <div class="col-span-6">แผน (unitCost)</div>
+                                <div class="col-span-5 text-right">จำนวนหน่วย</div>
+                                <div class="col-span-1"></div>
+                            </div>
+                            <div id="portfolio-entries" class="space-y-2"></div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button id="portfolio-plan-modal-cancel-btn" type="button" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium border border-slate-300">ปิดหน้าต่าง</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="portfolio-delete-confirm-modal" class="hidden fixed inset-0 z-[75] bg-slate-900/70 backdrop-blur-sm p-4">
+                <div class="max-w-md mx-auto mt-20 md:mt-28 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+                    <div class="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-200 bg-rose-50">
+                        <div>
+                            <p class="text-sm font-semibold text-rose-800">ยืนยันการลบรายการ</p>
+                            <p class="text-xs text-rose-700">การลบนี้จะลบข้อมูลพอร์ตถาวร</p>
+                        </div>
+                        <button id="portfolio-delete-confirm-close-btn" type="button" class="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-medium border border-slate-300">ปิด</button>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <p id="portfolio-delete-confirm-message" class="text-sm text-slate-700 leading-6">ยืนยันลบรายการนี้หรือไม่?</p>
+                        <div class="flex justify-end gap-2">
+                            <button id="portfolio-delete-confirm-cancel-btn" type="button" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium border border-slate-300">ยกเลิก</button>
+                            <button id="portfolio-delete-confirm-submit-btn" type="button" class="px-3 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-sm font-medium">ยืนยันลบ</button>
+                        </div>
+                    </div>
+                </div>
             </div>
          </section>
 
@@ -365,6 +588,21 @@
       <footer class="text-center mt-6 text-slate-500 text-sm">
         <p>ข้อมูลจาก กองทุนบำเหน็จบำนาญข้าราชการ (กบข.)</p>
      </footer>
+
+            <div id="global-loading-modal" class="hidden fixed inset-0 z-[70] bg-slate-900/55 backdrop-blur-sm p-4">
+                <div class="max-w-md mx-auto mt-20 md:mt-28 rounded-2xl border border-slate-200 bg-white shadow-xl p-4">
+                        <div class="flex items-center gap-3 mb-3">
+                                <span class="inline-block w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
+                                <p id="global-loading-text" class="text-sm font-semibold text-slate-700">กำลังโหลดข้อมูล...</p>
+                        </div>
+                        <div class="space-y-2">
+                                <div class="h-2 rounded bg-slate-200 animate-pulse"></div>
+                                <div class="h-2 rounded bg-slate-200 animate-pulse w-11/12"></div>
+                                <div class="h-2 rounded bg-slate-200 animate-pulse w-8/12"></div>
+                        </div>
+                </div>
+            </div>
+                        <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
     </div>
   <script>
         // Default configuration
@@ -390,6 +628,7 @@
         let fullscreenChart = null;
         let gasMonthListLoaded = false;
         let startupAutoSyncDone = false;
+        let globalLoadingCounter = 0;
 
         const cursorCrosshairPlugin = {
             id: 'cursorCrosshairPlugin',
@@ -490,9 +729,24 @@
         let portfolioCurrentRowsCache = [];
         let portfolioChangesCache = [];
         let portfolioSelectedPlanCharts = [];
+        let portfolioSwitchResultChart = null;
+        let adminApprovalDashboardCache = null;
         let portfolioLoadingCounter = 0;
+        let isPortfolioProfileMenuOpen = false;
+        let showPortfolioAuthForm = false;
+        let otpResendCooldownSeconds = 0;
+        let otpResendCooldownTimer = null;
+        let isSendingEmailChangeOtp = false;
+        let isVerifyingEmailChangeOtp = false;
+        let emailChangeOtpRequested = false;
+        let emailChangeOtpVerified = false;
+        let toastAutoId = 0;
+        let portfolioDeleteConfirmResolver = null;
+        let pendingEmailChangeUserId = '';
+        let portfolioTabLoadedKey = '';
         const portfolioHistoryByChangeId = new Map();
         const ACTIVE_USER_STORAGE_KEY = 'gpf_active_user_v1';
+        const PENDING_EMAIL_CHANGE_USER_ID_STORAGE_KEY = 'gpf_pending_email_change_user_id_v1';
 
         // Thai month names
         const thaiMonths = [
@@ -712,12 +966,25 @@
                 }
 
                 if (isPortfolioTab) {
-                    refreshPortfolioUi().catch((errorObj) => {
-                        const statusEl = document.getElementById('portfolio-status');
-                        if (statusEl) {
-                            statusEl.textContent = `สถานะ: โหลดพอร์ตไม่สำเร็จ (${errorObj.message})`;
-                        }
-                    });
+                    initGoogleSignIn();
+                    const currentLoadKey = getPortfolioTabLoadKey();
+                    if (portfolioTabLoadedKey === currentLoadKey) {
+                        return;
+                    }
+                    setGlobalLoading(true, 'กำลังโหลดข้อมูลพอร์ต...');
+                    refreshPortfolioUi()
+                        .then(() => {
+                            portfolioTabLoadedKey = currentLoadKey;
+                        })
+                        .catch((errorObj) => {
+                            const statusEl = document.getElementById('portfolio-status');
+                            if (statusEl) {
+                                statusEl.textContent = `สถานะ: โหลดพอร์ตไม่สำเร็จ (${errorObj.message})`;
+                            }
+                        })
+                        .finally(() => {
+                            setGlobalLoading(false);
+                        });
                 }
             }
         }
@@ -733,6 +1000,30 @@
             if (fetchButtonText) {
                 fetchButtonText.textContent = isLoading ? 'กำลังดึงข้อมูล...' : '📈 ดึงข้อมูลและแสดงกราฟ';
             }
+        }
+
+        function setGlobalLoading(isLoading, message = 'กำลังโหลดข้อมูล...') {
+            const modal = document.getElementById('global-loading-modal');
+            const textEl = document.getElementById('global-loading-text');
+            if (!modal || !textEl) return;
+
+            if (isLoading) {
+                globalLoadingCounter += 1;
+                textEl.textContent = String(message || 'กำลังโหลดข้อมูล...');
+                modal.classList.remove('hidden');
+                return;
+            }
+
+            globalLoadingCounter = Math.max(0, globalLoadingCounter - 1);
+            if (globalLoadingCounter === 0) {
+                modal.classList.add('hidden');
+                textEl.textContent = 'กำลังโหลดข้อมูล...';
+            }
+        }
+
+        function getPortfolioTabLoadKey() {
+            const userId = String(activeUser?.userId || '').trim();
+            return userId ? `user:${userId}` : 'guest';
         }
 
         function scheduleAutoFetch(delay = 250) {
@@ -778,6 +1069,18 @@
         const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxn9OA4-5Bg0d5nrDVxiPyY8M_JnXBuNM-MYWaxRqqvFQ8DysYgrYq01xh58m91Oqhn/exec';
         const GAS_SYNC_TOKEN = 'Amp';
         const GAS_PAGE_LIMIT = 5000;
+        // Google OAuth 2.0 Client ID — สร้างจาก https://console.cloud.google.com/
+        // (APIs & Services → Credentials → Create OAuth 2.0 Client ID → Web application)
+        // เพิ่ม Authorized JavaScript origins ให้รวม URL ที่ host หน้านี้
+        const GOOGLE_CLIENT_ID = '1070500285126-t2bin0ih150oecuosnmor146kigr616j.apps.googleusercontent.com';
+        // ถ้าต้องการให้ยอมรับ origin อื่น เพิ่มเต็มรูปแบบ เช่น https://your-domain.com
+        // ถ้าปล่อยเป็น [] จะไม่บล็อกจากฝั่งหน้าเว็บ (แต่อาจยังโดน Google 403 ถ้าไม่ได้ whitelist ใน Console)
+        const GOOGLE_ALLOWED_ORIGINS = [
+            'http://localhost:3000',
+            'http://127.0.0.1:3000',
+            'http://localhost:5500',
+            'http://127.0.0.1:5500'
+        ];
 
         function parseApiDate(dateText) {
             if (!dateText || typeof dateText !== 'string') return null;
@@ -984,7 +1287,7 @@
                 if (parsedIsoPart) return parsedIsoPart;
             }
 
-            // Support values like MM/DD/YYYY or DD/MM/YYYY coming from legacy/localized records.
+            // Support values like DD/MM/YYYY or MM/DD/YYYY coming from legacy/localized records.
             const slashMatch = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
             if (slashMatch) {
                 const first = Number(slashMatch[1]);
@@ -992,12 +1295,12 @@
                 const year = Number(slashMatch[3]);
                 if (!Number.isFinite(first) || !Number.isFinite(second) || !Number.isFinite(year)) return null;
 
-                // Prefer MM/DD/YYYY for browser date-input displays, then fallback to DD/MM/YYYY.
-                if (first >= 1 && first <= 12 && second >= 1 && second <= 31) {
-                    return new Date(year, first - 1, second);
-                }
+                // NAV/date labels in this app are primarily DD/MM/YYYY.
                 if (first >= 1 && first <= 31 && second >= 1 && second <= 12) {
                     return new Date(year, second - 1, first);
+                }
+                if (first >= 1 && first <= 12 && second >= 1 && second <= 31) {
+                    return new Date(year, first - 1, second);
                 }
             }
 
@@ -1036,6 +1339,151 @@
             return text;
         }
 
+        function formatDisplayDateTime(value) {
+            if (!value) return '-';
+            const parsed = value instanceof Date ? value : new Date(String(value));
+            if (isNaN(parsed.getTime())) return String(value);
+            return parsed.toLocaleString('th-TH');
+        }
+
+        function removeToast(toastEl) {
+            if (!toastEl) return;
+            toastEl.classList.remove('show');
+            window.setTimeout(() => {
+                if (toastEl.parentNode) {
+                    toastEl.parentNode.removeChild(toastEl);
+                }
+            }, 220);
+        }
+
+        function showToast(message, tone = 'info', durationMs = 3200) {
+            const container = document.getElementById('toast-container');
+            if (!container) return null;
+
+            const toast = document.createElement('div');
+            toast.className = `app-toast ${tone}`;
+            toast.dataset.toastId = `toast-${++toastAutoId}`;
+            toast.innerHTML = `
+                <div class="flex items-start gap-2">
+                    <p class="text-sm text-slate-700 flex-1 leading-5">${String(message || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+                    <button type="button" class="toast-close-btn text-slate-400 hover:text-slate-600 text-xs px-1">✕</button>
+                </div>
+            `;
+
+            const closeBtn = toast.querySelector('.toast-close-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => removeToast(toast));
+            }
+
+            container.appendChild(toast);
+            window.requestAnimationFrame(() => toast.classList.add('show'));
+
+            if (Number(durationMs) > 0) {
+                window.setTimeout(() => removeToast(toast), Number(durationMs));
+            }
+
+            return toast;
+        }
+
+        function showConfirmToast(message, options = {}) {
+            const container = document.getElementById('toast-container');
+            if (!container) return Promise.resolve(false);
+
+            const confirmText = String(options.confirmText || 'ยืนยัน');
+            const cancelText = String(options.cancelText || 'ยกเลิก');
+            const tone = String(options.tone || 'warn');
+
+            return new Promise((resolve) => {
+                const toast = document.createElement('div');
+                toast.className = `app-toast ${tone}`;
+                toast.innerHTML = `
+                    <div class="space-y-2">
+                        <p class="text-sm text-slate-700 leading-5">${String(message || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+                        <div class="flex justify-end gap-2">
+                            <button type="button" class="toast-cancel-btn px-2.5 py-1 text-xs rounded border border-slate-300 bg-white hover:bg-slate-100 text-slate-700">${cancelText}</button>
+                            <button type="button" class="toast-confirm-btn px-2.5 py-1 text-xs rounded border border-amber-300 bg-amber-100 hover:bg-amber-200 text-amber-800">${confirmText}</button>
+                        </div>
+                    </div>
+                `;
+
+                const done = (result) => {
+                    removeToast(toast);
+                    resolve(result);
+                };
+
+                const confirmBtn = toast.querySelector('.toast-confirm-btn');
+                const cancelBtn = toast.querySelector('.toast-cancel-btn');
+                if (confirmBtn) confirmBtn.addEventListener('click', () => done(true));
+                if (cancelBtn) cancelBtn.addEventListener('click', () => done(false));
+
+                container.appendChild(toast);
+                window.requestAnimationFrame(() => toast.classList.add('show'));
+            });
+        }
+
+        function isPortfolioDeleteConfirmModalOpen() {
+            const modal = document.getElementById('portfolio-delete-confirm-modal');
+            return !!modal && !modal.classList.contains('hidden');
+        }
+
+        function setPortfolioDeleteConfirmBusy(isBusy, message = '') {
+            const messageEl = document.getElementById('portfolio-delete-confirm-message');
+            const closeBtn = document.getElementById('portfolio-delete-confirm-close-btn');
+            const cancelBtn = document.getElementById('portfolio-delete-confirm-cancel-btn');
+            const submitBtn = document.getElementById('portfolio-delete-confirm-submit-btn');
+            const busy = Boolean(isBusy);
+
+            if (messageEl) {
+                const baseMessage = String(messageEl.dataset.baseMessage || 'ยืนยันลบรายการนี้หรือไม่?');
+                messageEl.textContent = busy ? String(message || 'กำลังลบรายการ โปรดรอสักครู่...') : baseMessage;
+            }
+            if (closeBtn) closeBtn.disabled = busy;
+            if (cancelBtn) cancelBtn.disabled = busy;
+            if (submitBtn) {
+                submitBtn.disabled = busy;
+                submitBtn.textContent = busy ? 'กำลังลบ...' : 'ยืนยันลบ';
+                submitBtn.classList.toggle('opacity-60', busy);
+                submitBtn.classList.toggle('cursor-not-allowed', busy);
+            }
+        }
+
+        function resolvePortfolioDeleteConfirm(result) {
+            if (typeof portfolioDeleteConfirmResolver !== 'function') return;
+            const resolve = portfolioDeleteConfirmResolver;
+            portfolioDeleteConfirmResolver = null;
+            resolve(Boolean(result));
+        }
+
+        function closePortfolioDeleteConfirmModal(result = false) {
+            const modal = document.getElementById('portfolio-delete-confirm-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+
+            setPortfolioDeleteConfirmBusy(false);
+
+            resolvePortfolioDeleteConfirm(result);
+        }
+
+        function showPortfolioDeleteConfirmModal(batchLabel) {
+            const modal = document.getElementById('portfolio-delete-confirm-modal');
+            const messageEl = document.getElementById('portfolio-delete-confirm-message');
+            if (!modal || !messageEl) return Promise.resolve(false);
+
+            if (typeof portfolioDeleteConfirmResolver === 'function') {
+                closePortfolioDeleteConfirmModal(false);
+            }
+
+            messageEl.dataset.baseMessage = `ยืนยันลบรายการ ${String(batchLabel || '-')} ใช่หรือไม่?`;
+            messageEl.textContent = String(messageEl.dataset.baseMessage);
+            modal.classList.remove('hidden');
+            setPortfolioDeleteConfirmBusy(false);
+
+            return new Promise((resolve) => {
+                portfolioDeleteConfirmResolver = resolve;
+            });
+        }
+
         function setPortfolioStatus(message, tone = 'normal') {
             const el = document.getElementById('portfolio-status');
             if (!el) return;
@@ -1050,6 +1498,247 @@
             } else {
                 el.classList.add('text-slate-600');
             }
+
+            if (tone === 'error') {
+                showToast(message, 'error', 4500);
+            } else if (tone === 'success') {
+                showToast(message, 'success', 3000);
+            }
+        }
+
+        function setAccountChangeStatus(message, tone = 'normal') {
+            const targets = [
+                document.getElementById('portfolio-email-change-status'),
+                document.getElementById('portfolio-email-change-modal-status')
+            ].filter(Boolean);
+            targets.forEach((el) => {
+                el.textContent = String(message || '');
+                el.classList.remove('text-slate-500', 'text-rose-600', 'text-emerald-600', 'text-amber-600');
+                if (tone === 'error') {
+                    el.classList.add('text-rose-600');
+                } else if (tone === 'success') {
+                    el.classList.add('text-emerald-600');
+                } else if (tone === 'warn') {
+                    el.classList.add('text-amber-600');
+                } else {
+                    el.classList.add('text-slate-500');
+                }
+            });
+
+            if (tone === 'error') {
+                showToast(message, 'error', 4500);
+            } else if (tone === 'success') {
+                showToast(message, 'success', 3000);
+            }
+        }
+
+        function setEmailChangeModalStep(step = 1) {
+            const normalizedStep = Math.max(1, Math.min(3, Number(step) || 1));
+            const stepStyles = {
+                done: {
+                    border: 'border-emerald-200',
+                    bg: 'bg-emerald-50',
+                    title: 'text-emerald-700',
+                    desc: 'text-emerald-700'
+                },
+                active: {
+                    border: 'border-blue-200',
+                    bg: 'bg-blue-50',
+                    title: 'text-blue-700',
+                    desc: 'text-blue-700'
+                },
+                waiting: {
+                    border: 'border-slate-200',
+                    bg: 'bg-slate-50',
+                    title: 'text-slate-600',
+                    desc: 'text-slate-600'
+                }
+            };
+
+            [1, 2, 3].forEach((idx) => {
+                const el = document.getElementById(`email-change-step-${idx}`);
+                if (!el) return;
+                const titleEl = el.querySelector('p:nth-child(1)');
+                const descEl = el.querySelector('p:nth-child(2)');
+                const state = idx < normalizedStep
+                    ? 'done'
+                    : idx === normalizedStep
+                        ? 'active'
+                        : 'waiting';
+                const style = stepStyles[state];
+
+                el.classList.remove('border-emerald-200', 'bg-emerald-50', 'border-blue-200', 'bg-blue-50', 'border-slate-200', 'bg-slate-50');
+                el.classList.add(style.border, style.bg);
+
+                if (titleEl) {
+                    titleEl.classList.remove('text-emerald-700', 'text-blue-700', 'text-slate-600');
+                    titleEl.classList.add(style.title);
+                }
+                if (descEl) {
+                    descEl.classList.remove('text-emerald-700', 'text-blue-700', 'text-slate-600');
+                    descEl.classList.add(style.desc);
+                }
+            });
+
+            const resendBtn = document.getElementById('portfolio-resend-email-change-otp-btn');
+            const verifyBtn = document.getElementById('portfolio-verify-email-change-btn');
+            const finishBtn = document.getElementById('portfolio-email-change-finish-btn');
+            if (resendBtn) {
+                resendBtn.classList.toggle('hidden', normalizedStep === 3);
+                resendBtn.textContent = normalizedStep === 1 ? 'Next: ส่ง OTP' : 'ส่ง OTP อีกครั้ง';
+            }
+            if (verifyBtn) {
+                verifyBtn.classList.toggle('hidden', normalizedStep !== 2);
+                verifyBtn.textContent = 'Next: ยืนยัน OTP';
+            }
+            if (finishBtn) {
+                finishBtn.classList.toggle('hidden', normalizedStep !== 3);
+            }
+        }
+
+        function updateOtpResendButtonState() {
+            const btn = document.getElementById('portfolio-resend-email-change-otp-btn');
+            const hintEl = document.getElementById('portfolio-email-otp-resend-hint');
+            if (!btn) return;
+
+            if (isSendingEmailChangeOtp) {
+                btn.disabled = true;
+                btn.classList.add('opacity-60', 'cursor-not-allowed');
+                btn.textContent = 'กำลังส่ง OTP...';
+                if (hintEl) {
+                    hintEl.textContent = 'กำลังประมวลผลคำขอส่ง OTP กรุณารอสักครู่';
+                }
+                return;
+            }
+
+            if (otpResendCooldownSeconds > 0) {
+                btn.disabled = true;
+                btn.classList.add('opacity-60', 'cursor-not-allowed');
+                btn.textContent = `ส่ง OTP ใหม่ได้ใน ${otpResendCooldownSeconds}s`;
+                if (hintEl) {
+                    hintEl.textContent = 'ระบบป้องกันการยิงรหัสถี่เกินไป โปรดรอสักครู่แล้วลองอีกครั้ง';
+                }
+            } else {
+                btn.disabled = false;
+                btn.classList.remove('opacity-60', 'cursor-not-allowed');
+                btn.textContent = emailChangeOtpRequested ? 'ส่ง OTP อีกครั้ง' : 'ส่ง OTP';
+                if (hintEl) {
+                    hintEl.textContent = emailChangeOtpRequested
+                        ? 'หากยังไม่พบอีเมล ให้ตรวจโฟลเดอร์ Spam แล้วกดส่ง OTP อีกครั้ง'
+                        : 'ยังไม่ได้รับรหัส? เริ่มด้วยปุ่มส่ง OTP';
+                }
+            }
+        }
+
+        function startOtpResendCooldown(seconds = 60) {
+            otpResendCooldownSeconds = Math.max(0, Number(seconds) || 0);
+            if (otpResendCooldownTimer) {
+                clearInterval(otpResendCooldownTimer);
+                otpResendCooldownTimer = null;
+            }
+            updateOtpResendButtonState();
+            if (otpResendCooldownSeconds <= 0) return;
+
+            otpResendCooldownTimer = setInterval(() => {
+                otpResendCooldownSeconds = Math.max(0, otpResendCooldownSeconds - 1);
+                updateOtpResendButtonState();
+                if (otpResendCooldownSeconds <= 0 && otpResendCooldownTimer) {
+                    clearInterval(otpResendCooldownTimer);
+                    otpResendCooldownTimer = null;
+                }
+            }, 1000);
+        }
+
+        async function sendOtpToCurrentEmailForChange() {
+            if (!activeUser || !String(activeUser.userId || '').trim()) {
+                setAccountChangeStatus('กรุณา login ก่อนส่ง OTP', 'error');
+                return;
+            }
+            if (isSendingEmailChangeOtp) return;
+
+            emailChangeOtpVerified = false;
+            isSendingEmailChangeOtp = true;
+            updateOtpResendButtonState();
+
+            setAccountChangeStatus('กำลังส่ง OTP ไปยังอีเมลเดิม...', 'warn');
+            setPortfolioLoading(true, 'กำลังส่ง OTP ไปยังอีเมลเดิม...');
+            try {
+                const result = await requestEmailChangeOtpViaGas(activeUser.userId);
+                emailChangeOtpRequested = true;
+                setAccountChangeStatus(`ส่ง OTP ไปยัง ${result?.sentTo || 'อีเมลเดิม'} แล้ว รหัสมีอายุถึง ${formatDisplayDateTime(result?.expiresAt)}`, 'success');
+                setPortfolioStatus('ส่ง OTP เพื่อเปลี่ยนอีเมลสำเร็จ', 'success');
+                setEmailChangeModalStep(2);
+                startOtpResendCooldown(60);
+            } catch (error) {
+                setAccountChangeStatus(`ส่ง OTP ไม่สำเร็จ (${error.message})`, 'error');
+            } finally {
+                isSendingEmailChangeOtp = false;
+                updateOtpResendButtonState();
+                setPortfolioLoading(false);
+            }
+        }
+
+        function openEmailChangeModal() {
+            const modal = document.getElementById('portfolio-email-change-modal');
+            const currentEmailEl = document.getElementById('portfolio-email-change-current-email');
+            const otpInput = document.getElementById('portfolio-email-change-otp');
+            if (!modal || !activeUser || !String(activeUser.userId || '').trim()) {
+                setAccountChangeStatus('กรุณา login ก่อนเปลี่ยนอีเมล', 'error');
+                return;
+            }
+
+            if (otpInput) otpInput.value = '';
+            if (currentEmailEl) {
+                currentEmailEl.textContent = `ส่ง OTP ไปยังอีเมลเดิม: ${String(activeUser.username || '-').trim() || '-'}`;
+            }
+            modal.classList.remove('hidden');
+            setEmailChangeModalStep(1);
+
+            if (otpResendCooldownSeconds > 0) {
+                setAccountChangeStatus(`สามารถส่ง OTP ใหม่ได้ใน ${otpResendCooldownSeconds} วินาที`, 'warn');
+                setEmailChangeModalStep(2);
+                updateOtpResendButtonState();
+                if (otpInput) otpInput.focus();
+                return;
+            }
+
+            if (emailChangeOtpRequested) {
+                setEmailChangeModalStep(2);
+            }
+
+            updateOtpResendButtonState();
+            setAccountChangeStatus('กดปุ่มส่ง OTP เพื่อเริ่มขั้นตอน', 'normal');
+            if (otpInput) otpInput.focus();
+        }
+
+        function closeEmailChangeModal() {
+            const modal = document.getElementById('portfolio-email-change-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function openPortfolioPlanModal(mode = 'create') {
+            const modal = document.getElementById('portfolio-plan-modal');
+            if (!modal) return;
+            if (!activeUser || !String(activeUser.userId || '').trim()) {
+                setPortfolioStatus('กรุณา login ก่อนจัดการเปลี่ยนแผน', 'error');
+                return;
+            }
+
+            if (mode === 'create') {
+                setPortfolioEditMode('');
+                document.getElementById('portfolio-note').value = '';
+                document.getElementById('portfolio-change-date').value = formatAsIsoDate(new Date());
+                resetPortfolioEntryRows();
+            }
+
+            modal.classList.remove('hidden');
+            refreshPortfolioEntryPriceHints().catch(() => {});
+            refreshPortfolioSelectedPlanChart().catch(() => {});
+        }
+
+        function closePortfolioPlanModal() {
+            const modal = document.getElementById('portfolio-plan-modal');
+            if (modal) modal.classList.add('hidden');
         }
 
         function setPortfolioLoading(isLoading, message = 'กำลังโหลดข้อมูลพอร์ต...') {
@@ -1137,6 +1826,7 @@
                 const tx = db.transaction(PORT_DB_STORE, 'readwrite');
                 const store = tx.objectStore(PORT_DB_STORE);
                 const payload = {
+                    changeId: String(change.changeId || ''),
                     userId: String(change.userId || '').trim(),
                     batchId: String(change.batchId || ''),
                     effectiveDate: String(change.effectiveDate || ''),
@@ -1209,11 +1899,13 @@
                     for (let i = 0; i < input.length; i++) {
                         const item = input[i] || {};
                         store.add({
+                            changeId: String(item.changeId || ''),
                             userId: id,
                             batchId: String(item.batchId || ''),
                             effectiveDate: String(item.effectiveDate || ''),
                             entriesJson: String(item.entriesJson || JSON.stringify(item.entries || [])),
                             note: String(item.note || ''),
+                            updatedAt: String(item.updatedAt || new Date().toISOString()),
                             createdAt: String(item.createdAt || new Date().toISOString())
                         });
                     }
@@ -1241,6 +1933,176 @@
                 passwordHash
             });
             return payload?.result || null;
+        }
+
+        async function getUserProfileViaGas(userId) {
+            const payload = await fetchGasJson({
+                action: 'get_user_profile',
+                userId
+            });
+            return payload?.result || null;
+        }
+
+        async function loginWithGoogleTokenViaGas(idToken, pendingUserId = '') {
+            const payload = await fetchGasJson({ action: 'login_with_google_token', idToken, pendingUserId });
+            return payload?.result || null;
+        }
+
+        async function requestEmailChangeOtpViaGas(userId) {
+            const payload = await fetchGasJson({ action: 'request_email_change_otp', userId });
+            return payload?.result || null;
+        }
+
+        async function verifyEmailChangeOtpViaGas(userId, otpCode, newEmail = '') {
+            const payload = await fetchGasJson({ action: 'verify_email_change_otp', userId, otpCode, newEmail });
+            return payload?.result || null;
+        }
+
+        function normalizeGoogleLoginErrorForDisplay(rawError) {
+            const rawText = String(rawError && rawError.message ? rawError.message : rawError || '').trim();
+            const normalized = rawText.toLowerCase();
+            const isPendingApproval =
+                normalized.includes('account created and waiting for admin approval') ||
+                (normalized.includes('admin') && normalized.includes('approval')) ||
+                normalized.includes('waiting for admin approval') ||
+                normalized.includes('pending') ||
+                normalized.includes('รออนุมัติ');
+
+            if (isPendingApproval) {
+                return {
+                    tone: 'success',
+                    message: 'คุณเพิ่งเริ่มใช้งานครั้งแรก ระบบได้รับข้อมูลเรียบร้อยแล้ว กรุณารอผู้ดูแลระบบอนุมัติก่อนเข้าใช้งาน ขอบคุณครับ'
+                };
+            }
+
+            return {
+                tone: 'error',
+                message: `Google login ไม่สำเร็จ (${rawText || 'ไม่ทราบสาเหตุ'})`
+            };
+        }
+
+        function handleGoogleCredential(response) {
+            const idToken = response?.credential;
+            if (!idToken) {
+                setPortfolioStatus('Google login ไม่สำเร็จ (ไม่ได้รับ token)', 'error');
+                return;
+            }
+            setPortfolioLoading(true, 'กำลังยืนยัน Google account...');
+            const pendingUserId = String(pendingEmailChangeUserId || '').trim();
+            loginWithGoogleTokenViaGas(idToken, pendingUserId)
+                .then((user) => {
+                    setActiveUser({
+                        userId: String(user?.userId || '').trim(),
+                        username: String(user?.username || user?.email || '').trim(),
+                        displayName: String(user?.displayName || user?.email || '').trim(),
+                        googleId: String(user?.googleId || '').trim(),
+                        authType: String(user?.authType || 'google').trim(),
+                        role: String(user?.role || 'user').trim(),
+                        status: String(user?.status || 'approved').trim()
+                    });
+                    const loginMessage = user?.linkedByEmailChange
+                        ? `ผูกอีเมลใหม่กับบัญชีเดิมสำเร็จแล้ว (${user?.email || user?.displayName})`
+                        : `เข้าสู่ระบบด้วย Google แล้ว (${user?.displayName || user?.email})`;
+                    pendingEmailChangeUserId = '';
+                    localStorage.removeItem(PENDING_EMAIL_CHANGE_USER_ID_STORAGE_KEY);
+                    setPortfolioStatus(loginMessage, 'success');
+                    if (user?.linkedByEmailChange) {
+                        setAccountChangeStatus('ย้ายบัญชีสำเร็จแล้ว ขณะนี้ user เดิมถูกผูกกับ Google account ใหม่เรียบร้อย', 'success');
+                    } else if (user?.emailChangePending) {
+                        const pendingEmail = String(user?.pendingEmail || '').trim();
+                        const pendingText = pendingEmail
+                            ? `ยังรอผูกอีเมลใหม่ ${pendingEmail}`
+                            : 'ยังรอผูกอีเมลใหม่';
+                        setAccountChangeStatus(`${pendingText} กรุณา login ด้วย Google account ใหม่ก่อนหมดเวลา`, 'warn');
+                        setEmailChangeModalStep(3);
+                    } else {
+                        setAccountChangeStatus('เข้าสู่ระบบ Google สำเร็จ', 'success');
+                    }
+                    return refreshPortfolioUi();
+                })
+                .catch((error) => {
+                    const friendly = normalizeGoogleLoginErrorForDisplay(error);
+                    setPortfolioStatus(friendly.message, friendly.tone);
+                })
+                .finally(() => setPortfolioLoading(false));
+        }
+
+        function updateGoogleSigninHelp(message, tone = 'normal') {
+            const el = document.getElementById('google-signin-help');
+            if (!el) return;
+
+            el.textContent = String(message || '');
+            el.classList.remove('text-slate-500', 'text-amber-600', 'text-rose-600');
+
+            if (tone === 'error') {
+                el.classList.add('text-rose-600');
+            } else if (tone === 'warn') {
+                el.classList.add('text-amber-600');
+            } else {
+                el.classList.add('text-slate-500');
+            }
+        }
+
+        let gisInitialized = false;
+        function initGoogleSignIn() {
+            if (gisInitialized) return;
+            const section = document.getElementById('google-signin-section');
+            const btnContainer = document.getElementById('google-signin-btn');
+            if (section) section.classList.remove('hidden');
+
+            if (!GOOGLE_CLIENT_ID) {
+                updateGoogleSigninHelp('ยังไม่ได้ตั้งค่า GOOGLE_CLIENT_ID สำหรับ Google Sign-In', 'error');
+                return;
+            }
+
+            const currentOrigin = window.location.origin;
+            const originList = Array.isArray(GOOGLE_ALLOWED_ORIGINS) ? GOOGLE_ALLOWED_ORIGINS : [];
+            const isOriginAllowedByFrontend =
+                originList.length === 0 || originList.indexOf(currentOrigin) >= 0;
+
+            if (!isOriginAllowedByFrontend) {
+                if (btnContainer) btnContainer.innerHTML = '';
+                updateGoogleSigninHelp(
+                    `Origin ปัจจุบัน (${currentOrigin}) ยังไม่อยู่ใน GOOGLE_ALLOWED_ORIGINS และจะโดน 403. เพิ่ม origin นี้ทั้งในโค้ดและ Google Cloud Console > OAuth Client > Authorized JavaScript origins`,
+                    'error'
+                );
+                return;
+            }
+
+            updateGoogleSigninHelp(
+                `Google Sign-In ใช้ origin ปัจจุบัน: ${currentOrigin} ถ้าปุ่มขึ้น 403 ให้เพิ่ม origin นี้ใน Google Cloud Console > OAuth Client > Authorized JavaScript origins`,
+                currentOrigin.indexOf('localhost') >= 0 || currentOrigin.indexOf('127.0.0.1') >= 0 ? 'warn' : 'normal'
+            );
+
+            if (typeof google === 'undefined' || !google?.accounts?.id) {
+                updateGoogleSigninHelp('Google Identity script ยังโหลดไม่เสร็จ กรุณาลองใหม่อีกครั้ง', 'warn');
+                return;
+            }
+
+            try {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleGoogleCredential
+                });
+
+                if (btnContainer) {
+                    google.accounts.id.renderButton(btnContainer, {
+                        theme: 'outline',
+                        size: 'large',
+                        text: 'signin_with',
+                        locale: 'th',
+                        width: 300
+                    });
+                }
+
+                gisInitialized = true;
+            } catch (error) {
+                if (btnContainer) btnContainer.innerHTML = '';
+                updateGoogleSigninHelp(
+                    `ไม่สามารถเริ่ม Google Sign-In ได้ (${error?.message || error})`,
+                    'error'
+                );
+            }
         }
 
         async function savePortfolioBatchViaGas(userId, effectiveDate, entriesJson, note, batchId) {
@@ -1284,6 +2146,23 @@
                 limit: 1000
             });
             return payload?.result?.batches || [];
+        }
+
+        async function getAdminApprovalDashboardViaGas(adminUserId) {
+            const payload = await fetchGasJson({
+                action: 'get_admin_approval_dashboard',
+                adminUserId
+            });
+            return payload?.result || null;
+        }
+
+        async function approveUserByAdminViaGas(adminUserId, targetUserId) {
+            const payload = await fetchGasJson({
+                action: 'approve_user_registration',
+                adminUserId,
+                targetUserId
+            });
+            return payload?.result || null;
         }
 
         async function syncPortfolioHistoryFromGasToCache(userId) {
@@ -1353,7 +2232,7 @@
                 saveBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-500');
                 saveBtn.classList.add('bg-amber-600', 'hover:bg-amber-500');
             } else {
-                saveBtn.textContent = 'บันทึกรอบนี้';
+                saveBtn.textContent = 'บันทึกการเปลี่ยนแผน';
                 saveBtn.classList.remove('bg-amber-600', 'hover:bg-amber-500');
                 saveBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500');
             }
@@ -1392,40 +2271,312 @@
         }
 
         function setActiveUser(user) {
+            const previousUserId = String(activeUser?.userId || '').trim();
             activeUser = user || null;
+            const nextUserId = String(activeUser?.userId || '').trim();
+            if (previousUserId !== nextUserId) {
+                portfolioTabLoadedKey = '';
+            }
             if (activeUser && String(activeUser.userId || '').trim()) {
+                showPortfolioAuthForm = false;
                 localStorage.setItem(ACTIVE_USER_STORAGE_KEY, JSON.stringify({
                     userId: String(activeUser.userId || '').trim(),
                     username: String(activeUser.username || '').trim(),
-                    displayName: String(activeUser.displayName || '').trim()
+                    displayName: String(activeUser.displayName || '').trim(),
+                    googleId: String(activeUser.googleId || '').trim(),
+                    authType: String(activeUser.authType || '').trim(),
+                    role: String(activeUser.role || '').trim(),
+                    status: String(activeUser.status || '').trim()
                 }));
             } else {
                 localStorage.removeItem(ACTIVE_USER_STORAGE_KEY);
+                adminApprovalDashboardCache = null;
                 renderPortfolioSummary({ totalCost: 0, totalCurrent: 0, totalPnl: 0 });
                 renderPortfolioCurrentTable([]);
                 renderPortfolioHistoryTable([]);
+                renderPortfolioSwitchResultTable([]);
+                renderPortfolioSwitchResultChart([]);
+                const otpInput = document.getElementById('portfolio-email-change-otp');
+                if (otpInput) otpInput.value = '';
+                emailChangeOtpRequested = false;
+                emailChangeOtpVerified = false;
+                showPortfolioAuthForm = false;
+                closeEmailChangeModal();
+                closePortfolioPlanModal();
+                setAccountChangeStatus('ยังไม่มีการร้องขอเปลี่ยนอีเมล');
             }
             updatePortfolioAuthUi();
+        }
+
+        async function ensureActiveUserRoleHydrated() {
+            if (!activeUser || !String(activeUser.userId || '').trim()) return;
+
+            const hasRole = String(activeUser.role || '').trim();
+            const hasStatus = String(activeUser.status || '').trim();
+            if (hasRole && hasStatus) return;
+
+            try {
+                const profile = await getUserProfileViaGas(activeUser.userId);
+                if (!profile) return;
+
+                setActiveUser({
+                    ...activeUser,
+                    username: String(profile?.username || activeUser.username || '').trim(),
+                    displayName: String(profile?.displayName || activeUser.displayName || '').trim(),
+                    googleId: String(profile?.googleId || activeUser.googleId || '').trim(),
+                    role: String(profile?.role || activeUser.role || '').trim(),
+                    status: String(profile?.status || activeUser.status || '').trim()
+                });
+            } catch (_error) {
+                // Keep existing session as-is when profile endpoint is unavailable.
+            }
+        }
+
+        function isActiveAdmin() {
+            return String(activeUser?.role || '').trim().toLowerCase() === 'admin';
+        }
+
+        function renderAdminApprovalDashboard(dashboard) {
+            const wrap = document.getElementById('admin-approval-dashboard');
+            const listEl = document.getElementById('admin-approval-list');
+            const statusEl = document.getElementById('admin-approval-status');
+            if (!wrap || !listEl || !statusEl) return;
+
+            if (!isActiveAdmin()) {
+                wrap.classList.add('hidden');
+                return;
+            }
+
+            wrap.classList.remove('hidden');
+            const pendingUsers = Array.isArray(dashboard?.pendingUsers) ? dashboard.pendingUsers : [];
+            const summary = dashboard?.summary || {};
+
+            const totalPendingEl = document.getElementById('admin-approval-total-pending');
+            const totalUsersEl = document.getElementById('admin-approval-total-users');
+            const totalApprovedEl = document.getElementById('admin-approval-total-approved');
+            const totalAdminEl = document.getElementById('admin-approval-total-admin');
+            if (totalPendingEl) totalPendingEl.textContent = String(Number(summary.pending || pendingUsers.length || 0));
+            if (totalUsersEl) totalUsersEl.textContent = String(Number(summary.totalUsers || 0));
+            if (totalApprovedEl) totalApprovedEl.textContent = String(Number(summary.approved || 0));
+            if (totalAdminEl) totalAdminEl.textContent = String(Number(summary.admins || 0));
+
+            if (!pendingUsers.length) {
+                listEl.innerHTML = '<div class="text-xs text-emerald-700">ไม่มีรายการรออนุมัติแล้ว</div>';
+                statusEl.textContent = 'สถานะ: ไม่มีผู้ใช้รออนุมัติ';
+                return;
+            }
+
+            listEl.innerHTML = pendingUsers.map((item) => {
+                const userId = String(item?.userId || '').trim();
+                const username = String(item?.username || '-').trim() || '-';
+                const displayName = String(item?.displayName || '-').trim() || '-';
+                const createdAt = formatDisplayDateTime(item?.createdAt || '-');
+                return `
+                    <div class="rounded-lg border border-emerald-200 bg-white p-3">
+                        <p class="text-xs text-slate-500">รหัสผู้ใช้: ${userId || '-'}</p>
+                        <p class="text-sm font-semibold text-slate-800">${displayName}</p>
+                        <p class="text-xs text-slate-600 break-all">${username}</p>
+                        <p class="text-[11px] text-slate-500 mt-1">สมัครเมื่อ: ${createdAt}</p>
+                        <div class="mt-2 flex justify-end">
+                            <button type="button" class="admin-approve-user-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white" data-target-user-id="${userId}">อนุมัติทันที</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            statusEl.textContent = `สถานะ: มีผู้ใช้รออนุมัติ ${pendingUsers.length} ราย`;
+        }
+
+        function setAdminApprovalStatus(message) {
+            const statusEl = document.getElementById('admin-approval-status');
+            if (!statusEl) return;
+            statusEl.textContent = `สถานะ: ${String(message || '').trim()}`;
+        }
+
+        function applyApprovedUserToAdminDashboardCache(targetUserId) {
+            if (!adminApprovalDashboardCache) return;
+
+            const nextDashboard = {
+                ...adminApprovalDashboardCache,
+                summary: {
+                    ...(adminApprovalDashboardCache.summary || {})
+                },
+                pendingUsers: Array.isArray(adminApprovalDashboardCache.pendingUsers)
+                    ? adminApprovalDashboardCache.pendingUsers.slice()
+                    : []
+            };
+
+            const beforeCount = nextDashboard.pendingUsers.length;
+            nextDashboard.pendingUsers = nextDashboard.pendingUsers.filter((item) => {
+                return String(item?.userId || '').trim() !== String(targetUserId || '').trim();
+            });
+            const removed = beforeCount - nextDashboard.pendingUsers.length;
+            if (removed > 0) {
+                nextDashboard.summary.pending = Math.max(0, Number(nextDashboard.summary.pending || 0) - removed);
+                nextDashboard.summary.approved = Number(nextDashboard.summary.approved || 0) + removed;
+            }
+            nextDashboard.updatedAt = new Date().toISOString();
+            adminApprovalDashboardCache = nextDashboard;
+        }
+
+        async function refreshAdminApprovalDashboard(force = false) {
+            const wrap = document.getElementById('admin-approval-dashboard');
+            if (!wrap) return;
+
+            if (!activeUser || !isActiveAdmin()) {
+                wrap.classList.add('hidden');
+                return;
+            }
+
+            if (!force && adminApprovalDashboardCache) {
+                renderAdminApprovalDashboard(adminApprovalDashboardCache);
+                return;
+            }
+
+            setAdminApprovalStatus('กำลังโหลดรายการรออนุมัติ...');
+            try {
+                const result = await getAdminApprovalDashboardViaGas(activeUser.userId);
+                adminApprovalDashboardCache = result;
+                renderAdminApprovalDashboard(result || {});
+            } catch (error) {
+                wrap.classList.remove('hidden');
+                setAdminApprovalStatus(`โหลดรายการรออนุมัติไม่สำเร็จ (${error.message})`);
+            }
+        }
+
+        async function approveAllPendingUsersByAdmin() {
+            if (!activeUser || !isActiveAdmin()) {
+                setPortfolioStatus('เฉพาะ admin เท่านั้นที่อนุมัติผู้ใช้ได้', 'error');
+                return;
+            }
+
+            const latest = await getAdminApprovalDashboardViaGas(activeUser.userId);
+            const pendingUsers = Array.isArray(latest?.pendingUsers) ? latest.pendingUsers : [];
+            if (!pendingUsers.length) {
+                showToast('ไม่มีผู้ใช้ที่รออนุมัติ', 'info', 2400);
+                adminApprovalDashboardCache = latest || null;
+                renderAdminApprovalDashboard(latest || {});
+                return;
+            }
+
+            const confirmed = await showConfirmToast(`ยืนยันอนุมัติผู้ใช้ทั้งหมด ${pendingUsers.length} รายการ ใช่หรือไม่?`, {
+                confirmText: 'อนุมัติทั้งหมด',
+                cancelText: 'ยกเลิก',
+                tone: 'success'
+            });
+            if (!confirmed) return;
+
+            setAdminApprovalStatus(`กำลังอนุมัติผู้ใช้ทั้งหมด ${pendingUsers.length} รายการ...`);
+
+            let approvedCount = 0;
+            let failedCount = 0;
+            let mailedCount = 0;
+
+            for (let i = 0; i < pendingUsers.length; i++) {
+                const item = pendingUsers[i] || {};
+                const targetUserId = String(item.userId || '').trim();
+                if (!targetUserId) continue;
+                setAdminApprovalStatus(`กำลังอนุมัติ ${i + 1}/${pendingUsers.length} (${targetUserId})`);
+
+                try {
+                    const result = await approveUserByAdminViaGas(activeUser.userId, targetUserId);
+                    approvedCount += 1;
+                    if (result?.notification?.sent) mailedCount += 1;
+                    applyApprovedUserToAdminDashboardCache(targetUserId);
+                    renderAdminApprovalDashboard(adminApprovalDashboardCache || latest || {});
+                } catch (_error) {
+                    failedCount += 1;
+                }
+            }
+
+            if (failedCount === 0) {
+                showToast(`อนุมัติครบ ${approvedCount} รายการ (ส่งอีเมลสำเร็จ ${mailedCount} ราย)`, 'success', 4200);
+                setPortfolioStatus(`อนุมัติผู้ใช้ครบ ${approvedCount} รายการแล้ว`, 'success');
+                setAdminApprovalStatus(`อนุมัติครบ ${approvedCount} รายการแล้ว`);
+            } else {
+                showToast(`อนุมัติสำเร็จ ${approvedCount} รายการ, ไม่สำเร็จ ${failedCount} รายการ`, 'warn', 4600);
+                setPortfolioStatus(`อนุมัติแบบกลุ่มเสร็จ: สำเร็จ ${approvedCount}, ไม่สำเร็จ ${failedCount}`, 'warn');
+                setAdminApprovalStatus(`อนุมัติแบบกลุ่มเสร็จ: สำเร็จ ${approvedCount}, ไม่สำเร็จ ${failedCount}`);
+            }
         }
 
         function updatePortfolioAuthUi() {
             const authStatus = document.getElementById('portfolio-auth-status');
             const authBox = document.getElementById('portfolio-auth-box');
             const mainBox = document.getElementById('portfolio-main-box');
+            const accountEmail = document.getElementById('portfolio-account-email');
+            const accountAuthType = document.getElementById('portfolio-account-auth-type');
+            const loginToggleBtn = document.getElementById('portfolio-menu-login-toggle-btn');
+            const logoutBtn = document.getElementById('portfolio-menu-logout-btn');
+            const openEmailChangeBtn = document.getElementById('portfolio-menu-open-email-change-btn');
+            const openEmailChangeInlineBtn = document.getElementById('portfolio-open-email-change-inline-btn');
             if (!authStatus || !authBox || !mainBox) return;
 
             if (activeUser) {
-                authStatus.textContent = `เข้าสู่ระบบ: ${activeUser.username}`;
+                const roleText = isActiveAdmin() ? ' (admin)' : '';
+                authStatus.textContent = `เข้าสู่ระบบ: ${activeUser.username}${roleText}`;
                 authBox.classList.add('hidden');
                 mainBox.classList.remove('hidden');
+                if (accountEmail) {
+                    accountEmail.textContent = `อีเมลปัจจุบัน: ${String(activeUser.username || '-').trim() || '-'}`;
+                }
+                if (accountAuthType) {
+                    const authTypeText = String(activeUser.authType || '').trim() === 'google' || String(activeUser.googleId || '').trim()
+                        ? 'Google'
+                        : 'Password';
+                    accountAuthType.textContent = `ประเภทบัญชี: ${authTypeText}`;
+                }
+
+                if (loginToggleBtn) {
+                    loginToggleBtn.textContent = 'Login / Register';
+                    loginToggleBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                    loginToggleBtn.disabled = true;
+                }
+                if (logoutBtn) {
+                    logoutBtn.classList.remove('hidden');
+                }
+                if (openEmailChangeBtn) {
+                    openEmailChangeBtn.disabled = false;
+                    openEmailChangeBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+                }
+                if (openEmailChangeInlineBtn) {
+                    openEmailChangeInlineBtn.disabled = false;
+                    openEmailChangeInlineBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+                }
+                refreshAdminApprovalDashboard().catch(() => {});
             } else {
                 authStatus.textContent = 'ยังไม่เข้าสู่ระบบ';
-                authBox.classList.remove('hidden');
+                authBox.classList.toggle('hidden', !showPortfolioAuthForm);
                 mainBox.classList.add('hidden');
+                const adminWrap = document.getElementById('admin-approval-dashboard');
+                if (adminWrap) adminWrap.classList.add('hidden');
+                if (accountEmail) {
+                    accountEmail.textContent = 'อีเมลปัจจุบัน: -';
+                }
+                if (accountAuthType) {
+                    accountAuthType.textContent = 'ประเภทบัญชี: -';
+                }
+
+                if (loginToggleBtn) {
+                    loginToggleBtn.textContent = showPortfolioAuthForm ? 'ซ่อนฟอร์ม Login' : 'Login / Register';
+                    loginToggleBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+                    loginToggleBtn.disabled = false;
+                }
+                if (logoutBtn) {
+                    logoutBtn.classList.add('hidden');
+                }
+                if (openEmailChangeBtn) {
+                    openEmailChangeBtn.disabled = true;
+                    openEmailChangeBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                }
+                if (openEmailChangeInlineBtn) {
+                    openEmailChangeInlineBtn.disabled = true;
+                    openEmailChangeInlineBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                }
             }
         }
 
         async function restoreActiveUserSession() {
+            pendingEmailChangeUserId = String(localStorage.getItem(PENDING_EMAIL_CHANGE_USER_ID_STORAGE_KEY) || '').trim();
             const saved = localStorage.getItem(ACTIVE_USER_STORAGE_KEY);
             if (!saved) {
                 setActiveUser(null);
@@ -1442,8 +2593,13 @@
                 setActiveUser({
                     userId,
                     username: String(parsed?.username || '').trim(),
-                    displayName: String(parsed?.displayName || '').trim()
+                    displayName: String(parsed?.displayName || '').trim(),
+                    googleId: String(parsed?.googleId || '').trim(),
+                    authType: String(parsed?.authType || '').trim(),
+                    role: String(parsed?.role || '').trim(),
+                    status: String(parsed?.status || '').trim()
                 });
+                await ensureActiveUserRoleHydrated();
             } catch (_error) {
                 setActiveUser(null);
             }
@@ -1499,10 +2655,45 @@
             return Number.isFinite(price) ? price : nearestAfter;
         }
 
+        function comparePortfolioRowsByTimeline(a, b) {
+            const aDateObj = parseFlexibleDateToDateObj(a?.effectiveDate);
+            const bDateObj = parseFlexibleDateToDateObj(b?.effectiveDate);
+            if (aDateObj instanceof Date && bDateObj instanceof Date) {
+                const diff = aDateObj.getTime() - bDateObj.getTime();
+                if (diff !== 0) return diff;
+            } else {
+                const aDate = String(a?.effectiveDate || '');
+                const bDate = String(b?.effectiveDate || '');
+                if (aDate !== bDate) {
+                    return aDate.localeCompare(bDate);
+                }
+            }
+
+            const aCreated = String(a?.createdAt || '');
+            const bCreated = String(b?.createdAt || '');
+            if (aCreated !== bCreated) {
+                return aCreated.localeCompare(bCreated);
+            }
+
+            return Number(a?.id || 0) - Number(b?.id || 0);
+        }
+
+        function calcBatchValueAtDate(batch, navRecords, targetDateText) {
+            const entries = parsePortfolioEntriesJson(batch?.entriesJson);
+            return entries.reduce((sum, entry) => {
+                const plan = parsePlanIdFromUnitCostKey(entry.unitCostKey);
+                if (!plan) return sum;
+                const units = Number(entry.units || 0);
+                const price = getNavPriceAtOrBefore(navRecords, plan, targetDateText);
+                if (!Number.isFinite(price)) return sum;
+                return sum + (units * price);
+            }, 0);
+        }
+
         function buildPortfolioSnapshot(changes, navRecords) {
-            const rows = Array.isArray(changes) ? changes : [];
-            const latestByPlan = new Map();
+            const rows = Array.isArray(changes) ? changes.slice().sort(comparePortfolioRowsByTimeline) : [];
             const historyRows = [];
+            const switchResults = [];
 
             rows.forEach((item) => {
                 const entries = parsePortfolioEntriesJson(item.entriesJson);
@@ -1532,23 +2723,6 @@
                         latestPrice,
                         pnl
                     });
-
-                    const prev = latestByPlan.get(plan);
-                    const nextModel = {
-                        source: item,
-                        plan,
-                        units,
-                        planName: entry.planName || planNames[plan] || `แผน ${plan}`
-                    };
-                    if (!prev) {
-                        latestByPlan.set(plan, nextModel);
-                    } else {
-                        const prevDate = String(prev.source?.effectiveDate || '');
-                        const nextDate = String(item.effectiveDate || '');
-                        if (nextDate > prevDate || (nextDate === prevDate && String(item.createdAt || '') >= String(prev.source?.createdAt || ''))) {
-                            latestByPlan.set(plan, nextModel);
-                        }
-                    }
                 });
 
                 historyRows.push({
@@ -1564,37 +2738,116 @@
                 });
             });
 
-            const currentRows = Array.from(latestByPlan.values()).map((item) => {
-                const plan = String(item.plan || '');
-                const units = Number(item.units || 0);
-                const entryPrice = getNavPriceAtOrBefore(navRecords, plan, item.source?.effectiveDate);
+            for (let i = 1; i < rows.length; i++) {
+                const prevBatch = rows[i - 1];
+                const nextBatch = rows[i];
+                const prevCostBasis = calcBatchValueAtDate(prevBatch, navRecords, prevBatch.effectiveDate);
+                const prevCloseValue = calcBatchValueAtDate(prevBatch, navRecords, nextBatch.effectiveDate);
+                const realizedPnl = prevCloseValue - prevCostBasis;
+                const realizedPct = prevCostBasis > 0 ? (realizedPnl / prevCostBasis) * 100 : 0;
+
+                const fromPlans = parsePortfolioEntriesJson(prevBatch.entriesJson)
+                    .map((entry) => {
+                        const plan = parsePlanIdFromUnitCostKey(entry.unitCostKey);
+                        return planNames[plan] || entry.planName || `แผน ${plan || '-'}`;
+                    })
+                    .filter(Boolean)
+                    .join(', ') || '-';
+
+                const toPlans = parsePortfolioEntriesJson(nextBatch.entriesJson)
+                    .map((entry) => {
+                        const plan = parsePlanIdFromUnitCostKey(entry.unitCostKey);
+                        return planNames[plan] || entry.planName || `แผน ${plan || '-'}`;
+                    })
+                    .filter(Boolean)
+                    .join(', ') || '-';
+
+                switchResults.push({
+                    index: i,
+                    effectiveDate: String(nextBatch.effectiveDate || ''),
+                    fromBatchId: String(prevBatch.batchId || prevBatch.changeId || `row-${i}`),
+                    toBatchId: String(nextBatch.batchId || nextBatch.changeId || `row-${i + 1}`),
+                    fromPlans,
+                    toPlans,
+                    prevCostBasis,
+                    prevCloseValue,
+                    realizedPnl,
+                    realizedPct,
+                    status: 'closed',
+                    isOngoing: false
+                });
+            }
+
+            const latestBatch = rows.length ? rows[rows.length - 1] : null;
+            const latestEntries = latestBatch ? parsePortfolioEntriesJson(latestBatch.entriesJson) : [];
+            const currentRows = latestEntries.map((entry) => {
+                const plan = String(parsePlanIdFromUnitCostKey(entry.unitCostKey) || '');
+                const units = Number(entry.units || 0);
+                const entryPrice = getNavPriceAtOrBefore(navRecords, plan, latestBatch?.effectiveDate);
                 const latestPrice = getLatestNavPriceForPlan(navRecords, plan);
                 const cost = Number.isFinite(entryPrice) ? units * entryPrice : 0;
                 const current = Number.isFinite(latestPrice) ? units * latestPrice : 0;
 
                 return {
-                    ...item.source,
+                    ...latestBatch,
                     plan,
                     units,
-                    planName: item.planName,
+                    planName: entry.planName || planNames[plan] || `แผน ${plan}`,
                     entryPrice,
                     latestPrice,
                     cost,
                     current,
                     pnl: current - cost
                 };
-            }).sort((a, b) => String(a.plan).localeCompare(String(b.plan), 'en'));
+            }).filter((row) => getPlanIndexById(row.plan) >= 0)
+                .sort((a, b) => String(a.plan).localeCompare(String(b.plan), 'en'));
 
             const totalCost = currentRows.reduce((sum, row) => sum + Number(row.cost || 0), 0);
             const totalCurrent = currentRows.reduce((sum, row) => sum + Number(row.current || 0), 0);
+
+            if (latestBatch) {
+                const latestNavDateText = String(navRecords[navRecords.length - 1]?.date || latestBatch.effectiveDate || '').trim();
+                const currentCostBasis = calcBatchValueAtDate(latestBatch, navRecords, latestBatch.effectiveDate);
+                const currentValue = calcBatchValueAtDate(latestBatch, navRecords, latestNavDateText);
+                const currentPnl = currentValue - currentCostBasis;
+                const currentPct = currentCostBasis > 0 ? (currentPnl / currentCostBasis) * 100 : 0;
+                const currentPlans = latestEntries
+                    .map((entry) => {
+                        const plan = parsePlanIdFromUnitCostKey(entry.unitCostKey);
+                        return planNames[plan] || entry.planName || `แผน ${plan || '-'}`;
+                    })
+                    .filter(Boolean)
+                    .join(', ') || '-';
+
+                switchResults.push({
+                    index: rows.length,
+                    effectiveDate: latestNavDateText,
+                    fromBatchId: String(latestBatch.batchId || latestBatch.changeId || `row-${rows.length}`),
+                    toBatchId: 'IN_PROGRESS',
+                    fromPlans: currentPlans,
+                    toPlans: 'กำลังดำเนินการ',
+                    prevCostBasis: currentCostBasis,
+                    prevCloseValue: currentValue,
+                    realizedPnl: currentPnl,
+                    realizedPct: currentPct,
+                    status: 'current',
+                    isOngoing: true
+                });
+            }
 
             return {
                 totalCost,
                 totalCurrent,
                 totalPnl: totalCurrent - totalCost,
                 currentRows,
+                switchResults,
                 historyRows: historyRows.slice().sort((a, b) => {
-                    if (a.effectiveDate !== b.effectiveDate) {
+                    const aDateObj = parseFlexibleDateToDateObj(a?.effectiveDate);
+                    const bDateObj = parseFlexibleDateToDateObj(b?.effectiveDate);
+                    if (aDateObj instanceof Date && bDateObj instanceof Date) {
+                        const diff = bDateObj.getTime() - aDateObj.getTime();
+                        if (diff !== 0) return diff;
+                    } else if (a.effectiveDate !== b.effectiveDate) {
                         return String(b.effectiveDate).localeCompare(String(a.effectiveDate));
                     }
                     return Number(b.id || 0) - Number(a.id || 0);
@@ -1602,19 +2855,38 @@
             };
         }
 
-        function renderPortfolioSummary(snapshot) {
+        function renderPortfolioSummary(snapshot, latestDataDateText = '-') {
             document.getElementById('portfolio-total-cost').textContent = formatCurrency(snapshot.totalCost);
             document.getElementById('portfolio-total-current').textContent = formatCurrency(snapshot.totalCurrent);
+            const updatedAtText = `อัปเดตล่าสุด: ${String(latestDataDateText || '-').trim() || '-'}`;
+            const currentUpdatedEl = document.getElementById('portfolio-total-current-updated-at');
+            if (currentUpdatedEl) {
+                currentUpdatedEl.textContent = updatedAtText;
+            }
 
             const pnlEl = document.getElementById('portfolio-total-pnl');
+            const pnlPercentEl = document.getElementById('portfolio-total-pnl-percent');
+            const pnlPercent = Number(snapshot.totalCost) > 0
+                ? (Number(snapshot.totalPnl) / Number(snapshot.totalCost)) * 100
+                : 0;
+            const pnlPercentSign = pnlPercent > 0 ? '+' : '';
             pnlEl.textContent = formatCurrency(snapshot.totalPnl);
+            if (pnlPercentEl) {
+                pnlPercentEl.textContent = `${pnlPercentSign}${pnlPercent.toFixed(2)}%`;
+            }
             pnlEl.classList.remove('text-emerald-600', 'text-rose-600', 'text-slate-800');
+            if (pnlPercentEl) {
+                pnlPercentEl.classList.remove('text-emerald-600', 'text-rose-600', 'text-slate-700');
+            }
             if (snapshot.totalPnl > 0) {
                 pnlEl.classList.add('text-emerald-600');
+                if (pnlPercentEl) pnlPercentEl.classList.add('text-emerald-600');
             } else if (snapshot.totalPnl < 0) {
                 pnlEl.classList.add('text-rose-600');
+                if (pnlPercentEl) pnlPercentEl.classList.add('text-rose-600');
             } else {
                 pnlEl.classList.add('text-slate-800');
+                if (pnlPercentEl) pnlPercentEl.classList.add('text-slate-700');
             }
         }
 
@@ -1689,6 +2961,159 @@
             }).join('');
         }
 
+        function renderPortfolioSwitchResultTable(rows) {
+            const body = document.getElementById('portfolio-switch-result-table-body');
+            if (!body) return;
+
+            const closedRows = Array.isArray(rows) ? rows.filter((row) => !row.isOngoing) : [];
+            if (!closedRows.length) {
+                body.innerHTML = '<tr><td colspan="8" class="py-3 text-slate-400">ยังไม่มีข้อมูล</td></tr>';
+                return;
+            }
+
+            body.innerHTML = closedRows.map((row, idx) => {
+                const pnlClass = row.realizedPnl >= 0 ? 'text-emerald-600' : 'text-rose-600';
+                const pctSign = row.realizedPct > 0 ? '+' : '';
+                const rowNum = idx + 1;
+                return `
+                    <tr class="border-b border-slate-100">
+                        <td class="py-2 pr-2">${rowNum}</td>
+                        <td class="py-2 px-2 whitespace-nowrap">${formatShortDateDisplay(row.effectiveDate)}</td>
+                        <td class="py-2 px-2">${row.fromPlans || '-'}</td>
+                        <td class="py-2 px-2">${row.toPlans || '-'}</td>
+                        <td class="py-2 px-2 text-right">${formatCurrency(row.prevCostBasis || 0)}</td>
+                        <td class="py-2 px-2 text-right">${formatCurrency(row.prevCloseValue || 0)}</td>
+                        <td class="py-2 px-2 text-right ${pnlClass}">${formatCurrency(row.realizedPnl || 0)}</td>
+                        <td class="py-2 pl-2 text-right ${pnlClass}">${pctSign}${Number(row.realizedPct || 0).toFixed(2)}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderPortfolioSwitchResultChart(rows) {
+            const emptyEl = document.getElementById('portfolio-switch-result-empty');
+            const wrapEl = document.getElementById('portfolio-switch-result-chart-wrap');
+            const canvas = document.getElementById('portfolio-switch-result-chart');
+            if (!emptyEl || !wrapEl || !canvas) return;
+
+            if (portfolioSwitchResultChart) {
+                portfolioSwitchResultChart.destroy();
+                portfolioSwitchResultChart = null;
+            }
+
+            if (!rows.length) {
+                wrapEl.classList.add('hidden');
+                emptyEl.classList.remove('hidden');
+                emptyEl.textContent = 'ยังไม่มีรายการเปลี่ยนแผนเพียงพอสำหรับคำนวณผล';
+                return;
+            }
+
+            wrapEl.classList.remove('hidden');
+            emptyEl.classList.add('hidden');
+
+            const labels = rows.map((row) => row.isOngoing
+                ? `ปัจจุบัน ${formatShortDateDisplay(row.effectiveDate)}`
+                : `#${row.index} ${formatShortDateDisplay(row.effectiveDate)}`
+            );
+            const closedData = rows.map((row) => row.isOngoing ? null : Number(row.realizedPnl || 0));
+            const currentData = rows.map((row) => row.isOngoing ? Number(row.realizedPnl || 0) : null);
+
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            portfolioSwitchResultChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'ปิดยอด (Take Profit แล้ว)',
+                            data: closedData,
+                            backgroundColor: 'rgba(37, 99, 235, 0.75)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            borderWidth: 1.2,
+                            borderRadius: 6,
+                            maxBarThickness: 48
+                        },
+                        {
+                            label: 'กำลังดำเนินการ',
+                            data: currentData,
+                            backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            borderWidth: 1.2,
+                            borderRadius: 6,
+                            maxBarThickness: 48
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const value = Number(context.parsed?.y || 0);
+                                    return `${context.dataset?.label || 'ผลต่าง'}: ${formatCurrency(value)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function (value) {
+                                    return formatCurrency(Number(value || 0));
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.2)'
+                            }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            const currentRow = Array.isArray(rows) ? rows.find((row) => row.isOngoing) : null;
+            renderPortfolioCurrentStatus(currentRow);
+        }
+
+        function renderPortfolioCurrentStatus(currentRow) {
+            const statusEl = document.getElementById('portfolio-current-status');
+            if (!statusEl) return;
+
+            if (!currentRow) {
+                statusEl.classList.add('hidden');
+                return;
+            }
+
+            statusEl.classList.remove('hidden');
+            const plnClass = currentRow.realizedPnl >= 0 ? 'text-emerald-600' : 'text-rose-600';
+            const pctSign = currentRow.realizedPct > 0 ? '+' : '';
+
+            const plansEl = document.getElementById('portfolio-current-plans');
+            const dateEl = document.getElementById('portfolio-current-date');
+            const netEl = document.getElementById('portfolio-current-net');
+            const pnlEl = document.getElementById('portfolio-current-pnl');
+
+            if (plansEl) plansEl.textContent = currentRow.toPlans || '-';
+            if (dateEl) dateEl.textContent = formatShortDateDisplay(currentRow.effectiveDate);
+            if (netEl) {
+                netEl.classList.remove('text-emerald-600', 'text-rose-600');
+                netEl.classList.add(plnClass);
+                netEl.textContent = formatCurrency(currentRow.prevCloseValue || 0);
+            }
+            if (pnlEl) {
+                pnlEl.classList.remove('text-emerald-600', 'text-rose-600');
+                pnlEl.classList.add(plnClass);
+                pnlEl.textContent = `${formatCurrency(currentRow.realizedPnl || 0)} (${pctSign}${Number(currentRow.realizedPct || 0).toFixed(2)}%)`;
+            }
+        }
+
         async function refreshPortfolioUi() {
             setPortfolioLoading(true, 'กำลังโหลดข้อมูลพอร์ต...');
             try {
@@ -1698,6 +3123,9 @@
                     portfolioCurrentRowsCache = [];
                     portfolioChangesCache = [];
                     destroyPortfolioSelectedPlanChart();
+                    renderPortfolioSwitchResultTable([]);
+                    renderPortfolioSwitchResultChart([]);
+                    portfolioTabLoadedKey = getPortfolioTabLoadKey();
                     return;
                 }
 
@@ -1714,23 +3142,33 @@
                     renderPortfolioSummary({ totalCost: 0, totalCurrent: 0, totalPnl: 0 });
                     renderPortfolioCurrentTable([]);
                     renderPortfolioHistoryTable([]);
+                    renderPortfolioSwitchResultTable([]);
+                    renderPortfolioSwitchResultChart([]);
                     portfolioCurrentRowsCache = [];
                     portfolioChangesCache = [];
                     await refreshPortfolioEntryPriceHints();
                     await refreshPortfolioSelectedPlanChart();
+                    portfolioTabLoadedKey = getPortfolioTabLoadKey();
                     return;
                 }
 
                 const changes = await idbGetPortfolioChangesByUser(activeUser.userId);
                 portfolioChangesCache = Array.isArray(changes) ? changes : [];
                 const snapshot = buildPortfolioSnapshot(changes, navRecords);
-                renderPortfolioSummary(snapshot);
+                const latestNavDateText = String(navRecords[navRecords.length - 1]?.date || '').trim() || '-';
+                renderPortfolioSummary(snapshot, latestNavDateText);
                 renderPortfolioCurrentTable(snapshot.currentRows);
                 renderPortfolioHistoryTable(snapshot.historyRows);
+                renderPortfolioSwitchResultTable(snapshot.switchResults || []);
+                renderPortfolioSwitchResultChart(snapshot.switchResults || []);
                 portfolioCurrentRowsCache = Array.isArray(snapshot.currentRows) ? snapshot.currentRows : [];
                 await refreshPortfolioEntryPriceHints();
                 await refreshPortfolioSelectedPlanChart();
+                if (isActiveAdmin()) {
+                    await refreshAdminApprovalDashboard(true);
+                }
                 document.getElementById('portfolio-status').textContent = `สถานะ: โหลดพอร์ตของ ${activeUser.username} แล้ว (${changes.length} รายการ)`;
+                portfolioTabLoadedKey = getPortfolioTabLoadKey();
             } finally {
                 setPortfolioLoading(false);
             }
@@ -1837,72 +3275,6 @@
             portfolioSelectedPlanCharts = [];
         }
 
-        function buildPortfolioPlanChangeMarkers(planId, labels, navRecords) {
-            const selectedPlan = String(planId || '').trim();
-            const labelList = Array.isArray(labels) ? labels : [];
-            const markerByLabel = new Map();
-            if (!selectedPlan || getPlanIndexById(selectedPlan) < 0 || !labelList.length) {
-                return labelList.map(() => null);
-            }
-
-            const navRows = Array.isArray(navRecords) ? navRecords : [];
-            const labelDateMap = new Map();
-            navRows.forEach((row) => {
-                if (!row || !(row.dateObj instanceof Date)) return;
-                const label = String(row.date || '').trim();
-                if (!label) return;
-                labelDateMap.set(label, row.dateObj);
-            });
-
-            const findNearestLabelForChangeDate = (effectiveDateText) => {
-                const effectiveDate = parseFlexibleDateToDateObj(effectiveDateText);
-                if (!(effectiveDate instanceof Date) || isNaN(effectiveDate.getTime())) {
-                    return '';
-                }
-
-                let lastOnOrBefore = '';
-                for (let i = 0; i < labelList.length; i++) {
-                    const label = labelList[i];
-                    const labelDateObj = labelDateMap.get(label);
-                    if (!(labelDateObj instanceof Date)) continue;
-                    if (labelDateObj.getTime() <= effectiveDate.getTime()) {
-                        lastOnOrBefore = label;
-                    }
-                }
-
-                if (lastOnOrBefore) return lastOnOrBefore;
-
-                // If the change date is earlier than visible range, pin to first visible point.
-                for (let i = 0; i < labelList.length; i++) {
-                    const label = labelList[i];
-                    if (labelDateMap.has(label)) return label;
-                }
-                return '';
-            };
-
-            const sourceRows = Array.isArray(portfolioChangesCache) ? portfolioChangesCache : [];
-            sourceRows.forEach((changeRow) => {
-                const entries = parsePortfolioEntriesJson(changeRow.entriesJson);
-                const hasPlan = entries.some((entry) => parsePlanIdFromUnitCostKey(entry.unitCostKey) === selectedPlan);
-                if (!hasPlan) return;
-
-                const displayDate = formatShortDateDisplay(changeRow.effectiveDate);
-                const markerLabel = findNearestLabelForChangeDate(changeRow.effectiveDate);
-                if (!markerLabel) return;
-
-                const price = getNavPriceAtOrBefore(navRows, selectedPlan, markerLabel);
-                if (!Number.isFinite(price)) return;
-
-                markerByLabel.set(markerLabel, {
-                    y: Number(price),
-                    changedAt: String(changeRow.effectiveDate || ''),
-                    displayDate
-                });
-            });
-
-            return labelList.map((label) => markerByLabel.get(label) || null);
-        }
-
         async function refreshPortfolioSelectedPlanChart() {
             const grid = document.getElementById('portfolio-selected-plan-chart-grid');
             const emptyEl = document.getElementById('portfolio-selected-plan-chart-empty');
@@ -1961,8 +3333,20 @@
                     .filter((item) => item.label && Number.isFinite(item.value));
                 if (!points.length) return;
 
+                const planStartDateObj = parseFlexibleDateToDateObj(row.effectiveDate);
+                const dateFilteredPoints = (planStartDateObj instanceof Date && !isNaN(planStartDateObj.getTime()))
+                    ? points.filter((item) => {
+                        const pointDateObj = parseFlexibleDateToDateObj(item.label);
+                        return pointDateObj instanceof Date
+                            && !isNaN(pointDateObj.getTime())
+                            && pointDateObj.getTime() >= planStartDateObj.getTime();
+                    })
+                    : points;
+                const visiblePoints = dateFilteredPoints;
+                if (!visiblePoints.length) return;
+
                 const maxPoints = 180;
-                const sliced = points.slice(Math.max(0, points.length - maxPoints));
+                const sliced = visiblePoints.slice(Math.max(0, visiblePoints.length - maxPoints));
                 const labels = sliced.map((it) => it.label);
                 const values = sliced.map((it) => Number(it.value));
                 const planColor = getPlanColor(selectedPlan);
@@ -2041,44 +3425,14 @@
                     });
                 }
 
-                const markerData = buildPortfolioPlanChangeMarkers(selectedPlan, labels, navRecords);
-                const hasMarker = markerData.some((point) => point && Number.isFinite(point.y));
-                if (hasMarker) {
-                    datasets.push({
-                        label: 'จุดเปลี่ยนแผน',
-                        data: markerData,
-                        type: 'line',
-                        showLine: false,
-                        borderColor: '#dc2626',
-                        backgroundColor: '#dc2626',
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 1.5,
-                        pointStyle: 'rectRot',
-                        yAxisID: 'y',
-                        order: 0
-                    });
-                }
-
                 const portfolioChartOptions = buildChartOptions(false);
                 portfolioChartOptions.plugins.tooltip = {
                     enabled: true,
                     callbacks: {
                         title: function (items) {
-                            const raw = items?.[0]?.raw;
-                            if (raw && typeof raw === 'object' && raw.displayDate) {
-                                return `วันที่เปลี่ยน: ${raw.displayDate}`;
-                            }
                             return items?.[0]?.label || '';
                         },
                         label: function (context) {
-                            const raw = context.raw;
-                            if (context.dataset?.label === 'จุดเปลี่ยนแผน' && raw && typeof raw === 'object') {
-                                const value = Number(raw.y);
-                                return `ราคาเปลี่ยนแผน: ${Number.isFinite(value) ? formatCurrency(value) : '-'}`;
-                            }
-
                             const value = context.parsed?.y;
                             return `${context.dataset?.label || 'ค่า'}: ${Number.isFinite(value) ? formatCurrency(value) : '-'}`;
                         }
@@ -3305,6 +4659,7 @@
             document.getElementById('loading').classList.remove('hidden');
             document.getElementById('chart-container').classList.add('hidden');
             setFetchUiState(true);
+            setGlobalLoading(true, 'กำลังโหลดข้อมูลกราฟ...');
 
             try {
                 let allData = await loadDataFromDbRange(startMonth, startYear, endMonth, endYear);
@@ -3347,6 +4702,7 @@
                 setFetchUiState(false);
             } finally {
                 isFetchingData = false;
+                setGlobalLoading(false);
                 if (pendingAutoFetch) {
                     pendingAutoFetch = false;
                     scheduleAutoFetch(0);
@@ -3397,6 +4753,10 @@
         });
 
         document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && isPortfolioDeleteConfirmModalOpen()) {
+                event.preventDefault();
+                return;
+            }
             if (event.key === 'Escape' && !document.getElementById('chart-fullscreen-modal').classList.contains('hidden')) {
                 closeFullscreenChart();
             }
@@ -3461,6 +4821,7 @@
         });
 
         document.getElementById('db-load-range-btn').addEventListener('click', async () => {
+            setGlobalLoading(true, 'กำลังโหลดข้อมูลจาก DB...');
             try {
                 const startMonth = parseInt(document.getElementById('start-month').value);
                 const startYear = parseInt(document.getElementById('start-year').value);
@@ -3493,16 +4854,23 @@
                 document.getElementById('db-status').textContent = `สถานะ: โหลดข้อมูลจาก DB สำเร็จ ${allData.length} แถว`;
             } catch (error) {
                 document.getElementById('db-status').textContent = `สถานะ: โหลดจาก DB ไม่สำเร็จ (${error.message})`;
+            } finally {
+                setGlobalLoading(false);
             }
         });
 
         document.getElementById('db-sync-all-btn').addEventListener('click', async () => {
-            const confirmed = window.confirm('ซิงก์ข้อมูลล่าสุดจาก GAS แล้วอัปเดตลง IndexedDB ตอนนี้?');
+            const confirmed = await showConfirmToast('ซิงก์ข้อมูลล่าสุดจาก GAS แล้วอัปเดตลง IndexedDB ตอนนี้?', {
+                confirmText: 'ซิงก์ตอนนี้',
+                cancelText: 'ยกเลิก',
+                tone: 'warn'
+            });
             if (!confirmed) return;
 
             const button = document.getElementById('db-sync-all-btn');
             button.disabled = true;
             button.classList.add('opacity-60', 'cursor-not-allowed');
+            setGlobalLoading(true, 'กำลังซิงก์ข้อมูลจาก GAS...');
 
             try {
                 await syncAllHistoricalDataToCache();
@@ -3514,10 +4882,12 @@
             } finally {
                 button.disabled = false;
                 button.classList.remove('opacity-60', 'cursor-not-allowed');
+                setGlobalLoading(false);
             }
         });
 
         document.getElementById('gas-month-refresh-btn').addEventListener('click', async () => {
+            setGlobalLoading(true, 'กำลังโหลดรายการเดือนจาก GAS...');
             try {
                 document.getElementById('db-status').textContent = 'สถานะ: กำลังโหลดรายการเดือนจาก GAS...';
                 const months = await refreshGasMonthList();
@@ -3525,6 +4895,8 @@
                 document.getElementById('db-status').textContent = `สถานะ: โหลดรายการเดือนจาก GAS แล้ว (${months.length} เดือน)`;
             } catch (error) {
                 document.getElementById('db-status').textContent = `สถานะ: โหลดรายการเดือนจาก GAS ไม่สำเร็จ (${error.message})`;
+            } finally {
+                setGlobalLoading(false);
             }
         });
 
@@ -3532,6 +4904,7 @@
             const button = document.getElementById('gas-month-sync-mismatch-btn');
             button.disabled = true;
             button.classList.add('opacity-60', 'cursor-not-allowed');
+            setGlobalLoading(true, 'กำลังซิงก์เฉพาะเดือนที่ไม่ตรงกัน...');
 
             try {
                 await syncMismatchedMonths({
@@ -3540,6 +4913,7 @@
             } finally {
                 button.disabled = false;
                 button.classList.remove('opacity-60', 'cursor-not-allowed');
+                setGlobalLoading(false);
             }
         });
 
@@ -3551,11 +4925,16 @@
             const month = parseInt(button.dataset.month, 10);
             if (!Number.isInteger(year) || !Number.isInteger(month)) return;
 
-            const confirmed = window.confirm(`ซิงก์เดือน ${String(month).padStart(2, '0')}/${year} จาก GAS และอัปเดตลง IndexedDB ตอนนี้?`);
+            const confirmed = await showConfirmToast(`ซิงก์เดือน ${String(month).padStart(2, '0')}/${year} จาก GAS และอัปเดตลง IndexedDB ตอนนี้?`, {
+                confirmText: 'ซิงก์เดือนนี้',
+                cancelText: 'ยกเลิก',
+                tone: 'warn'
+            });
             if (!confirmed) return;
 
             button.disabled = true;
             button.classList.add('opacity-60', 'cursor-not-allowed');
+            setGlobalLoading(true, `กำลังซิงก์เดือน ${String(month).padStart(2, '0')}/${year}...`);
 
             try {
                 await syncSingleGasMonthToDb(year, month);
@@ -3564,11 +4943,16 @@
             } finally {
                 button.disabled = false;
                 button.classList.remove('opacity-60', 'cursor-not-allowed');
+                setGlobalLoading(false);
             }
         });
 
         document.getElementById('db-clear-btn').addEventListener('click', async () => {
-            const confirmed = window.confirm('ยืนยันล้างข้อมูลแคชทั้งหมดใน IndexedDB?');
+            const confirmed = await showConfirmToast('ยืนยันล้างข้อมูลแคชทั้งหมดใน IndexedDB?', {
+                confirmText: 'ล้างข้อมูล',
+                cancelText: 'ยกเลิก',
+                tone: 'error'
+            });
             if (!confirmed) return;
 
             try {
@@ -3634,7 +5018,11 @@
                 setActiveUser({
                     userId: String(user?.userId || '').trim(),
                     username: String(user?.username || username).trim(),
-                    displayName: String(user?.displayName || username).trim()
+                    displayName: String(user?.displayName || username).trim(),
+                    googleId: String(user?.googleId || '').trim(),
+                    authType: String(user?.authType || 'password').trim(),
+                    role: String(user?.role || 'user').trim(),
+                    status: String(user?.status || 'approved').trim()
                 });
                 document.getElementById('portfolio-password').value = '';
                 setPortfolioStatus(`สมัครและเข้าสู่ระบบแล้ว (${username})`, 'success');
@@ -3661,7 +5049,11 @@
                 setActiveUser({
                     userId: String(user?.userId || '').trim(),
                     username: String(user?.username || username).trim(),
-                    displayName: String(user?.displayName || username).trim()
+                    displayName: String(user?.displayName || username).trim(),
+                    googleId: String(user?.googleId || '').trim(),
+                    authType: String(user?.authType || 'password').trim(),
+                    role: String(user?.role || 'user').trim(),
+                    status: String(user?.status || 'approved').trim()
                 });
                 document.getElementById('portfolio-password').value = '';
                 setPortfolioStatus(`เข้าสู่ระบบแล้ว (${username})`, 'success');
@@ -3673,9 +5065,233 @@
             }
         });
 
-        document.getElementById('portfolio-logout-btn').addEventListener('click', () => {
+        document.getElementById('portfolio-profile-menu-btn').addEventListener('click', (event) => {
+            event.stopPropagation();
+            const menu = document.getElementById('portfolio-profile-menu');
+            if (!menu) return;
+
+            isPortfolioProfileMenuOpen = !isPortfolioProfileMenuOpen;
+            menu.classList.toggle('hidden', !isPortfolioProfileMenuOpen);
+        });
+
+        document.getElementById('portfolio-menu-login-toggle-btn').addEventListener('click', () => {
+            if (activeUser) return;
+            showPortfolioAuthForm = !showPortfolioAuthForm;
+            updatePortfolioAuthUi();
+            const menu = document.getElementById('portfolio-profile-menu');
+            if (menu) menu.classList.add('hidden');
+            isPortfolioProfileMenuOpen = false;
+        });
+
+        document.getElementById('portfolio-menu-logout-btn').addEventListener('click', () => {
+            if (typeof google !== 'undefined' && google?.accounts?.id?.disableAutoSelect) {
+                google.accounts.id.disableAutoSelect();
+            }
             setActiveUser(null);
             document.getElementById('portfolio-status').textContent = 'สถานะ: ออกจากระบบแล้ว';
+            const menu = document.getElementById('portfolio-profile-menu');
+            if (menu) menu.classList.add('hidden');
+            isPortfolioProfileMenuOpen = false;
+        });
+
+        document.getElementById('portfolio-menu-open-email-change-btn').addEventListener('click', () => {
+            openEmailChangeModal();
+            const menu = document.getElementById('portfolio-profile-menu');
+            if (menu) menu.classList.add('hidden');
+            isPortfolioProfileMenuOpen = false;
+        });
+
+        document.getElementById('portfolio-email-change-close-btn').addEventListener('click', () => {
+            closeEmailChangeModal();
+        });
+
+        document.getElementById('portfolio-email-change-cancel-btn').addEventListener('click', () => {
+            closeEmailChangeModal();
+        });
+
+        document.getElementById('portfolio-email-change-modal').addEventListener('click', (event) => {
+            if (event.target && event.target.id === 'portfolio-email-change-modal') {
+                closeEmailChangeModal();
+            }
+        });
+
+        document.getElementById('portfolio-open-plan-modal-btn').addEventListener('click', () => {
+            openPortfolioPlanModal('create');
+        });
+
+        document.getElementById('portfolio-plan-modal-close-btn').addEventListener('click', () => {
+            closePortfolioPlanModal();
+        });
+
+        document.getElementById('portfolio-plan-modal-cancel-btn').addEventListener('click', () => {
+            closePortfolioPlanModal();
+        });
+
+        document.getElementById('portfolio-plan-modal').addEventListener('click', (event) => {
+            if (event.target && event.target.id === 'portfolio-plan-modal') {
+                closePortfolioPlanModal();
+            }
+        });
+
+        document.getElementById('portfolio-delete-confirm-close-btn').addEventListener('click', () => {
+            closePortfolioDeleteConfirmModal(false);
+        });
+
+        document.getElementById('portfolio-delete-confirm-cancel-btn').addEventListener('click', () => {
+            closePortfolioDeleteConfirmModal(false);
+        });
+
+        document.getElementById('portfolio-delete-confirm-submit-btn').addEventListener('click', () => {
+            setPortfolioDeleteConfirmBusy(true, 'กำลังลบรายการ โปรดรอสักครู่...');
+            resolvePortfolioDeleteConfirm(true);
+        });
+
+        document.getElementById('admin-approval-refresh-btn').addEventListener('click', async () => {
+            if (!activeUser || !isActiveAdmin()) return;
+            await refreshAdminApprovalDashboard(true);
+        });
+
+        document.getElementById('admin-approve-all-btn').addEventListener('click', async () => {
+            const button = document.getElementById('admin-approve-all-btn');
+            if (!button) return;
+            button.disabled = true;
+            button.classList.add('opacity-60', 'cursor-not-allowed');
+            try {
+                await approveAllPendingUsersByAdmin();
+            } finally {
+                button.disabled = false;
+                button.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
+        });
+
+        document.getElementById('admin-approval-list').addEventListener('click', async (event) => {
+            const button = event.target.closest('.admin-approve-user-btn');
+            if (!button) return;
+            if (!activeUser || !isActiveAdmin()) {
+                setPortfolioStatus('เฉพาะ admin เท่านั้นที่อนุมัติผู้ใช้ได้', 'error');
+                return;
+            }
+
+            const targetUserId = String(button.dataset.targetUserId || '').trim();
+            if (!targetUserId) return;
+
+            const confirmed = await showConfirmToast(`ยืนยันอนุมัติผู้ใช้ ${targetUserId} ใช่หรือไม่?`, {
+                confirmText: 'อนุมัติ',
+                cancelText: 'ยกเลิก',
+                tone: 'success'
+            });
+            if (!confirmed) return;
+
+            setAdminApprovalStatus(`กำลังอนุมัติผู้ใช้ ${targetUserId}...`);
+            button.disabled = true;
+            button.classList.add('opacity-60', 'cursor-not-allowed');
+            try {
+                const result = await approveUserByAdminViaGas(activeUser.userId, targetUserId);
+                const targetEmail = String(result?.username || targetUserId).trim();
+                const mailSent = Boolean(result?.notification?.sent);
+                if (mailSent) {
+                    showToast(`อนุมัติผู้ใช้สำเร็จและส่งอีเมลแจ้งแล้ว: ${targetEmail}`, 'success', 3200);
+                    setPortfolioStatus(`อนุมัติผู้ใช้ ${targetEmail} สำเร็จ และส่งอีเมลแจ้งแล้ว`, 'success');
+                } else {
+                    const reason = String(result?.notification?.reason || 'ไม่สามารถส่งอีเมลแจ้งได้').trim();
+                    showToast(`อนุมัติผู้ใช้สำเร็จ แต่ส่งอีเมลไม่สำเร็จ (${reason})`, 'warn', 4500);
+                    setPortfolioStatus(`อนุมัติผู้ใช้ ${targetEmail} สำเร็จ แต่ส่งอีเมลแจ้งไม่สำเร็จ`, 'warn');
+                }
+                applyApprovedUserToAdminDashboardCache(targetUserId);
+                renderAdminApprovalDashboard(adminApprovalDashboardCache || {});
+                setAdminApprovalStatus(`อนุมัติผู้ใช้ ${targetEmail} เรียบร้อยแล้ว`);
+            } catch (error) {
+                showToast(`อนุมัติผู้ใช้ไม่สำเร็จ: ${error.message}`, 'error', 4200);
+                setPortfolioStatus(`อนุมัติผู้ใช้ไม่สำเร็จ (${error.message})`, 'error');
+                setAdminApprovalStatus(`อนุมัติผู้ใช้ไม่สำเร็จ (${error.message})`);
+            } finally {
+                button.disabled = false;
+                button.classList.remove('opacity-60', 'cursor-not-allowed');
+            }
+        });
+
+        document.getElementById('portfolio-resend-email-change-otp-btn').addEventListener('click', async () => {
+            if (otpResendCooldownSeconds > 0) {
+                setAccountChangeStatus(`กรุณารอ ${otpResendCooldownSeconds} วินาทีก่อนส่ง OTP ใหม่`, 'warn');
+                return;
+            }
+            await sendOtpToCurrentEmailForChange();
+        });
+
+        document.addEventListener('click', (event) => {
+            const menu = document.getElementById('portfolio-profile-menu');
+            const menuBtn = document.getElementById('portfolio-profile-menu-btn');
+            if (!menu || !menuBtn) return;
+
+            const clickedInsideMenu = menu.contains(event.target);
+            const clickedButton = menuBtn.contains(event.target);
+            if (!clickedInsideMenu && !clickedButton) {
+                menu.classList.add('hidden');
+                isPortfolioProfileMenuOpen = false;
+            }
+        });
+
+        document.getElementById('portfolio-verify-email-change-btn').addEventListener('click', async () => {
+            const verifyBtn = document.getElementById('portfolio-verify-email-change-btn');
+            if (!activeUser || !String(activeUser.userId || '').trim()) {
+                setAccountChangeStatus('กรุณา login ก่อนยืนยันการเปลี่ยนอีเมล', 'error');
+                return;
+            }
+            if (isVerifyingEmailChangeOtp) return;
+
+            if (!emailChangeOtpRequested) {
+                setAccountChangeStatus('กรุณากดส่ง OTP ก่อน (Step 1)', 'error');
+                return;
+            }
+
+            const otpCode = String(document.getElementById('portfolio-email-change-otp').value || '').trim();
+            if (!otpCode) {
+                setAccountChangeStatus('กรอก OTP ให้ครบ', 'error');
+                return;
+            }
+
+            isVerifyingEmailChangeOtp = true;
+            if (verifyBtn) {
+                verifyBtn.disabled = true;
+                verifyBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                verifyBtn.textContent = 'กำลังยืนยัน OTP...';
+            }
+            setPortfolioLoading(true, 'กำลังยืนยัน OTP...');
+            try {
+                const result = await verifyEmailChangeOtpViaGas(activeUser.userId, otpCode, '');
+                emailChangeOtpVerified = true;
+                pendingEmailChangeUserId = String(activeUser.userId || '').trim();
+                localStorage.setItem(PENDING_EMAIL_CHANGE_USER_ID_STORAGE_KEY, pendingEmailChangeUserId);
+                setAccountChangeStatus(`OTP ถูกต้องแล้ว กด Finish เพื่อออกจากระบบและ login ด้วย Google account ใหม่ภายใน ${formatDisplayDateTime(result?.linkExpiresAt)}`, 'success');
+                setPortfolioStatus('OTP ผ่านแล้ว พร้อมไป Step 3', 'success');
+                setEmailChangeModalStep(3);
+            } catch (error) {
+                setAccountChangeStatus(`ยืนยัน OTP ไม่สำเร็จ (${error.message})`, 'error');
+            } finally {
+                isVerifyingEmailChangeOtp = false;
+                if (verifyBtn) {
+                    verifyBtn.disabled = false;
+                    verifyBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+                    verifyBtn.textContent = 'Next: ยืนยัน OTP';
+                }
+                setPortfolioLoading(false);
+            }
+        });
+
+        document.getElementById('portfolio-email-change-finish-btn').addEventListener('click', () => {
+            if (!emailChangeOtpVerified) {
+                setAccountChangeStatus('กรุณายืนยัน OTP ให้สำเร็จก่อน (Step 2)', 'error');
+                return;
+            }
+
+            if (typeof google !== 'undefined' && google?.accounts?.id?.disableAutoSelect) {
+                google.accounts.id.disableAutoSelect();
+            }
+            setPortfolioStatus('ออกจากระบบแล้ว กรุณา login ด้วย Google account ใหม่', 'warn');
+            setActiveUser(null);
+            showPortfolioAuthForm = true;
+            updatePortfolioAuthUi();
+            closeEmailChangeModal();
         });
 
         document.getElementById('portfolio-add-row-btn').addEventListener('click', () => {
@@ -3718,6 +5334,7 @@
                 if (!batch) return;
                 loadPortfolioBatchIntoForm(batch);
                 setPortfolioEditMode(rowKey);
+                openPortfolioPlanModal('edit');
                 document.getElementById('portfolio-status').textContent = `สถานะ: โหมดแก้ไข batch ${batch.batchId || batch.changeId || rowKey}`;
                 return;
             }
@@ -3733,10 +5350,11 @@
             const rowKey = String(deleteButton.dataset.rowKey || '').trim();
             const batch = portfolioHistoryByChangeId.get(rowKey);
             if (!batch) return;
-            const confirmed = window.confirm(`ยืนยันลบ batch ${batch.batchId || batch.changeId || rowKey} ?`);
+            const confirmed = await showPortfolioDeleteConfirmModal(batch.batchId || batch.changeId || rowKey);
             if (!confirmed) return;
 
             setPortfolioLoading(true, 'กำลังลบรายการพอร์ต...');
+            setPortfolioDeleteConfirmBusy(true, 'กำลังลบรายการพอร์ต โปรดรอสักครู่...');
             deleteButton.disabled = true;
             try {
                 if (String(batch.changeId || '').trim()) {
@@ -3756,9 +5374,12 @@
                     document.getElementById('portfolio-note').value = '';
                 }
                 document.getElementById('portfolio-status').textContent = `สถานะ: ลบ batch ${batch.batchId || batch.changeId || rowKey} สำเร็จ`;
+                showToast(`ลบ batch ${batch.batchId || batch.changeId || rowKey} สำเร็จ`, 'success', 2600);
             } catch (error) {
                 document.getElementById('portfolio-status').textContent = `สถานะ: ลบ batch ไม่สำเร็จ (${error.message})`;
+                showToast(`ลบไม่สำเร็จ: ${error.message}`, 'error', 3600);
             } finally {
+                closePortfolioDeleteConfirmModal(false);
                 setPortfolioLoading(false);
                 deleteButton.disabled = false;
             }
@@ -3877,6 +5498,7 @@
                         setPortfolioEditMode('');
                         document.getElementById('portfolio-note').value = '';
                         resetPortfolioEntryRows();
+                        closePortfolioPlanModal();
                         setPortfolioStatus(
                             `บันทึกในเครื่องสำเร็จ (${normalizedEntries.length} แผน) แต่ส่งขึ้น GAS ไม่สำเร็จ (${saved.error})`,
                             'warn'
@@ -3888,6 +5510,7 @@
                 document.getElementById('portfolio-note').value = '';
                 setPortfolioEditMode('');
                 resetPortfolioEntryRows();
+                closePortfolioPlanModal();
                 await refreshPortfolioUi();
                 setPortfolioStatus(`บันทึกรายการพอร์ตสำเร็จ (${validEntries.length} แผน, batch: ${saved?.batchId || '-'})`, 'success');
             } catch (error) {

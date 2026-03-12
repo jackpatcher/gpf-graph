@@ -21,7 +21,22 @@ const GAS_SHEET_SCHEMA = {
 	unitCostCount: 14,
 	dataHeaders: buildDataHeaders_(),
 	configHeaders: ['key', 'value', 'description', 'updatedAt'],
-	usersHeaders: ['userId', 'username', 'passwordHash', 'displayName', 'createdAt', 'updatedAt'],
+	usersHeaders: [
+		'userId',
+		'username',
+		'passwordHash',
+		'displayName',
+		'role',
+		'status',
+		'createdAt',
+		'updatedAt',
+		'googleId',
+		'emailChangeOtpHash',
+		'emailChangeOtpExpiresAt',
+		'pendingEmail',
+		'pendingEmailLinkExpiresAt',
+		'emailChangeLastSentAt'
+	],
 	portfolioHeaders: [
 		'changeId',
 		'batchId',
@@ -38,13 +53,17 @@ const GAS_SHEET_SCHEMA = {
 			userId: 'U001',
 			username: 'demo_user_1',
 			passwordHash: 'demo_hash_amp',
-			displayName: 'Demo User 1'
+			displayName: 'Demo User 1',
+			role: 'admin',
+			status: 'approved'
 		},
 		{
 			userId: 'U002',
 			username: 'demo_user_2',
 			passwordHash: 'demo_hash_demo',
-			displayName: 'Demo User 2'
+			displayName: 'Demo User 2',
+			role: 'user',
+			status: 'approved'
 		}
 	],
 	samplePortfolioChanges: [
@@ -86,8 +105,8 @@ const GAS_SHEET_SCHEMA = {
 	configDefaults: [
 		{
 			key: 'SHEET_VERSION',
-			value: '3',
-			description: 'Schema version for NAV + users + batch portfolio JSON rows'
+			value: '4',
+			description: 'Schema version for NAV + users + Google email change OTP flow'
 		},
 		{
 			key: 'PROJECT_NAME',
@@ -290,9 +309,11 @@ function ensureUsersSheet_(spreadsheet) {
 	const headers = GAS_SHEET_SCHEMA.usersHeaders;
 	const expectedWidth = headers.length;
 
+	// Only hard-reset (clear) when the sheet is empty or the first header is wrong.
+	// Do NOT clear on column count mismatch — new columns (e.g. googleId) should be
+	// appended without wiping existing user data.
 	const shouldResetHeader =
 		sheet.getLastRow() < 1 ||
-		sheet.getLastColumn() < expectedWidth ||
 		String(sheet.getRange(1, 1).getValue() || '').trim() !== headers[0];
 
 	if (shouldResetHeader) {
@@ -362,8 +383,16 @@ function upsertSampleUsers_(sheet) {
 			item.username,
 			item.passwordHash,
 			item.displayName,
+			item.role || 'user',
+			item.status || 'approved',
 			nowIso,
-			nowIso
+			nowIso,
+			'',
+			'',
+			'',
+			'',
+			'',
+			''
 		];
 	});
 
@@ -457,11 +486,19 @@ function applyUsersSheetStyle_(sheet, headerWidth) {
 	sheet.getRange(1, 1, 1, headerWidth).setFontWeight('bold').setBackground('#dcfce7');
 
 	sheet.setColumnWidth(1, 100); // userId
-	sheet.setColumnWidth(2, 180); // username
+	sheet.setColumnWidth(2, 220); // username / email
 	sheet.setColumnWidth(3, 240); // passwordHash
 	sheet.setColumnWidth(4, 220); // displayName
-	sheet.setColumnWidth(5, 190); // createdAt
-	sheet.setColumnWidth(6, 190); // updatedAt
+	sheet.setColumnWidth(5, 100); // role
+	sheet.setColumnWidth(6, 110); // status
+	sheet.setColumnWidth(7, 190); // createdAt
+	sheet.setColumnWidth(8, 190); // updatedAt
+	sheet.setColumnWidth(9, 220); // googleId
+	sheet.setColumnWidth(10, 220); // emailChangeOtpHash
+	sheet.setColumnWidth(11, 190); // emailChangeOtpExpiresAt
+	sheet.setColumnWidth(12, 220); // pendingEmail
+	sheet.setColumnWidth(13, 190); // pendingEmailLinkExpiresAt
+	sheet.setColumnWidth(14, 190); // emailChangeLastSentAt
 }
 
 function applyPortfolioSheetStyle_(sheet, headerWidth) {
@@ -525,4 +562,11 @@ function setupProjectReady() {
 		trigger: triggerResult,
 		completedAt: new Date().toISOString()
 	};
+}
+
+/**
+ * Backward-compatible alias for typo usage.
+ */
+function setupRrojectReady() {
+	return setupProjectReady();
 }

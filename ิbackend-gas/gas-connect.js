@@ -30,6 +30,8 @@ const GAS_CONNECT_CONFIG = {
 	portfolioSheetName:
 		PropertiesService.getScriptProperties().getProperty('PORTFOLIO_SHEET_NAME') || 'PORTFOLIO_CHANGES',
 	syncToken: PropertiesService.getScriptProperties().getProperty('SYNC_TOKEN') || '',
+	mailSenderName: PropertiesService.getScriptProperties().getProperty('MAIL_SENDER_NAME') || 'GPF Graph',
+	googleClientId: PropertiesService.getScriptProperties().getProperty('GOOGLE_CLIENT_ID') || '',
 	timeoutMs: 30000,
 	apiUrlTemplate:
 		'https://www.gpf.or.th/thai2019/About/memberfund-api.php?pageName=NAVBottom_{MM}_{YYYY}',
@@ -39,8 +41,8 @@ const GAS_CONNECT_CONFIG = {
 const GAS_CONNECT_PROJECT_CONFIG_DEFAULTS = [
 	{
 		key: 'SHEET_VERSION',
-		value: '1',
-		description: 'Schema version for NAV + CONFIG sheets'
+		value: '4',
+		description: 'Schema version for NAV + users + Google email change OTP flow'
 	},
 	{
 		key: 'PROJECT_NAME',
@@ -90,6 +92,23 @@ const GAS_CONNECT_PROJECT_CONFIG_DEFAULTS = [
 	}
 ];
 
+const GAS_CONNECT_USER_HEADERS = [
+	'userId',
+	'username',
+	'passwordHash',
+	'displayName',
+	'role',
+	'status',
+	'createdAt',
+	'updatedAt',
+	'googleId',
+	'emailChangeOtpHash',
+	'emailChangeOtpExpiresAt',
+	'pendingEmail',
+	'pendingEmailLinkExpiresAt',
+	'emailChangeLastSentAt'
+];
+
 function doGet(e) {
 	return handleRequest_(e, null);
 }
@@ -102,6 +121,15 @@ function doPost(e) {
 		return jsonOut_({ ok: false, error: 'Invalid JSON body' });
 	}
 	return handleRequest_(e, payload);
+}
+
+// Run this once from Apps Script editor to grant required scopes (including mail send scope).
+function authorizeRequiredScopes() {
+	MailApp.getRemainingDailyQuota();
+	return {
+		ok: true,
+		message: 'Scopes authorized. You can deploy/redeploy Web App and retry OTP email.'
+	};
 }
 
 function handleRequest_(e, body) {
@@ -173,6 +201,46 @@ function handleRequest_(e, body) {
 			const passwordHash = String((body && body.passwordHash) || params.passwordHash || '').trim();
 			const result = loginUser_(username, passwordHash);
 			return jsonOut_({ ok: true, action: 'loginUser', result: result });
+		}
+
+		if (action === 'getuserprofile' || action === 'get_user_profile') {
+			const userId = String((body && body.userId) || params.userId || '').trim();
+			const result = getUserProfile_(userId);
+			return jsonOut_({ ok: true, action: 'getUserProfile', result: result });
+		}
+
+		if (action === 'loginwithgoogletoken' || action === 'login_with_google_token') {
+			const idToken = String((body && body.idToken) || params.idToken || '').trim();
+			const pendingUserId = String((body && body.pendingUserId) || params.pendingUserId || '').trim();
+			const result = loginWithGoogleToken_(idToken, pendingUserId);
+			return jsonOut_({ ok: true, action: 'loginWithGoogleToken', result: result });
+		}
+
+		if (action === 'getadminapprovaldashboard' || action === 'get_admin_approval_dashboard') {
+			const adminUserId = String((body && body.adminUserId) || params.adminUserId || '').trim();
+			const result = getAdminApprovalDashboard_(adminUserId);
+			return jsonOut_({ ok: true, action: 'getAdminApprovalDashboard', result: result });
+		}
+
+		if (action === 'approveuserregistration' || action === 'approve_user_registration') {
+			const adminUserId = String((body && body.adminUserId) || params.adminUserId || '').trim();
+			const targetUserId = String((body && body.targetUserId) || params.targetUserId || '').trim();
+			const result = approveUserRegistration_(adminUserId, targetUserId);
+			return jsonOut_({ ok: true, action: 'approveUserRegistration', result: result });
+		}
+
+		if (action === 'requestemailchangeotp' || action === 'request_email_change_otp') {
+			const userId = String((body && body.userId) || params.userId || '').trim();
+			const result = requestEmailChangeOtp_(userId);
+			return jsonOut_({ ok: true, action: 'requestEmailChangeOtp', result: result });
+		}
+
+		if (action === 'verifyemailchangeotp' || action === 'verify_email_change_otp') {
+			const userId = String((body && body.userId) || params.userId || '').trim();
+			const otpCode = String((body && body.otpCode) || params.otpCode || '').trim();
+			const newEmail = String((body && body.newEmail) || params.newEmail || '').trim();
+			const result = verifyEmailChangeOtp_(userId, otpCode, newEmail);
+			return jsonOut_({ ok: true, action: 'verifyEmailChangeOtp', result: result });
 		}
 
 		if (action === 'saveportfoliobatch' || action === 'save_portfolio_batch') {
@@ -487,14 +555,7 @@ function ensureUsersSheetInitialized_(spreadsheet) {
 		sheet = spreadsheet.insertSheet(GAS_CONNECT_CONFIG.usersSheetName);
 	}
 
-	const schema = ensureSheetHeaders_(sheet, [
-		'userId',
-		'username',
-		'passwordHash',
-		'displayName',
-		'createdAt',
-		'updatedAt'
-	]);
+	const schema = ensureSheetHeaders_(sheet, GAS_CONNECT_USER_HEADERS);
 	sheet.setFrozenRows(1);
 	sheet.getRange(1, 1, 1, schema.headers.length).setFontWeight('bold').setBackground('#dcfce7');
 	return sheet;
@@ -522,15 +583,190 @@ function ensurePortfolioSheetInitialized_(spreadsheet) {
 	return sheet;
 }
 
-function buildUsersByUsernameIndex_(sheet) {
+function syncPortfolioUsernameByUserId_(spreadsheet, userId, username) {
+	const normalizedUserId = String(userId || '').trim();
+	const normalizedUsername = String(username || '').trim();
+	if (!normalizedUserId || !normalizedUsername) return 0;
+
+	const sheet = ensurePortfolioSheetInitialized_(spreadsheet);
 	const schema = ensureSheetHeaders_(sheet, [
+		'changeId',
+		'batchId',
 		'userId',
 		'username',
-		'passwordHash',
-		'displayName',
+		'effectiveDate',
+		'entriesJson',
+		'note',
 		'createdAt',
 		'updatedAt'
 	]);
+	const headerMap = schema.headerMap;
+	const lastRow = sheet.getLastRow();
+	if (lastRow <= 1) return 0;
+
+	const rows = sheet.getRange(2, 1, lastRow - 1, schema.headers.length).getValues();
+	let changed = 0;
+	for (let i = 0; i < rows.length; i++) {
+		const row = rows[i];
+		const rowUserId = String(getCellByHeader_(row, headerMap, 'userId') || '').trim();
+		if (rowUserId !== normalizedUserId) continue;
+		const rowUsername = String(getCellByHeader_(row, headerMap, 'username') || '').trim();
+		if (rowUsername === normalizedUsername) continue;
+		setCellByHeader_(row, headerMap, 'username', normalizedUsername);
+		setCellByHeader_(row, headerMap, 'updatedAt', new Date().toISOString());
+		rows[i] = row;
+		changed++;
+	}
+
+	if (changed > 0) {
+		sheet.getRange(2, 1, rows.length, schema.headers.length).setValues(rows);
+	}
+
+	return changed;
+}
+
+function reassignPortfolioUserIdByUsername_(spreadsheet, oldUserId, newUserId, username) {
+	const normalizedOldUserId = String(oldUserId || '').trim();
+	const normalizedNewUserId = String(newUserId || '').trim();
+	const normalizedUsername = String(username || '').trim().toLowerCase();
+	if (!normalizedOldUserId || !normalizedNewUserId || !normalizedUsername) return 0;
+	if (normalizedOldUserId === normalizedNewUserId) return 0;
+
+	const sheet = ensurePortfolioSheetInitialized_(spreadsheet);
+	const schema = ensureSheetHeaders_(sheet, [
+		'changeId',
+		'batchId',
+		'userId',
+		'username',
+		'effectiveDate',
+		'entriesJson',
+		'note',
+		'createdAt',
+		'updatedAt'
+	]);
+	const headerMap = schema.headerMap;
+	const lastRow = sheet.getLastRow();
+	if (lastRow <= 1) return 0;
+
+	const rows = sheet.getRange(2, 1, lastRow - 1, schema.headers.length).getValues();
+	let changed = 0;
+	for (let i = 0; i < rows.length; i++) {
+		const row = rows[i];
+		const rowUserId = String(getCellByHeader_(row, headerMap, 'userId') || '').trim();
+		const rowUsername = String(getCellByHeader_(row, headerMap, 'username') || '').trim().toLowerCase();
+		if (rowUserId !== normalizedOldUserId || rowUsername !== normalizedUsername) {
+			continue;
+		}
+
+		setCellByHeader_(row, headerMap, 'userId', normalizedNewUserId);
+		setCellByHeader_(row, headerMap, 'updatedAt', new Date().toISOString());
+		rows[i] = row;
+		changed++;
+	}
+
+	if (changed > 0) {
+		sheet.getRange(2, 1, rows.length, schema.headers.length).setValues(rows);
+	}
+
+	return changed;
+}
+
+function generateGoogleUserIdBase_(googleId) {
+	return 'G_' + sha256Text_(String(googleId || '').trim()).slice(0, 20);
+}
+
+function collectExistingUserIds_(sheet, schema) {
+	const headerMap = schema.headerMap;
+	const out = {};
+	const lastRow = sheet.getLastRow();
+	if (lastRow <= 1) return out;
+
+	const rows = sheet.getRange(2, 1, lastRow - 1, schema.headers.length).getValues();
+	for (let i = 0; i < rows.length; i++) {
+		const id = String(getCellByHeader_(rows[i], headerMap, 'userId') || '').trim();
+		if (id) out[id] = true;
+	}
+	return out;
+}
+
+function makeUniqueUserId_(existingIdMap, preferredId) {
+	const base = String(preferredId || '').trim() || ('U' + String(Date.now()));
+	if (!existingIdMap[base]) {
+		existingIdMap[base] = true;
+		return base;
+	}
+
+	let index = 2;
+	while (existingIdMap[base + '_' + index]) {
+		index++;
+	}
+	const uniqueId = base + '_' + index;
+	existingIdMap[uniqueId] = true;
+	return uniqueId;
+}
+
+function repairDuplicateUserIds_(spreadsheet) {
+	const usersSheet = ensureUsersSheetInitialized_(spreadsheet);
+	const usersSchema = ensureSheetHeaders_(usersSheet, GAS_CONNECT_USER_HEADERS);
+	const headerMap = usersSchema.headerMap;
+	const lastRow = usersSheet.getLastRow();
+	if (lastRow <= 1) return 0;
+
+	const rows = usersSheet.getRange(2, 1, lastRow - 1, usersSchema.headers.length).getValues();
+	const existingIdMap = {};
+	let maxNumericUserId = 0;
+	for (let i = 0; i < rows.length; i++) {
+		const id = String(getCellByHeader_(rows[i], headerMap, 'userId') || '').trim();
+		if (id) existingIdMap[id] = true;
+		const m = id.match(/^U(\d+)$/i);
+		if (m) {
+			const n = parseInt(m[1], 10);
+			if (Number.isFinite(n) && n > maxNumericUserId) maxNumericUserId = n;
+		}
+	}
+
+	const seen = {};
+	let changed = 0;
+	for (let i = 0; i < rows.length; i++) {
+		const row = rows[i];
+		const currentId = String(getCellByHeader_(row, headerMap, 'userId') || '').trim();
+		const username = String(getCellByHeader_(row, headerMap, 'username') || '').trim();
+		const googleId = String(getCellByHeader_(row, headerMap, 'googleId') || '').trim();
+
+		if (currentId && !seen[currentId]) {
+			seen[currentId] = true;
+			continue;
+		}
+
+		let preferredId = '';
+		if (googleId) {
+			preferredId = generateGoogleUserIdBase_(googleId);
+		} else {
+			maxNumericUserId += 1;
+			preferredId = 'U' + String(maxNumericUserId).padStart(4, '0');
+		}
+
+		const nextId = makeUniqueUserId_(existingIdMap, preferredId);
+		setCellByHeader_(row, headerMap, 'userId', nextId);
+		setCellByHeader_(row, headerMap, 'updatedAt', new Date().toISOString());
+		rows[i] = row;
+		seen[nextId] = true;
+		changed++;
+
+		if (currentId && username) {
+			reassignPortfolioUserIdByUsername_(spreadsheet, currentId, nextId, username);
+		}
+	}
+
+	if (changed > 0) {
+		usersSheet.getRange(2, 1, rows.length, usersSchema.headers.length).setValues(rows);
+	}
+
+	return changed;
+}
+
+function buildUsersByUsernameIndex_(sheet) {
+	const schema = ensureSheetHeaders_(sheet, GAS_CONNECT_USER_HEADERS);
 	const headerMap = schema.headerMap;
 	const lastRow = sheet.getLastRow();
 	const out = {};
@@ -546,7 +782,10 @@ function buildUsersByUsernameIndex_(sheet) {
 			userId: String(getCellByHeader_(row, headerMap, 'userId') || '').trim(),
 			username: username,
 			passwordHash: String(getCellByHeader_(row, headerMap, 'passwordHash') || '').trim(),
-			displayName: String(getCellByHeader_(row, headerMap, 'displayName') || '').trim()
+			displayName: String(getCellByHeader_(row, headerMap, 'displayName') || '').trim(),
+			googleId: String(getCellByHeader_(row, headerMap, 'googleId') || '').trim(),
+			role: normalizeUserRole_(getCellByHeader_(row, headerMap, 'role')),
+			status: normalizeUserStatus_(getCellByHeader_(row, headerMap, 'status'))
 		};
 	}
 
@@ -554,14 +793,7 @@ function buildUsersByUsernameIndex_(sheet) {
 }
 
 function getNextUserId_(sheet) {
-	const schema = ensureSheetHeaders_(sheet, [
-		'userId',
-		'username',
-		'passwordHash',
-		'displayName',
-		'createdAt',
-		'updatedAt'
-	]);
+	const schema = ensureSheetHeaders_(sheet, GAS_CONNECT_USER_HEADERS);
 	const headerMap = schema.headerMap;
 	const lastRow = sheet.getLastRow();
 	if (lastRow <= 1) {
@@ -589,14 +821,7 @@ function getUserById_(userId) {
 
 	const spreadsheet = SpreadsheetApp.openById(GAS_CONNECT_CONFIG.sheetId);
 	const sheet = ensureUsersSheetInitialized_(spreadsheet);
-	const schema = ensureSheetHeaders_(sheet, [
-		'userId',
-		'username',
-		'passwordHash',
-		'displayName',
-		'createdAt',
-		'updatedAt'
-	]);
+	const schema = ensureSheetHeaders_(sheet, GAS_CONNECT_USER_HEADERS);
 	const headerMap = schema.headerMap;
 	const lastRow = sheet.getLastRow();
 	if (lastRow <= 1) return null;
@@ -610,7 +835,10 @@ function getUserById_(userId) {
 		return {
 			userId: normalizedId,
 			username: String(getCellByHeader_(row, headerMap, 'username') || '').trim(),
-			displayName: String(getCellByHeader_(row, headerMap, 'displayName') || '').trim()
+			displayName: String(getCellByHeader_(row, headerMap, 'displayName') || '').trim(),
+			googleId: String(getCellByHeader_(row, headerMap, 'googleId') || '').trim(),
+			role: normalizeUserRole_(getCellByHeader_(row, headerMap, 'role')),
+			status: normalizeUserStatus_(getCellByHeader_(row, headerMap, 'status'))
 		};
 	}
 
@@ -631,14 +859,7 @@ function registerUser_(username, passwordHash, displayName) {
 
 	const spreadsheet = SpreadsheetApp.openById(GAS_CONNECT_CONFIG.sheetId);
 	const sheet = ensureUsersSheetInitialized_(spreadsheet);
-	const schema = ensureSheetHeaders_(sheet, [
-		'userId',
-		'username',
-		'passwordHash',
-		'displayName',
-		'createdAt',
-		'updatedAt'
-	]);
+	const schema = ensureSheetHeaders_(sheet, GAS_CONNECT_USER_HEADERS);
 	const headerMap = schema.headerMap;
 	const indexByUsername = buildUsersByUsernameIndex_(sheet);
 	if (indexByUsername[normalizedUsername.toLowerCase()]) {
@@ -651,6 +872,8 @@ function registerUser_(username, passwordHash, displayName) {
 	setCellByHeader_(payload, headerMap, 'username', normalizedUsername);
 	setCellByHeader_(payload, headerMap, 'passwordHash', normalizedHash);
 	setCellByHeader_(payload, headerMap, 'displayName', normalizedDisplay || normalizedUsername);
+	setCellByHeader_(payload, headerMap, 'role', 'user');
+	setCellByHeader_(payload, headerMap, 'status', 'approved');
 	setCellByHeader_(payload, headerMap, 'createdAt', new Date().toISOString());
 	setCellByHeader_(payload, headerMap, 'updatedAt', new Date().toISOString());
 	sheet.appendRow(payload);
@@ -659,6 +882,10 @@ function registerUser_(username, passwordHash, displayName) {
 		userId: userId,
 		username: normalizedUsername,
 		displayName: normalizedDisplay || normalizedUsername,
+		googleId: '',
+		role: 'user',
+		status: 'approved',
+		authType: 'password',
 		createdAt: new Date().toISOString()
 	};
 }
@@ -680,12 +907,715 @@ function loginUser_(username, passwordHash) {
 	if (String(found.passwordHash || '') !== normalizedHash) {
 		throw new Error('Invalid password');
 	}
+	if (found.status !== 'approved') {
+		throw new Error('Account is pending admin approval');
+	}
 
 	return {
 		userId: found.userId,
 		username: found.username,
-		displayName: found.displayName || found.username
+		displayName: found.displayName || found.username,
+		googleId: String(found.googleId || '').trim(),
+		role: found.role,
+		status: found.status,
+		authType: 'password'
 	};
+}
+
+function getUserProfile_(userId) {
+	const user = requireApprovedUserById_(userId);
+	return {
+		userId: String(user.userId || '').trim(),
+		username: String(user.username || '').trim(),
+		displayName: String(user.displayName || user.username || '').trim(),
+		googleId: String(user.googleId || '').trim(),
+		role: normalizeUserRole_(user.role),
+		status: normalizeUserStatus_(user.status)
+	};
+}
+
+/**
+ * Verify a Google ID token and upsert the user in USERS sheet.
+ * GAS Script Property: GOOGLE_CLIENT_ID (optional but recommended for audience validation).
+ */
+function loginWithGoogleToken_(idToken, pendingUserId) {
+	const identity = verifyGoogleIdToken_(idToken);
+	const googleId = identity.googleId;
+	const email = identity.email;
+	const displayName = identity.displayName;
+	const normalizedPendingUserId = String(pendingUserId || '').trim();
+	const spreadsheet = SpreadsheetApp.openById(GAS_CONNECT_CONFIG.sheetId);
+	repairDuplicateUserIds_(spreadsheet);
+	const sheet = ensureUsersSheetInitialized_(spreadsheet);
+	const schema = ensureSheetHeaders_(sheet, GAS_CONNECT_USER_HEADERS);
+	const headerMap = schema.headerMap;
+	const nowIso = new Date().toISOString();
+	const indexByUsername = buildUsersByUsernameIndex_(sheet);
+
+	const existing = findUserByGoogleId_(sheet, schema, googleId);
+	if (existing) {
+		const row = sheet.getRange(existing.rowIndex, 1, 1, schema.headers.length).getValues()[0];
+		const conflictByEmail = indexByUsername[email.toLowerCase()];
+		if (conflictByEmail && conflictByEmail.userId !== existing.userId) {
+			throw new Error('Email already belongs to another user');
+		}
+		const pendingState = getActivePendingEmailState_(row, headerMap);
+		setCellByHeader_(row, headerMap, 'username', email);
+		setCellByHeader_(row, headerMap, 'displayName', displayName);
+		setCellByHeader_(row, headerMap, 'role', normalizeUserRole_(getCellByHeader_(row, headerMap, 'role')));
+		setCellByHeader_(row, headerMap, 'status', normalizeUserStatus_(getCellByHeader_(row, headerMap, 'status')));
+		setCellByHeader_(row, headerMap, 'updatedAt', nowIso);
+		if (!pendingState.active) {
+			clearEmailChangeStateInRow_(row, headerMap);
+		}
+		sheet.getRange(existing.rowIndex, 1, 1, schema.headers.length).setValues([row]);
+		const existingStatus = normalizeUserStatus_(getCellByHeader_(row, headerMap, 'status'));
+		const existingRole = normalizeUserRole_(getCellByHeader_(row, headerMap, 'role'));
+		if (existingStatus !== 'approved') {
+			throw new Error('Account is pending admin approval');
+		}
+		syncPortfolioUsernameByUserId_(spreadsheet, existing.userId, email);
+		return {
+			userId: existing.userId,
+			username: email,
+			displayName: displayName,
+			googleId: googleId,
+			email: email,
+			role: existingRole,
+			status: existingStatus,
+			authType: 'google',
+			emailChangePending: pendingState.active,
+			pendingEmail: pendingState.active ? pendingState.pendingEmail : '',
+			pendingEmailLinkExpiresAt: pendingState.active ? pendingState.expiresAt : ''
+		};
+	}
+
+	let pendingUser = findUserByPendingEmail_(sheet, schema, email);
+	if (!pendingUser && normalizedPendingUserId) {
+		const pendingByUserId = findUserByIdInSheet_(sheet, schema, normalizedPendingUserId);
+		if (pendingByUserId) {
+			const pendingRow = sheet.getRange(pendingByUserId.rowIndex, 1, 1, schema.headers.length).getValues()[0];
+			const pendingState = getActivePendingEmailState_(pendingRow, headerMap);
+			if (pendingState.active) {
+				pendingUser = pendingByUserId;
+			}
+		}
+	}
+	if (pendingUser) {
+		const row = sheet.getRange(pendingUser.rowIndex, 1, 1, schema.headers.length).getValues()[0];
+		const conflictByEmail = indexByUsername[email.toLowerCase()];
+		if (conflictByEmail && conflictByEmail.userId !== pendingUser.userId) {
+			throw new Error('Email already belongs to another user');
+		}
+		setCellByHeader_(row, headerMap, 'username', email);
+		setCellByHeader_(row, headerMap, 'displayName', displayName);
+		setCellByHeader_(row, headerMap, 'googleId', googleId);
+		setCellByHeader_(row, headerMap, 'role', normalizeUserRole_(getCellByHeader_(row, headerMap, 'role')));
+		setCellByHeader_(row, headerMap, 'status', 'approved');
+		setCellByHeader_(row, headerMap, 'updatedAt', nowIso);
+		clearEmailChangeStateInRow_(row, headerMap);
+		sheet.getRange(pendingUser.rowIndex, 1, 1, schema.headers.length).setValues([row]);
+		syncPortfolioUsernameByUserId_(spreadsheet, pendingUser.userId, email);
+		return {
+			userId: pendingUser.userId,
+			username: email,
+			displayName: displayName,
+			googleId: googleId,
+			email: email,
+			role: normalizeUserRole_(getCellByHeader_(row, headerMap, 'role')),
+			status: 'approved',
+			authType: 'google',
+			linkedByEmailChange: true
+		};
+	}
+
+	const foundByEmail = indexByUsername[email.toLowerCase()];
+	if (foundByEmail) {
+		if (String(foundByEmail.googleId || '').trim()) {
+			throw new Error('Email already belongs to another Google account');
+		}
+
+		const row = sheet.getRange(foundByEmail.rowIndex, 1, 1, schema.headers.length).getValues()[0];
+		setCellByHeader_(row, headerMap, 'displayName', displayName);
+		setCellByHeader_(row, headerMap, 'googleId', googleId);
+		setCellByHeader_(row, headerMap, 'role', normalizeUserRole_(getCellByHeader_(row, headerMap, 'role')));
+		setCellByHeader_(row, headerMap, 'status', normalizeUserStatus_(getCellByHeader_(row, headerMap, 'status')));
+		setCellByHeader_(row, headerMap, 'updatedAt', nowIso);
+		clearEmailChangeStateInRow_(row, headerMap);
+		sheet.getRange(foundByEmail.rowIndex, 1, 1, schema.headers.length).setValues([row]);
+		const foundStatus = normalizeUserStatus_(getCellByHeader_(row, headerMap, 'status'));
+		const foundRole = normalizeUserRole_(getCellByHeader_(row, headerMap, 'role'));
+		if (foundStatus !== 'approved') {
+			throw new Error('Account is pending admin approval');
+		}
+		syncPortfolioUsernameByUserId_(spreadsheet, foundByEmail.userId, email);
+		return {
+			userId: foundByEmail.userId,
+			username: email,
+			displayName: displayName,
+			googleId: googleId,
+			email: email,
+			role: foundRole,
+			status: foundStatus,
+			authType: 'google'
+		};
+	}
+
+	const existingIdMap = collectExistingUserIds_(sheet, schema);
+	const userId = makeUniqueUserId_(existingIdMap, generateGoogleUserIdBase_(googleId));
+	const payload = createEmptyRowByHeaders_(schema.headers);
+	setCellByHeader_(payload, headerMap, 'userId', userId);
+	setCellByHeader_(payload, headerMap, 'username', email);
+	setCellByHeader_(payload, headerMap, 'passwordHash', '');
+	setCellByHeader_(payload, headerMap, 'displayName', displayName);
+	setCellByHeader_(payload, headerMap, 'role', 'user');
+	setCellByHeader_(payload, headerMap, 'status', 'pending');
+	setCellByHeader_(payload, headerMap, 'createdAt', nowIso);
+	setCellByHeader_(payload, headerMap, 'updatedAt', nowIso);
+	setCellByHeader_(payload, headerMap, 'googleId', googleId);
+	sheet.appendRow(payload);
+	throw new Error('Account created and waiting for admin approval');
+}
+
+function requireAdminUserById_(userId) {
+	const approvedUser = requireApprovedUserById_(userId);
+	if (normalizeUserRole_(approvedUser.role) !== 'admin') {
+		throw new Error('Admin permission required');
+	}
+	return approvedUser;
+}
+
+function getAdminApprovalDashboard_(adminUserId) {
+	requireAdminUserById_(adminUserId);
+
+	const spreadsheet = SpreadsheetApp.openById(GAS_CONNECT_CONFIG.sheetId);
+	const sheet = ensureUsersSheetInitialized_(spreadsheet);
+	const schema = ensureSheetHeaders_(sheet, GAS_CONNECT_USER_HEADERS);
+	const headerMap = schema.headerMap;
+	const lastRow = sheet.getLastRow();
+
+	if (lastRow <= 1) {
+		return {
+			summary: { totalUsers: 0, pending: 0, approved: 0, admins: 0 },
+			pendingUsers: [],
+			updatedAt: new Date().toISOString()
+		};
+	}
+
+	const values = sheet.getRange(2, 1, lastRow - 1, schema.headers.length).getValues();
+	const pendingUsers = [];
+	let totalUsers = 0;
+	let approvedCount = 0;
+	let pendingCount = 0;
+	let adminCount = 0;
+
+	for (let i = 0; i < values.length; i++) {
+		const row = values[i];
+		const userId = String(getCellByHeader_(row, headerMap, 'userId') || '').trim();
+		if (!userId) continue;
+		totalUsers++;
+
+		const role = normalizeUserRole_(getCellByHeader_(row, headerMap, 'role'));
+		const status = normalizeUserStatus_(getCellByHeader_(row, headerMap, 'status'));
+		if (role === 'admin') adminCount++;
+		if (status === 'approved') approvedCount++;
+		if (status === 'pending') {
+			pendingCount++;
+			pendingUsers.push({
+				userId: userId,
+				username: String(getCellByHeader_(row, headerMap, 'username') || '').trim(),
+				displayName: String(getCellByHeader_(row, headerMap, 'displayName') || '').trim(),
+				role: role,
+				status: status,
+				createdAt: String(getCellByHeader_(row, headerMap, 'createdAt') || '').trim(),
+				updatedAt: String(getCellByHeader_(row, headerMap, 'updatedAt') || '').trim()
+			});
+		}
+	}
+
+	pendingUsers.sort(function (a, b) {
+		const aTime = Date.parse(String(a.createdAt || ''));
+		const bTime = Date.parse(String(b.createdAt || ''));
+		if (Number.isFinite(aTime) && Number.isFinite(bTime) && aTime !== bTime) {
+			return aTime - bTime;
+		}
+		return String(a.userId || '').localeCompare(String(b.userId || ''));
+	});
+
+	return {
+		summary: {
+			totalUsers: totalUsers,
+			pending: pendingCount,
+			approved: approvedCount,
+			admins: adminCount
+		},
+		pendingUsers: pendingUsers,
+		updatedAt: new Date().toISOString()
+	};
+}
+
+function approveUserRegistration_(adminUserId, targetUserId) {
+	const adminUser = requireAdminUserById_(adminUserId);
+	const normalizedTargetUserId = String(targetUserId || '').trim();
+	if (!normalizedTargetUserId) {
+		throw new Error('targetUserId is required');
+	}
+
+	const spreadsheet = SpreadsheetApp.openById(GAS_CONNECT_CONFIG.sheetId);
+	const sheet = ensureUsersSheetInitialized_(spreadsheet);
+	const schema = ensureSheetHeaders_(sheet, GAS_CONNECT_USER_HEADERS);
+	const headerMap = schema.headerMap;
+	const target = findUserByIdInSheet_(sheet, schema, normalizedTargetUserId);
+	if (!target) {
+		throw new Error('Target user not found');
+	}
+
+	const row = sheet.getRange(target.rowIndex, 1, 1, schema.headers.length).getValues()[0];
+	const currentStatus = normalizeUserStatus_(getCellByHeader_(row, headerMap, 'status'));
+	if (currentStatus === 'approved') {
+		return {
+			userId: normalizedTargetUserId,
+			username: String(getCellByHeader_(row, headerMap, 'username') || '').trim(),
+			displayName: String(getCellByHeader_(row, headerMap, 'displayName') || '').trim(),
+			status: 'approved',
+			alreadyApproved: true,
+			approvedAt: String(getCellByHeader_(row, headerMap, 'updatedAt') || '').trim() || new Date().toISOString(),
+			approvedBy: adminUser.userId,
+			notification: { attempted: false, sent: false, reason: 'Already approved' }
+		};
+	}
+
+	setCellByHeader_(row, headerMap, 'status', 'approved');
+	setCellByHeader_(row, headerMap, 'updatedAt', new Date().toISOString());
+	sheet.getRange(target.rowIndex, 1, 1, schema.headers.length).setValues([row]);
+
+	const approvedUsername = String(getCellByHeader_(row, headerMap, 'username') || '').trim();
+	const approvedDisplayName = String(getCellByHeader_(row, headerMap, 'displayName') || '').trim();
+	const approvedAt = String(getCellByHeader_(row, headerMap, 'updatedAt') || '').trim();
+
+	let notification = { attempted: false, sent: false, reason: '' };
+	if (isValidEmail_(approvedUsername)) {
+		notification.attempted = true;
+		try {
+			sendApprovalNotificationMail_(approvedUsername, approvedDisplayName || approvedUsername);
+			notification.sent = true;
+		} catch (mailError) {
+			notification.sent = false;
+			notification.reason = String((mailError && mailError.message) || mailError || 'Email notification failed');
+		}
+	} else {
+		notification.reason = 'Username is not a valid email address';
+	}
+
+	return {
+		userId: normalizedTargetUserId,
+		username: approvedUsername,
+		displayName: approvedDisplayName,
+		status: 'approved',
+		approvedAt: approvedAt,
+		approvedBy: adminUser.userId,
+		notification: notification
+	};
+}
+
+function sendApprovalNotificationMail_(toEmail, displayName) {
+	const recipient = String(toEmail || '').trim();
+	if (!recipient || !isValidEmail_(recipient)) {
+		throw new Error('Valid recipient email is required');
+	}
+
+	const safeName = String(displayName || recipient).trim();
+	const subject = 'บัญชีของคุณได้รับการอนุมัติแล้ว';
+	const textBody = [
+		'สวัสดี ' + safeName + ',',
+		'',
+		'บัญชีของคุณได้รับการอนุมัติเรียบร้อยแล้ว',
+		'ขณะนี้คุณสามารถเข้าสู่ระบบและใช้งานระบบได้ทันที',
+		'',
+		'ขอบคุณที่ใช้งานระบบ'
+	].join('\n');
+	const htmlBody =
+		'<p>สวัสดี ' + safeName + ',</p>' +
+		'<p>บัญชีของคุณได้รับการอนุมัติเรียบร้อยแล้ว</p>' +
+		'<p>ขณะนี้คุณสามารถเข้าสู่ระบบและใช้งานระบบได้ทันที</p>' +
+		'<p>ขอบคุณที่ใช้งานระบบ</p>';
+
+	try {
+		GmailApp.sendEmail(recipient, subject, textBody, {
+			htmlBody: htmlBody,
+			name: GAS_CONNECT_CONFIG.mailSenderName
+		});
+	} catch (_gmailError) {
+		MailApp.sendEmail({
+			to: recipient,
+			subject: subject,
+			htmlBody: htmlBody,
+			body: textBody,
+			name: GAS_CONNECT_CONFIG.mailSenderName
+		});
+	}
+}
+
+function findUserByGoogleId_(sheet, schema, googleId) {
+	const headerMap = schema.headerMap;
+	if (!headerMap.googleId) return null;
+
+	const lastRow = sheet.getLastRow();
+	if (lastRow <= 1) return null;
+
+	const values = sheet.getRange(2, 1, lastRow - 1, schema.headers.length).getValues();
+	for (let i = 0; i < values.length; i++) {
+		const row = values[i];
+		const rowGoogleId = String(getCellByHeader_(row, headerMap, 'googleId') || '').trim();
+		if (rowGoogleId && rowGoogleId === googleId) {
+			return {
+				rowIndex: i + 2,
+				userId: String(getCellByHeader_(row, headerMap, 'userId') || '').trim(),
+				username: String(getCellByHeader_(row, headerMap, 'username') || '').trim(),
+				displayName: String(getCellByHeader_(row, headerMap, 'displayName') || '').trim()
+			};
+		}
+	}
+	return null;
+}
+
+function findUserByPendingEmail_(sheet, schema, email) {
+	const normalizedEmail = String(email || '').trim().toLowerCase();
+	if (!normalizedEmail) return null;
+
+	const headerMap = schema.headerMap;
+	const lastRow = sheet.getLastRow();
+	if (lastRow <= 1) return null;
+
+	const values = sheet.getRange(2, 1, lastRow - 1, schema.headers.length).getValues();
+	const nowMs = Date.now();
+	for (let i = 0; i < values.length; i++) {
+		const row = values[i];
+		const pendingEmail = String(getCellByHeader_(row, headerMap, 'pendingEmail') || '').trim().toLowerCase();
+		const linkExpiresAt = String(getCellByHeader_(row, headerMap, 'pendingEmailLinkExpiresAt') || '').trim();
+		if (!pendingEmail || pendingEmail !== normalizedEmail) continue;
+		const expiry = Date.parse(linkExpiresAt);
+		if (!Number.isFinite(expiry) || expiry < nowMs) continue;
+		return {
+			rowIndex: i + 2,
+			userId: String(getCellByHeader_(row, headerMap, 'userId') || '').trim(),
+			username: String(getCellByHeader_(row, headerMap, 'username') || '').trim(),
+			displayName: String(getCellByHeader_(row, headerMap, 'displayName') || '').trim()
+		};
+	}
+
+	return null;
+}
+
+function requestEmailChangeOtp_(userId) {
+	const normalizedUserId = String(userId || '').trim();
+	if (!normalizedUserId) {
+		throw new Error('userId is required');
+	}
+
+	const spreadsheet = SpreadsheetApp.openById(GAS_CONNECT_CONFIG.sheetId);
+	const sheet = ensureUsersSheetInitialized_(spreadsheet);
+	const schema = ensureSheetHeaders_(sheet, GAS_CONNECT_USER_HEADERS);
+	const headerMap = schema.headerMap;
+	const user = findUserByIdInSheet_(sheet, schema, normalizedUserId);
+	if (!user) {
+		throw new Error('User not found');
+	}
+	if (normalizeUserStatus_(user.status) !== 'approved') {
+		throw new Error('Account is pending admin approval');
+	}
+
+	const currentEmail = String(user.username || '').trim();
+	if (!isValidEmail_(currentEmail)) {
+		throw new Error('Current account email is invalid or unavailable');
+	}
+
+	const row = sheet.getRange(user.rowIndex, 1, 1, schema.headers.length).getValues()[0];
+	const lastSentAtText = String(getCellByHeader_(row, headerMap, 'emailChangeLastSentAt') || '').trim();
+	const lastSentAtMs = Date.parse(lastSentAtText);
+	if (Number.isFinite(lastSentAtMs) && Date.now() - lastSentAtMs < 60000) {
+		throw new Error('Please wait at least 60 seconds before requesting another OTP');
+	}
+
+	const otpCode = generateOtpCode_();
+	const nowIso = new Date().toISOString();
+	const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+	setCellByHeader_(row, headerMap, 'emailChangeOtpHash', sha256Text_(otpCode));
+	setCellByHeader_(row, headerMap, 'emailChangeOtpExpiresAt', expiresAt);
+	setCellByHeader_(row, headerMap, 'pendingEmail', '');
+	setCellByHeader_(row, headerMap, 'pendingEmailLinkExpiresAt', '');
+	setCellByHeader_(row, headerMap, 'emailChangeLastSentAt', nowIso);
+	setCellByHeader_(row, headerMap, 'updatedAt', nowIso);
+	sheet.getRange(user.rowIndex, 1, 1, schema.headers.length).setValues([row]);
+
+	try {
+		sendEmailChangeOtpMail_(currentEmail, otpCode, expiresAt);
+	} catch (error) {
+		throw buildMailAuthorizationError_(error);
+	}
+
+	return {
+		userId: normalizedUserId,
+		sentTo: maskEmail_(currentEmail),
+		expiresAt: expiresAt,
+		sentAt: nowIso
+	};
+}
+
+function sendEmailChangeOtpMail_(toEmail, otpCode, expiresAtIso) {
+	const recipient = String(toEmail || '').trim();
+	if (!recipient) {
+		throw new Error('OTP recipient email is required');
+	}
+
+	const expiresAtText = String(expiresAtIso || '').trim();
+	const subject = 'รหัสยืนยันการเปลี่ยนอีเมลบัญชีของคุณ';
+	const textBody = [
+		'คำขอเปลี่ยนอีเมลบัญชี',
+		'',
+		'รหัสยืนยันของคุณ: ' + String(otpCode || ''),
+		'รหัสนี้ใช้ได้ถึง: ' + (expiresAtText || '-'),
+		'',
+		'หากคุณไม่ได้เป็นผู้ดำเนินการ กรุณาเพิกเฉยอีเมลฉบับนี้'
+	].join('\n');
+	const htmlBody =
+		'<p>คำขอเปลี่ยนอีเมลบัญชี</p>' +
+		'<p>รหัสยืนยันของคุณ:</p>' +
+		'<p style="font-size:24px;font-weight:700;letter-spacing:4px;margin:4px 0 8px 0">' + String(otpCode || '') + '</p>' +
+		'<p>รหัสนี้ใช้ได้ถึง: <strong>' + (expiresAtText || '-') + '</strong></p>' +
+		'<p>หากคุณไม่ได้เป็นผู้ดำเนินการ กรุณาเพิกเฉยอีเมลฉบับนี้</p>';
+
+	// Prefer GmailApp for more sender metadata; fallback to MailApp for compatibility.
+	try {
+		GmailApp.sendEmail(recipient, subject, textBody, {
+			htmlBody: htmlBody,
+			name: GAS_CONNECT_CONFIG.mailSenderName
+		});
+	} catch (_gmailError) {
+		MailApp.sendEmail({
+			to: recipient,
+			subject: subject,
+			htmlBody: htmlBody,
+			body: textBody,
+			name: GAS_CONNECT_CONFIG.mailSenderName
+		});
+	}
+}
+
+function buildMailAuthorizationError_(error) {
+	const rawMessage = String((error && error.message) || error || 'Mail send failed');
+	const authHints = [
+		'https://www.googleapis.com/auth/script.send_mail',
+		'MailApp.sendEmail',
+		'ไม่ได้รับอนุญาต',
+		'Authorization is required'
+	];
+	const isAuthError = authHints.some((hint) => rawMessage.indexOf(hint) >= 0);
+	if (!isAuthError) {
+		return new Error(rawMessage);
+	}
+
+	return new Error(
+		'OTP send failed: missing mail permission. In Apps Script editor run function authorizeRequiredScopes() and approve permissions, then redeploy Web App (Execute as: Me). Original error: ' + rawMessage
+	);
+}
+
+function verifyEmailChangeOtp_(userId, otpCode, newEmail) {
+	const normalizedUserId = String(userId || '').trim();
+	const normalizedOtpCode = String(otpCode || '').trim();
+	if (!normalizedUserId || !normalizedOtpCode) {
+		throw new Error('userId and otpCode are required');
+	}
+
+	const spreadsheet = SpreadsheetApp.openById(GAS_CONNECT_CONFIG.sheetId);
+	const sheet = ensureUsersSheetInitialized_(spreadsheet);
+	const schema = ensureSheetHeaders_(sheet, GAS_CONNECT_USER_HEADERS);
+	const headerMap = schema.headerMap;
+	const user = findUserByIdInSheet_(sheet, schema, normalizedUserId);
+	if (!user) {
+		throw new Error('User not found');
+	}
+	if (normalizeUserStatus_(user.status) !== 'approved') {
+		throw new Error('Account is pending admin approval');
+	}
+
+	const row = sheet.getRange(user.rowIndex, 1, 1, schema.headers.length).getValues()[0];
+	const otpHash = String(getCellByHeader_(row, headerMap, 'emailChangeOtpHash') || '').trim();
+	const otpExpiresAt = String(getCellByHeader_(row, headerMap, 'emailChangeOtpExpiresAt') || '').trim();
+	if (!otpHash || sha256Text_(normalizedOtpCode) !== otpHash) {
+		throw new Error('OTP is invalid');
+	}
+	const otpExpiresAtMs = Date.parse(otpExpiresAt);
+	if (!Number.isFinite(otpExpiresAtMs) || otpExpiresAtMs < Date.now()) {
+		throw new Error('OTP has expired');
+	}
+
+	const nowIso = new Date().toISOString();
+	const linkExpiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+	setCellByHeader_(row, headerMap, 'pendingEmail', '__ANY_GOOGLE_EMAIL__');
+	setCellByHeader_(row, headerMap, 'pendingEmailLinkExpiresAt', linkExpiresAt);
+	setCellByHeader_(row, headerMap, 'emailChangeOtpHash', '');
+	setCellByHeader_(row, headerMap, 'emailChangeOtpExpiresAt', '');
+	setCellByHeader_(row, headerMap, 'updatedAt', nowIso);
+	sheet.getRange(user.rowIndex, 1, 1, schema.headers.length).setValues([row]);
+
+	return {
+		userId: normalizedUserId,
+		pendingEmail: '',
+		pendingByGoogleLoginOnly: true,
+		linkExpiresAt: linkExpiresAt,
+		message: 'OTP verified. Please log out and sign in with the target Google account before the link expires.'
+	};
+}
+
+function verifyGoogleIdToken_(idToken) {
+	const normalizedToken = String(idToken || '').trim();
+	if (!normalizedToken) {
+		throw new Error('idToken is required');
+	}
+
+	const tokeninfoUrl =
+		'https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(normalizedToken);
+	const response = UrlFetchApp.fetch(tokeninfoUrl, {
+		method: 'get',
+		muteHttpExceptions: true
+	});
+
+	const code = response.getResponseCode();
+	if (code !== 200) {
+		throw new Error('Invalid Google ID token (status ' + code + ')');
+	}
+
+	let tokenInfo;
+	try {
+		tokenInfo = JSON.parse(response.getContentText('utf-8'));
+	} catch (_error) {
+		throw new Error('Failed to parse token info from Google');
+	}
+
+	if (GAS_CONNECT_CONFIG.googleClientId && tokenInfo.aud !== GAS_CONNECT_CONFIG.googleClientId) {
+		throw new Error('Token audience mismatch');
+	}
+	if (String(tokenInfo.email_verified || '') !== 'true') {
+		throw new Error('Google email not verified');
+	}
+
+	const googleId = String(tokenInfo.sub || '').trim();
+	const email = String(tokenInfo.email || '').trim().toLowerCase();
+	const displayName = String(tokenInfo.name || tokenInfo.given_name || email).trim();
+	if (!googleId || !email) {
+		throw new Error('Missing required fields (sub, email) from Google token info');
+	}
+
+	return {
+		googleId: googleId,
+		email: email,
+		displayName: displayName
+	};
+}
+
+function findUserByIdInSheet_(sheet, schema, userId) {
+	const normalizedUserId = String(userId || '').trim();
+	if (!normalizedUserId) return null;
+
+	const headerMap = schema.headerMap;
+	const lastRow = sheet.getLastRow();
+	if (lastRow <= 1) return null;
+
+	const values = sheet.getRange(2, 1, lastRow - 1, schema.headers.length).getValues();
+	for (let i = 0; i < values.length; i++) {
+		const row = values[i];
+		if (String(getCellByHeader_(row, headerMap, 'userId') || '').trim() !== normalizedUserId) {
+			continue;
+		}
+		return {
+			rowIndex: i + 2,
+			userId: normalizedUserId,
+			username: String(getCellByHeader_(row, headerMap, 'username') || '').trim(),
+			displayName: String(getCellByHeader_(row, headerMap, 'displayName') || '').trim(),
+			googleId: String(getCellByHeader_(row, headerMap, 'googleId') || '').trim(),
+			role: normalizeUserRole_(getCellByHeader_(row, headerMap, 'role')),
+			status: normalizeUserStatus_(getCellByHeader_(row, headerMap, 'status'))
+		};
+	}
+
+	return null;
+}
+
+function clearEmailChangeStateInRow_(row, headerMap) {
+	setCellByHeader_(row, headerMap, 'emailChangeOtpHash', '');
+	setCellByHeader_(row, headerMap, 'emailChangeOtpExpiresAt', '');
+	setCellByHeader_(row, headerMap, 'pendingEmail', '');
+	setCellByHeader_(row, headerMap, 'pendingEmailLinkExpiresAt', '');
+}
+
+function getActivePendingEmailState_(row, headerMap) {
+	const pendingEmail = String(getCellByHeader_(row, headerMap, 'pendingEmail') || '').trim().toLowerCase();
+	const expiresAt = String(getCellByHeader_(row, headerMap, 'pendingEmailLinkExpiresAt') || '').trim();
+	const expiresAtMs = Date.parse(expiresAt);
+	const active = !!pendingEmail && Number.isFinite(expiresAtMs) && expiresAtMs >= Date.now();
+	return {
+		active: active,
+		pendingEmail: pendingEmail,
+		expiresAt: expiresAt
+	};
+}
+
+function generateOtpCode_() {
+	return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+function sha256Text_(text) {
+	const digest = Utilities.computeDigest(
+		Utilities.DigestAlgorithm.SHA_256,
+		String(text || ''),
+		Utilities.Charset.UTF_8
+	);
+	let out = '';
+	for (let i = 0; i < digest.length; i++) {
+		const v = (digest[i] + 256) % 256;
+		out += ('0' + v.toString(16)).slice(-2);
+	}
+	return out;
+}
+
+function isValidEmail_(email) {
+	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+}
+
+function normalizeUserRole_(value) {
+	const role = String(value || '').trim().toLowerCase();
+	if (role === 'admin') return 'admin';
+	return 'user';
+}
+
+function normalizeUserStatus_(value) {
+	const status = String(value || '').trim().toLowerCase();
+	if (status === 'pending') return 'pending';
+	if (status === 'approve' || status === 'approved') return 'approved';
+	return 'approved';
+}
+
+function requireApprovedUserById_(userId) {
+	const user = getUserById_(userId);
+	if (!user) {
+		throw new Error('User not found for userId: ' + String(userId || '').trim());
+	}
+	if (normalizeUserStatus_(user.status) !== 'approved') {
+		throw new Error('Account is pending admin approval');
+	}
+	return user;
+}
+
+function maskEmail_(email) {
+	const text = String(email || '').trim();
+	const parts = text.split('@');
+	if (parts.length !== 2) return text;
+	const local = parts[0];
+	if (local.length <= 2) {
+		return local.charAt(0) + '*@' + parts[1];
+	}
+	return local.slice(0, 2) + '***@' + parts[1];
 }
 
 function normalizePortfolioEntries_(entriesJsonText) {
@@ -732,10 +1662,7 @@ function savePortfolioBatch_(userId, effectiveDate, entriesJson, note, batchId) 
 		throw new Error('effectiveDate must be YYYY-MM-DD');
 	}
 
-	const user = getUserById_(normalizedUserId);
-	if (!user) {
-		throw new Error('User not found for userId: ' + normalizedUserId);
-	}
+	const user = requireApprovedUserById_(normalizedUserId);
 
 	const normalizedEntries = normalizePortfolioEntries_(entriesJson);
 	const spreadsheet = SpreadsheetApp.openById(GAS_CONNECT_CONFIG.sheetId);
@@ -832,6 +1759,7 @@ function updatePortfolioBatch_(changeId, userId, effectiveDate, entriesJson, not
 	}
 
 	const normalizedEntries = normalizePortfolioEntries_(entriesJson);
+	const user = requireApprovedUserById_(normalizedUserId);
 	const spreadsheet = SpreadsheetApp.openById(GAS_CONNECT_CONFIG.sheetId);
 	const sheet = ensurePortfolioSheetInitialized_(spreadsheet);
 	const schema = ensureSheetHeaders_(sheet, [
@@ -857,6 +1785,9 @@ function updatePortfolioBatch_(changeId, userId, effectiveDate, entriesJson, not
 		setCellByHeader_(row, headerMap, 'changeId', 'PC' + String(Date.now()));
 	}
 	setCellByHeader_(row, headerMap, 'batchId', String(batchId || '').trim() || String(getCellByHeader_(row, headerMap, 'batchId') || ''));
+	if (user && String(user.username || '').trim()) {
+		setCellByHeader_(row, headerMap, 'username', String(user.username || '').trim());
+	}
 	setCellByHeader_(row, headerMap, 'effectiveDate', normalizedDate);
 	setCellByHeader_(row, headerMap, 'entriesJson', JSON.stringify(normalizedEntries));
 	setCellByHeader_(row, headerMap, 'note', normalizedNote);
@@ -880,6 +1811,7 @@ function deletePortfolioBatch_(changeId, userId) {
 	if (!normalizedChangeId || !normalizedUserId) {
 		throw new Error('changeId and userId are required');
 	}
+	requireApprovedUserById_(normalizedUserId);
 
 	const spreadsheet = SpreadsheetApp.openById(GAS_CONNECT_CONFIG.sheetId);
 	const sheet = ensurePortfolioSheetInitialized_(spreadsheet);
@@ -915,6 +1847,7 @@ function getPortfolioHistory_(userId, limit) {
 	if (!normalizedUserId) {
 		throw new Error('userId is required');
 	}
+	requireApprovedUserById_(normalizedUserId);
 
 	const spreadsheet = SpreadsheetApp.openById(GAS_CONNECT_CONFIG.sheetId);
 	const sheet = ensurePortfolioSheetInitialized_(spreadsheet);

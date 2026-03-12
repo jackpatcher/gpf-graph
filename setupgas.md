@@ -102,6 +102,31 @@ const GAS_PAGE_LIMIT = 5000;
 - เรียก Web App ไม่ได้
   - ตรวจสิทธิ์ deployment ว่าอนุญาตให้เข้าถึง URL ได้
 
+- Error: `คุณไม่ได้รับอนุญาตให้เรียกใช้ MailApp.sendEmail` หรือ `script.send_mail`
+  - ไปที่ Apps Script editor แล้วรันฟังก์ชัน `authorizeRequiredScopes` 1 ครั้ง
+  - กด `Review permissions` และ `Allow` ให้ครบ
+  - จากนั้น `Deploy > Manage deployments > Edit > Deploy` (redeploy เวอร์ชันล่าสุด)
+  - ทดสอบส่ง OTP ใหม่อีกครั้ง
+
+## 11) OTP Mail Permission (สำคัญ)
+
+สำหรับฟีเจอร์เปลี่ยนอีเมลด้วย OTP ระบบใช้ `MailApp.sendEmail` จึงต้อง authorize scope ส่งเมลก่อนใช้งานจริง:
+
+1. เปิดโปรเจกต์ Apps Script เดียวกับที่ deploy Web App
+2. เลือกฟังก์ชัน `authorizeRequiredScopes`
+3. กด `Run` และอนุญาตสิทธิ์ทั้งหมด
+4. Redeploy Web App (Execute as = Me)
+
+ถ้าใช้ manifest (`appsscript.json`) ให้ตรวจว่ามี scope นี้ด้วย:
+
+```json
+"oauthScopes": [
+  "https://www.googleapis.com/auth/script.external_request",
+  "https://www.googleapis.com/auth/spreadsheets",
+  "https://www.googleapis.com/auth/script.send_mail"
+]
+```
+
 ## Quick Checklist
 
 - [ ] สร้าง Google Sheet และได้ `SHEET_ID`
